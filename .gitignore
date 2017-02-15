@@ -40,7 +40,7 @@ jspm_packages
 .node_repl_history
 
 # Java libraries
-java/libs
+java/libs/*.jar
 
 # Compiled Java
 *.class
