@@ -22,13 +22,23 @@ import soot.options.Options;
 
 public class DataflowAnalysis {
 
-    public String analyze(String classpath, String javaSourceFile) {
+    private String mClasspath;
 
-        // The way that this is getting called, it's easier to pass the
-        // classpath in from the caller that to introspect the System
-        // a second time.  Keeps code less brittle too.
+    /**
+     * @param pClasspath Additional classpath beyond the default
+     *     classpath to look for Soot JARs and the file to analyze.
+     */
+    public DataflowAnalysis(String pClasspath) {
+        String classpath = Scene.v().defaultClassPath();
+        if (pClasspath == null) {
+            classpath += ":.";
+        } else {
+            classpath += (":" + classpath);
+        }
         Options.v().set_soot_classpath(classpath);
-        System.out.println(classpath);
+    }
+
+    public String analyze(String javaSourceFile) {
 
         String[] args = new String[] {
             // Run analysis on a Java source code file with this name
@@ -78,11 +88,8 @@ public class DataflowAnalysis {
     }
 
     public static void main(String[] args) {
-        DataflowAnalysis analysis = new DataflowAnalysis();
-        System.out.println(analysis.analyze(
-            Scene.v().defaultClassPath() + ":.:tests/",
-            "Example"
-        ));
+        DataflowAnalysis analysis = new DataflowAnalysis("tests/");
+        System.out.println(analysis.analyze("Example"));
     }
 
 }
