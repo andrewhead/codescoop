@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Create example from selection",
+        "command": "examplify:make-example-code"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Examplify",
+          "submenu": [
+            {
+              "label": "Create example from selection",
+              "command": "examplify:make-example-code"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

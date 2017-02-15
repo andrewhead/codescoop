@@ -1,0 +1,27 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+
+.examplify {
+}
+
+@import "syntax-variables";
+@import "ui-variables";
+// @blue-color: @syntax-color-renamed;
+
+atom-text-editor .highlight-hide .region {
+  color: #fff;
+  background-color: @syntax-background-color;
+  opacity: .8;
+  z-index: 100;
+}
+
+div.line.unchosen {
+  opacity: .5;
+}
+
+div.line.chosen {
+  opacity: 1;
+}
