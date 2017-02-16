@@ -51,9 +51,14 @@ public class DataflowAnalysis {
         if (pClasspath == null) {
             classpath += ":.";
         } else {
-            classpath += (":" + classpath);
+            classpath += (":" + pClasspath);
         }
-        Options.v().set_soot_classpath(classpath);
+        this.mClasspath = classpath;
+        Options.v().set_soot_classpath(this.mClasspath);
+    }
+
+    public String getClasspath() {
+        return this.mClasspath;
     }
 
     public Set<SymbolAppearance> getDefinitions() {
