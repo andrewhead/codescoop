@@ -60,6 +60,66 @@ public class DataflowAnalysis {
         return this.mDefinitions;
     }
 
+    public SymbolAppearance getLatestDefinitionBeforeUse(SymbolAppearance use) {
+
+        Map<String, Set<SymbolAppearance>> definitionsByName = this.getDefinitionsBySymbolName();
+        Set<SymbolAppearance> definitions = definitionsByName.get(use.getSymbolName());
+        SymbolAppearance latestDefinition = null;
+
+        // The latest definition is the one that occurs at the highest line index
+        // and also before the symbol's use
+        if (definitions != null) {
+            for (SymbolAppearance definition: definitions) {
+                if (definition.getLineNumber() < use.getLineNumber() && (
+                        latestDefinition == null ||
+                        definition.getLineNumber() > latestDefinition.getLineNumber())) {
+                    latestDefinition = definition;
+                }
+            }
+        }
+
+        return latestDefinition;
+    }
+
+    public Set<SymbolAppearance> getUndefinedUsesInLines(List<Integer> lines) {
+
+        Map<String, Set<SymbolAppearance>> definitionsByName = this.getDefinitionsBySymbolName();
+        Map<Integer, Set<SymbolAppearance>> usesByLine = this.getUsesByLine();
+        Set<SymbolAppearance> undefinedUses = new HashSet<SymbolAppearance>();
+
+        // Look at all uses on all lines
+        for (int line: lines) {
+            Set<SymbolAppearance> usesOnLine = usesByLine.get(line);
+            if (usesOnLine != null) {
+                for (SymbolAppearance use: usesOnLine) {
+
+                    // For each use, check if the symbol is defined on a line that is
+                    // 1. within the set of included lines
+                    // 2. before the line on which the symbol is used
+                    boolean useDefined = false;
+                    Set<SymbolAppearance> definitions = definitionsByName.get(use.getSymbolName());
+                    if (definitions != null) {
+                        for (SymbolAppearance definition: definitions) {
+                            if (lines.contains(definition.getLineNumber()) &&
+                                    definition.getLineNumber() < line) {
+                                useDefined = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!useDefined) {
+                        undefinedUses.add(use);
+                    }
+
+                }
+            }
+        }
+
+        return undefinedUses;
+
+    }
+
     public Set<String> getSymbolsDefinedInLines(List<Integer> lines) {
 
         Map<Integer, Set<SymbolAppearance>> definitionsByLine = this.getDefinitionsByLine();
@@ -103,6 +163,27 @@ public class DataflowAnalysis {
 
     }
 
+    public Map<Integer, Set<SymbolAppearance>> getUsesByLine() {
+        
+        Set<SymbolAppearance> uses = this.getUses();
+
+        HashMap<Integer, Set<SymbolAppearance>> linesToUses = (
+            new HashMap<Integer, Set<SymbolAppearance>>());
+
+        for (SymbolAppearance use: uses) {
+            int lineNumber = use.getLineNumber();
+            Set<SymbolAppearance> lineUses = linesToUses.get(lineNumber);
+            if (lineUses == null) {
+                lineUses = new HashSet<SymbolAppearance>();
+                linesToUses.put(lineNumber, lineUses);
+            }
+            lineUses.add(use);
+        }
+
+        return linesToUses;
+
+    }
+
     public Map<Integer, Set<SymbolAppearance>> getDefinitionsByLine() {
         
         Set<SymbolAppearance> definitions = this.getDefinitions();
@@ -135,7 +216,7 @@ public class DataflowAnalysis {
         return positionTag;
     }
 
-    public String analyze(String javaSourceFile) {
+    public void analyze(String javaSourceFile) {
 
         String[] args = new String[] {
             // Run analysis on a Java source code file with this name
@@ -238,13 +319,11 @@ public class DataflowAnalysis {
 
         soot.Main.main(args);
 
-        return "Hi";
-
     }
 
     public static void main(String[] args) {
         DataflowAnalysis analysis = new DataflowAnalysis("tests/");
-        System.out.println(analysis.analyze("Example"));
+        analysis.analyze("Example");
     }
 
 }

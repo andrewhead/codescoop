@@ -29,6 +29,11 @@ public class SymbolAppearance {
         return this.mEndPosition;
     }
 
+    public String toString() {
+        return ("(" + this.getSymbolName() + ", L" + this.getLineNumber() + " [" +
+                this.getStartPosition() + ", " + this.getEndPosition() + "])");
+    }
+
     public boolean equals(Object other) {
         if (!(other instanceof SymbolAppearance)) {
             return false;
