@@ -21,8 +21,8 @@ public class DataflowAnalysisTest {
         if (!setUpComplete) {
             dataflowAnalysis = new DataflowAnalysis("tests/");
             dataflowAnalysis.analyze("Example");
+            setUpComplete = true;
         }
-        setUpComplete = true;
     }
 
     @Test
@@ -223,8 +223,6 @@ public class DataflowAnalysisTest {
         definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
             new SymbolAppearance("x", 5, 4, 5));
         assertNull(definition);
-        
-
 
     }
 

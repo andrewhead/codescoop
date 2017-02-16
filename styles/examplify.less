@@ -11,18 +11,38 @@
 @import "ui-variables";
 // @blue-color: @syntax-color-renamed;
 
-atom-text-editor .highlight-hide .region {
-  color: #fff;
-  background-color: @syntax-background-color;
-  opacity: .8;
-  z-index: 100;
-}
-
 div.line.unchosen {
   opacity: .5;
 }
 
 atom-text-editor .highlight.undefined-use .region {
-  color: #fff;
   background-color: @syntax-color-removed;
+  opacity: .8;
+}
+
+div.line.unchosen.definition {
+  opacity: 1;
+}
+
+atom-text-editor div.line.definition span {
+  background-color: @syntax-color-renamed;
+  opacity: 1;
+}
+
+.definition-overlay {
+  // background-color: @tool-panel-background-color;
+  background-color: @background-color-warning;
+  border-color: @tool-panel-border-color;
+  color: @text-color-highlight;
+  padding: @component-padding;
+  font-family: @font-family;
+}
+
+.pick-overlay {
+  // background-color: @tool-panel-background-color;
+  background-color: @background-color-info;
+  border-color: @tool-panel-border-color;
+  color: @text-color-highlight;
+  padding: @component-padding;
+  font-family: @font-family;
 }

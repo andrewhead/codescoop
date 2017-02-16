@@ -8,13 +8,14 @@ import java.util.Set;
 
 import soot.Body;
 import soot.BodyTransformer;
+import soot.G;
+import soot.Local;
 import soot.Main;
 import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
 import soot.Unit;
 import soot.ValueBox;
-import soot.Local;
 
 import soot.options.Options;
 
@@ -47,6 +48,8 @@ public class DataflowAnalysis {
      *     classpath to look for Soot JARs and the file to analyze.
      */
     public DataflowAnalysis(String pClasspath) {
+
+        // Set up the path, including user-provided additions
         String classpath = Scene.v().defaultClassPath();
         if (pClasspath == null) {
             classpath += ":.";
@@ -54,7 +57,11 @@ public class DataflowAnalysis {
             classpath += (":" + pClasspath);
         }
         this.mClasspath = classpath;
-        Options.v().set_soot_classpath(this.mClasspath);
+
+        // Initialize intermediate data structures for saving definitions and uses
+        this.mDefinitions = new HashSet<SymbolAppearance>();
+        this.mUses = new HashSet<SymbolAppearance>();
+
     }
 
     public String getClasspath() {
@@ -223,6 +230,13 @@ public class DataflowAnalysis {
 
     public void analyze(String javaSourceFile) {
 
+        // It's important to do these two steps at the beginning of this method,
+        // every time analyze is called, because at the end of the last run,
+        // the Soot environment has been reset (`G.reset()`)
+        Options.v().set_soot_classpath(this.mClasspath);
+        PackManager.v().getPack("jtp").add(new Transform("jtp.myTransform", analyzer));
+
+        // Arguments for configuring Soot to provide useful IR
         String[] args = new String[] {
             // Run analysis on a Java source code file with this name
             javaSourceFile,
@@ -245,90 +259,107 @@ public class DataflowAnalysis {
             "-f", "none"
         };
 
-        this.mDefinitions = new HashSet<SymbolAppearance>();
-        this.mUses = new HashSet<SymbolAppearance>();
+        // Reset the definitions and uses
+        DataflowAnalysis.this.mDefinitions = new HashSet<SymbolAppearance>();
+        DataflowAnalysis.this.mUses = new HashSet<SymbolAppearance>();
 
-        final Set<SymbolAppearance> definitions = this.mDefinitions;
-        final Set<SymbolAppearance> uses = this.mUses;
+        // Run the analysis!
+        soot.Main.main(args);
 
-        PackManager.v().getPack("jtp").add(
-            new Transform("jtp.myTransform", new BodyTransformer() {
-                protected void internalTransform(Body body, String phase, Map options) {
+        // This `reset` lets us run the analyze method again.
+        // To my knowledge, it also clobbers all of the environmental setup.
+        G.reset();
 
-                    UnitGraph graph = new CompleteUnitGraph(body);
+    }
 
-                    // Save all local definition.  Visit every unit looking for
-                    // a definition of eachl local.  If one was found, and that symbol
-                    // corresponds to something in the original source, save a record
-                    // of the definition of that symbol.
-                    LocalDefs defs = new SimpleLocalDefs(graph);
+    /**
+     * For some crazy reason, this is run twice whenever soot.Main.main is invoked.
+     * And the second time through, it looks like the iterators are exhausted,
+     * or the body is empty.  Because of this, I don't reset the definitions and uses
+     * inside of the analyzer but outside of it, to make sure that the data is saved
+     * from the first round, and not clobbered by a no-op second pass.
+     */
+    private BodyTransformer analyzer = new BodyTransformer() {
 
-                    for (Local local: body.getLocals()) {
+        @SuppressWarnings("rawtypes")
+        protected void internalTransform(Body body, String phase, Map options) {
 
-                        for (Unit unit: body.getUnits()) {
-                            try {
-                                List<Unit> defUnits = defs.getDefsOfAt(local, unit);
-                                for (Unit defUnit: defUnits) {
-                                        SourceLnNamePosTag positionTag = (
-                                            getSourceLnNamePosTag(defUnit.getTags()));
-                                        if (positionTag != null) {
-                                        SymbolAppearance definition = new SymbolAppearance(
-                                            local.getName(),
-                                            positionTag.startLn(),
-                                            positionTag.startPos(),
-                                            positionTag.endPos()
-                                        );
-                                        definitions.add(definition);
-                                    }
+            Set<SymbolAppearance> definitions = DataflowAnalysis.this.mDefinitions;
+            Set<SymbolAppearance> uses = DataflowAnalysis.this.mUses;
 
-                                }
-                            } catch (RuntimeException runtimeException) {
-                                // A RuntimeException is thrown when no definition found in a unit.
-                                // This is expected to happen many times.  Just ignore it.
-                            }
-                        }
-                    }
+            // Make a control flow graph through the program
+            UnitGraph graph = new CompleteUnitGraph(body);
 
-                    // To find the uses of each variable, we're going to iterate through the uses
-                    // for all of the units and just save every local that was used.
-                    LocalUses localUses = new SimpleLocalUses(graph, defs);
+            // Save all local definition.  Visit every unit looking for
+            // a definition of eachl local.  If one was found, and that symbol
+            // corresponds to something in the original source, save a record
+            // of the definition of that symbol.
+            LocalDefs defs = new SimpleLocalDefs(graph);
 
-                    for (Unit unit: body.getUnits()) {
+            for (Local local: body.getLocals()) {
 
-                        List usesAtUnit = localUses.getUsesOf(unit);
-                        @SuppressWarnings("unchecked")
-                        List<UnitValueBoxPair> unitValueBoxPairs = (List<UnitValueBoxPair>) usesAtUnit;
-
-                        for (UnitValueBoxPair unitValueBoxPair: unitValueBoxPairs) {
-
-                            Unit localUnit = unitValueBoxPair.getUnit();
-                            ValueBox localValueBox = unitValueBoxPair.getValueBox();
-
-                            SourceLnNamePosTag positionTag = (
-                                getSourceLnNamePosTag(localValueBox.getTags()));
-                            if (positionTag != null) {
-                                SymbolAppearance use = new SymbolAppearance(
-                                    localValueBox.getValue().toString(),
+                for (Unit unit: body.getUnits()) {
+                    try {
+                        List<Unit> defUnits = defs.getDefsOfAt(local, unit);
+                        for (Unit defUnit: defUnits) {
+                                SourceLnNamePosTag positionTag = (
+                                    getSourceLnNamePosTag(defUnit.getTags()));
+                                if (positionTag != null) {
+                                SymbolAppearance definition = new SymbolAppearance(
+                                    local.getName(),
                                     positionTag.startLn(),
                                     positionTag.startPos(),
                                     positionTag.endPos()
                                 );
-                                uses.add(use);
+                                definitions.add(definition);
                             }
 
                         }
+                    } catch (RuntimeException runtimeException) {
+                        // A RuntimeException is thrown when no definition found in a unit.
+                        // This is expected to happen many times.  Just ignore it.
                     }
                 }
             }
-        ));
 
-        soot.Main.main(args);
+            // To find the uses of each variable, we're going to iterate through the uses
+            // for all of the units and just save every local that was used.
+            LocalUses localUses = new SimpleLocalUses(graph, defs);
 
-    }
+            for (Unit unit: body.getUnits()) {
+
+                List usesAtUnit = localUses.getUsesOf(unit);
+                @SuppressWarnings("unchecked")
+                List<UnitValueBoxPair> unitValueBoxPairs = (List<UnitValueBoxPair>) usesAtUnit;
+
+                for (UnitValueBoxPair unitValueBoxPair: unitValueBoxPairs) {
+
+                    Unit localUnit = unitValueBoxPair.getUnit();
+                    ValueBox localValueBox = unitValueBoxPair.getValueBox();
+
+                    SourceLnNamePosTag positionTag = (
+                        getSourceLnNamePosTag(localValueBox.getTags()));
+                    if (positionTag != null) {
+                        SymbolAppearance use = new SymbolAppearance(
+                            localValueBox.getValue().toString(),
+                            positionTag.startLn(),
+                            positionTag.startPos(),
+                            positionTag.endPos()
+                        );
+                        uses.add(use);
+                    }
+
+                }
+            }
+            DataflowAnalysis.this.mDefinitions = definitions;
+            DataflowAnalysis.this.mUses = uses;
+        }
+    };
 
     public static void main(String[] args) {
         DataflowAnalysis analysis = new DataflowAnalysis("tests/");
         analysis.analyze("Example");
     }
+
 
 }
