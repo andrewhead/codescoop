@@ -11,7 +11,13 @@
 @import "ui-variables";
 // @blue-color: @syntax-color-renamed;
 
+/*
 div.line.unchosen {
+  opacity: .5;
+}
+*/
+
+atom-text-editor div.line {
   opacity: .5;
 }
 
@@ -20,7 +26,7 @@ atom-text-editor .highlight.undefined-use .region {
   opacity: .8;
 }
 
-div.line.unchosen.definition {
+div.line.chosen, div.line.definition {
   opacity: 1;
 }
 
