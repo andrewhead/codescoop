@@ -23,28 +23,34 @@ import java.util.Scanner;
 public class VariableTracer {
 
     /**
-     * @param args args[0] is a class name of the class you want tor un.
+     * @param args args[0] is a class name of the class you want to run.
      *      The class that this code analyzes need to be compiled with the `-g` flag, to preserve
      *      debugging symbols.  Otherwise, it will be impossible to find out what variables are on the
-     *      stack when this utility steps through the class's code.
+     *      stack when this utility steps through the class's code.  args[1] is the classpath that
+     *      points to the class you want to run.
      */
     public static void main(String[] args) {
 
         String className = args[0];
+        String classpath = "";
+        if (args.length > 1) {
+            classpath = args[1];
+        }
         VariableTracer tracer = new VariableTracer();
 
         try {
-            tracer.run(className);
+            tracer.run(className, classpath);
         } catch (ClassNotFoundException exception) {
             System.out.println("Main class " + className + " could not be found when launching " +
-                    "the VM. Check your classpath.");
+                    "the VM. Check that your second argument (classpath) points to your class.");
         }
 
     }
 
-    public Map<String, Map<Integer, Map<String, Value>>> run(String className) throws ClassNotFoundException {
+    public Map<String, Map<Integer, Map<String, Value>>> run(
+            String className, String classpath) throws ClassNotFoundException {
 
-        VirtualMachine vm = launchVirtualMachine(className);
+        VirtualMachine vm = launchVirtualMachine(className, classpath);
         return runCode(vm);
 
     }
@@ -86,7 +92,7 @@ public class VariableTracer {
 
     }
 
-    public VirtualMachine launchVirtualMachine(String className) {
+    public VirtualMachine launchVirtualMachine(String className, String classpath) {
 
         LaunchingConnector connector = findLaunchingConnector();
 
@@ -94,6 +100,11 @@ public class VariableTracer {
         Map<String, Connector.Argument> arguments = connector.defaultArguments();
         Connector.Argument mainArg = arguments.get("main");
         mainArg.setValue(className);
+
+        // REUSE: This classpath trick is thanks to the Stack Overflow tip
+        // http://stackoverflow.com/questions/27140409/how-do-i-specify-the-classpath-for-a-jdi-launching-connector-using-eclipse
+        Connector.Argument options = arguments.get("options");
+        options.setValue("-cp " + classpath);
 
         // And launch the VM!
         try {

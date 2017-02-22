@@ -18,7 +18,7 @@ public class VariableTracerTest {
         boolean exceptionThrown = false;
 
         try {
-            variableTracer.run("NonexistentClass");
+            variableTracer.run("NonexistentClass", "tests/");
         } catch (ClassNotFoundException exception) {
             exceptionThrown = true;
         }
@@ -37,7 +37,7 @@ public class VariableTracerTest {
         // 2. Line number
         // 3. Variable name
         // TODO: Save multiple values when function run multiple times
-        Map<String, Map<Integer, Map<String, Value>>> values = variableTracer.run("Example");
+        Map<String, Map<Integer, Map<String, Value>>> values = variableTracer.run("Example", "tests/");
 
         // Check on line 6 values (j shouldn't be assigned yet)
         assertEquals(1, ((IntegerValue) values.get("Example.java").get(6).get("i")).value());

@@ -17,7 +17,4 @@ javac -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. *.java
 javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. tests/*.java
 
 # Discover and run tests
-# XXX: I'm not sure why, but if I use the -cp argument instead of the $CLASSPATH variable, it's
-# impossible for the VariableTracer test to find the Example class
-TEST_CLASSPATH=$JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$TESTS_DIR/
-CLASSPATH=$TEST_CLASSPATH java org.junit.runner.JUnitCore $TEST_CLASSES
+java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:tests/:. org.junit.runner.JUnitCore $TEST_CLASSES
