@@ -25,7 +25,7 @@ public class Main {
     }
 
     private class QueryResult {
-        
+
         public int getSize() {
             return 0;
         }
@@ -58,7 +58,7 @@ public class Main {
         private String title;
         private int year;
         private int numPages;
-        
+
         public int getId() { return id; }
         public String getTitle() { return title; }
         public int getYear() { return year; }
@@ -82,28 +82,28 @@ public class Main {
 
         Booklist booklist = new Booklist();
         List titles = new ArrayList();
-        
+
         try {
-        
+
             String query = "SELECT id, title, year, num_pages FROM table WHERE title LIKE '%" + genre + "%'";
             QueryResult queryResult = database.query(query);
             boolean finished = false;
-            
+
             if (queryResult.getSize() > 0) {
-                
+
                 int rowNumber = 0;
                 while (!finished) {
-                
+
                     Row[] records = queryResult.getRecords();
-                    
+
                     for (int i = 0; i < Math.min(records.length, max_books); ++i) {
-                    
+
                         Book book = (Book)records[i];
                         int id = book.getId();
                         String title = book.getTitle();
                         int year = book.getYear();
                         int num_pages = book.getNumPages();
-                        
+
                         if (title != null) {
                             titles.add(title);
                         }
@@ -113,13 +113,13 @@ public class Main {
                                 booklist.hasBestseller = bestseller;
                             }
                         }
-                        
+
                         if (DEBUG) {
                             System.out.println("Fetched book: " + title + "(" + genre + ")");
                         }
-                        
+
                         rowNumber++;
-                        
+
                         if (queryResult.isDone() || rowNumber >= max_books) {
                             finished = true;
                         } else {
@@ -127,18 +127,18 @@ public class Main {
                         }
 
                     }
-                 }       
+                 }
             } else {
                 System.out.println("Hello world!");
             }
-        
+
         } catch (ConnectionException exception) {
             exception.printStackTrace();
         }
-        
+
         booklist.titles = titles;
         return booklist;
-        
+
     }
 
     public static void main(String[] args) {

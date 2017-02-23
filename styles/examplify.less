@@ -17,17 +17,21 @@ div.line.unchosen {
 }
 */
 
-atom-text-editor div.line {
-  opacity: .5;
-}
-
 atom-text-editor .highlight.undefined-use .region {
   background-color: @syntax-color-removed;
   opacity: .8;
 }
 
-div.line.chosen, div.line.definition {
-  opacity: 1;
+atom-text-editor div.line {
+  &.chosen {
+    opacity: 1;
+  }
+  &.unchosen {
+    opacity: .5;
+    &.definition {
+      opacity: 1;
+    }
+  }
 }
 
 atom-text-editor div.line.definition span {
@@ -51,4 +55,24 @@ atom-text-editor div.line.definition span {
   color: @text-color-highlight;
   padding: @component-padding;
   font-family: @font-family;
+}
+
+div.definition-option {
+
+  &.disabled {
+    color: @text-color-subtle;
+    text-decoration: line-through;
+  }
+
+  &:not(:last-of-type) {
+    padding-right: .5em;
+    border-right: 1px white dashed;
+  }
+
+  &:not(:first-of-type) {
+    padding-left: .5em;
+  }
+
+  float: left;
+
 }

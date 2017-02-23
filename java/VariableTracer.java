@@ -38,11 +38,26 @@ public class VariableTracer {
         }
         VariableTracer tracer = new VariableTracer();
 
+        Map<String, Map<Integer, Map<String, Value>>> values = null;
         try {
-            tracer.run(className, classpath);
+            values = tracer.run(className, classpath);
         } catch (ClassNotFoundException exception) {
             System.out.println("Main class " + className + " could not be found when launching " +
                     "the VM. Check that your second argument (classpath) points to your class.");
+        }
+
+        if (values != null) {
+            for (String sourceFilename: values.keySet()) {
+                Map<Integer, Map<String, Value>> lineValues = values.get(sourceFilename);
+                for (int lineNumber: lineValues.keySet()) {
+                    Map<String, Value> variableValues = lineValues.get(lineNumber);
+                    for (String variableName: variableValues.keySet()) {
+                        Value value = variableValues.get(variableName);
+                        System.out.println(sourceFilename + "," + Integer.toString(lineNumber) +
+                                "," + variableName + "," + value);
+                    }
+                }
+            }
         }
 
     }
