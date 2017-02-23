@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class StepperThread extends Thread {
 
-    private String[] STANDARD_PACKAGES = {"java.*", "javax.*", "sun.*", "com.sun.*"};
+    private String[] STANDARD_PACKAGES = {"java/", "javax/", "sun/", "com/sun/"};
     private final VirtualMachine vm;
     private boolean connected = true;  // Connected to VM
     private Map<String, Map<Integer, Map<String, Value>>> values;
@@ -26,16 +26,12 @@ public class StepperThread extends Thread {
         this.vm = vm;
         this.values = values;
 
-        // Prepare the first event: the initial method entry
-        EventRequestManager mgr = vm.eventRequestManager();
-        MethodEntryRequest menr = mgr.createMethodEntryRequest();
-        menr.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        // We should only have to look at classes outside the standard library
-        // to find the one with the main.  Just skip the others.
-        for (String standardPackage: STANDARD_PACKAGES) {
-            menr.addClassExclusionFilter(standardPackage);
-        }
-        menr.enable();
+        // Just listen for the first method entry.  Then we step the rest of the way
+        // through the program (making sure to stop listening for method entries).
+        EventRequestManager requestManager = vm.eventRequestManager();
+        MethodEntryRequest methodEntryRequest = requestManager.createMethodEntryRequest();
+        methodEntryRequest.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+        methodEntryRequest.enable();
 
     }
 
@@ -51,48 +47,42 @@ public class StepperThread extends Thread {
         }
     }
 
-    private void requestStep(ThreadReference threadReference) {
+    private void requestStep(ThreadReference threadReference, int stepDirection) {
 
         // Clear out all existing step requests (should mostly be past requests).
-	EventRequestManager mgr = vm.eventRequestManager();
-        List<StepRequest> steps = new ArrayList<StepRequest>(mgr.stepRequests()); 
-        for (StepRequest stepRequest: steps) { 
+	EventRequestManager requestManager = vm.eventRequestManager();
+        List<StepRequest> stepRequests = new ArrayList<StepRequest>(requestManager.stepRequests()); 
+        for (StepRequest stepRequest: stepRequests) { 
             if (stepRequest.thread().equals(threadReference)) { 
-                mgr.deleteEventRequest(stepRequest); 
+                requestManager.deleteEventRequest(stepRequest); 
             } 
         } 
 
         // Now request another step.
-        mgr = vm.eventRequestManager();
-        StepRequest sr = mgr.createStepRequest(
+        StepRequest stepRequest = requestManager.createStepRequest(
             threadReference,
             StepRequest.STEP_LINE,
-            StepRequest.STEP_INTO
+            stepDirection
         );
-        sr.addCountFilter(1);
-
-	// Only pay attention to classes that don't come from the standard library
-        // This step has to be completed before we "enable" the request.
-        for(String standardPackage: STANDARD_PACKAGES) {
-            sr.addClassExclusionFilter(standardPackage);
-        }
-
-        sr.enable();
+        stepRequest.addCountFilter(1);
+        stepRequest.enable();
 
     }
 
-    // Forward event for thread specific processing
     private void handleMethodEntry(MethodEntryEvent event)  {
 
-        // "main" is my crude attempt to make sure we only start stepping through
-        // the code at the beginning of the program.  I have also tried loading in
-        // the first step after ThreadStartEvent or VMStartEvent, and neither of
-        // these seem to work, so we're going with this.
-        if (event.method().name().equals("main")) {
-            requestStep(event.thread());
-        }
-
+        // As soon as we enter any method, start the process of stepping from line to line.
         // Note: if we want to step through the program, DON'T resume the VM
+        requestStep(event.thread(), StepRequest.STEP_INTO);
+
+        // Another critical step is to stop listening for method entry events.
+        // These events will interrupt our stepping through the program.
+	EventRequestManager requestManager = vm.eventRequestManager();
+        List<MethodEntryRequest> entryRequests = (
+                new ArrayList<MethodEntryRequest>(requestManager.methodEntryRequests())); 
+        for (MethodEntryRequest entryRequest: entryRequests) {
+            entryRequest.disable();
+        }
 
     }
 
@@ -204,8 +194,32 @@ public class StepperThread extends Thread {
 	    }
 	}
 
-        // Prepare the next step through the program
-        requestStep(event.thread());
+        // The next few lines are what make it feasible to just step over all of the
+        // code without taking way too long.  We keep stepping "into" the code, as long
+        // as we don't hit the standard libraries.  As soon as we hit the standard libraries,
+        // we step out until we're no longer in the standard libraries.  This keeps the
+        // focus only on user-written code.
+        int stepDirection = StepRequest.STEP_INTO;
+
+        // Gets a path that looks like a package path but with slashes. See:
+        // https://docs.oracle.com/javase/7/docs/jdk/api/jpda/jdi/com/sun/jdi/ReferenceType.html#sourcePaths(java.lang.String)
+        String sourcePath = null;
+        try {
+            sourcePath = event.location().declaringType().sourcePaths("Java").get(0);
+        } catch (AbsentInformationException absentInformationException) {}
+
+        // Check to see if the source path is one of the standard libraries.
+        // If so, we need to step out to keep from stepping in unnecessary code.
+        if (sourcePath != null) {
+            for (String standardPackagePrefix: STANDARD_PACKAGES) {
+                if (sourcePath.startsWith(standardPackagePrefix)) {
+                    stepDirection = StepRequest.STEP_OUT;
+                }
+            }
+        }
+
+        // Finally, prepare the next step through the program
+        requestStep(event.thread(), stepDirection);
 
     }
 

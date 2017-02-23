@@ -6,7 +6,7 @@ import java.lang.Math;
 public class Main {
 
     private Database database;
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public Main() {
         this.database = new Database();
@@ -14,32 +14,75 @@ public class Main {
 
     private class Database {
 
+        private boolean mQueryDone = false;
+        private int QUERY_RESULT_SIZE = 2;
+
+        // Based on "Classic Books" list from
+        // https://www.abebooks.com/books/features/50-classic-books.shtml
+        // All page numbers are estimates.
+        private Row[] records = {
+            new Book(1, "Lord of the Flies", 1954, 250),
+            new Book(2, "Lorna Doone", 1869, 200),
+            new Book(3, "Daphne de Maurier", 1936, 330)
+        };
+
+        private List getRowList(int start, int length) {
+            if (start + length > records.length) {
+                length = 1;
+            }
+            ArrayList rowList = new ArrayList();
+            for (int i = 0; i < length; i++) {
+                rowList.add(records[start + i]);
+            }
+            return rowList;
+        }
+
+        private boolean hasMore(int start, int length) {
+            return (start + length) < records.length;
+        }
+
         public QueryResult query(String query) throws ConnectionException {
-            return new QueryResult();
+            return new QueryResult(
+                getRowList(0, QUERY_RESULT_SIZE),
+                hasMore(0, QUERY_RESULT_SIZE)
+            );
         }
 
         public QueryResult queryMore(int queryLocator) {
-            return new QueryResult();
+            return new QueryResult(
+                getRowList(queryLocator, QUERY_RESULT_SIZE),
+                hasMore(queryLocator, QUERY_RESULT_SIZE)
+            );
         }
 
     }
 
     private class QueryResult {
 
+        private final int BATCH_SIZE = 2;
+        private int mBatchPointer = 0;
+        private List mRows;
+        private boolean mIsDone;
+
+        public QueryResult(List rows, boolean pIsDone) {
+            this.mRows = rows;
+            this.mIsDone = pIsDone;
+        }
+
         public int getSize() {
-            return 0;
+            return this.mRows.size();
         }
 
         public Row[] getRecords() {
-            return new Row[1];
+            return (Row[]) this.mRows.toArray(new Row[this.mRows.size()]);
         }
 
         public boolean isDone() {
-            return false;
+            return this.mIsDone;
         }
 
         public int getQueryLocator() {
-            return -1;
+            return this.mBatchPointer;
         }
 
     }
@@ -48,9 +91,7 @@ public class Main {
         public static final long serialVersionUID = -1;
     }
 
-    private class Row {
-
-    }
+    private class Row {}
 
     private class Book extends Row {
 
@@ -58,6 +99,13 @@ public class Main {
         private String title;
         private int year;
         private int numPages;
+
+        public Book (int pId, String pTitle, int pYear, int pNumPages) {
+            this.id = pId;
+            this.title = pTitle;
+            this.year = pYear;
+            this.numPages = pNumPages;
+        }
 
         public int getId() { return id; }
         public String getTitle() { return title; }
@@ -75,7 +123,7 @@ public class Main {
     }
 
     public boolean isBestseller(int id) {
-        return id == 42;
+        return id == 2;
     }
 
     public Booklist getBooklist(String genre, int max_books) {
@@ -115,7 +163,8 @@ public class Main {
                         }
 
                         if (DEBUG) {
-                            System.out.println("Fetched book: " + title + "(" + genre + ")");
+                            System.out.println("Fetched book: " + title +
+                                " (" + genre + ")");
                         }
 
                         rowNumber++;

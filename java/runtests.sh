@@ -11,10 +11,12 @@ TESTS_DIR=tests
 TEST_CLASSES=`(cd $TESTS_DIR && ls *Test.java) | sed -e 's/\.java$//'`
 
 # Compile all classes, and all tests
-# Make sure to compile with -g flags so that our test files have debug symbols.
-# Otherwise, our trace analysis programs will fail
 javac -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. *.java
-javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. tests/*.java
+javac -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. tests/*.java
+
+# Compile classes for all of the files we're going to run test analysis on
+# Use `-g` so we get symbol information, for extracting variable names during analysis.
+javac -g tests/analysis_examples/*.java
 
 # Discover and run tests
 java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:tests/:. org.junit.runner.JUnitCore $TEST_CLASSES

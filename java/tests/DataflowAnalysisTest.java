@@ -19,7 +19,7 @@ public class DataflowAnalysisTest {
     @Before
     public void setUp() {
         if (!setUpComplete) {
-            dataflowAnalysis = new DataflowAnalysis("tests/");
+            dataflowAnalysis = new DataflowAnalysis("tests/analysis_examples");
             dataflowAnalysis.analyze("Example");
             setUpComplete = true;
         }
