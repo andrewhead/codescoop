@@ -1,14 +1,6 @@
-java = require 'java'
-{ JAVA_CLASSPATH } = require './paths'
-
-
-# Load up the Java objects we want to use
-java.classpath = java.classpath.concat JAVA_CLASSPATH
-SOOT_BASE_CLASSPATH = java.classpath.join ':'
+{ JAVA_CLASSPATH, java } = require './paths'
 DataflowAnalysis = java.import "DataflowAnalysis"
 SymbolAppearance = java.import "SymbolAppearance"
-VariableTracer = java.import "VariableTracer"
-
 
 ###
 Symbols have 4 properties: name, line, start, end
@@ -71,11 +63,10 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     pathToFile = @filePath.replace RegExp(@fileName + '$'), ''
 
     # Make sure that Soot will be able to find the source file
-    sootClasspath = SOOT_BASE_CLASSPATH + ":" + pathToFile
+    sootClasspath = (java.classpath.join ':') + ":" + pathToFile
 
     # This call is more important to do asynchronously:
     # It might take a few seconds to complete.
-    console.log sootClasspath
     @analysis = new DataflowAnalysis sootClasspath
     @analysis.analyze className, (error, result) =>
       if (error)

@@ -2,11 +2,15 @@ $ = require('jquery');
 
 module.exports.ExampleViewer = class ExampleViewer
 
-  constructor: (textEditor) ->
+  constructor: (textEditor, codeBuffer, chosenLines) ->
     @textEditor = textEditor
+    @codeBuffer = codeBuffer
+    @setChosenLines chosenLines
 
-  setChosenLines: (lines) ->
-    @chosenLines = lines
+  setChosenLines: (lineNumbers) ->
+    @chosenLines = lineNumbers
+    sortedLines = @chosenLines.sort()
+    @lineTexts = ((@codeBuffer.lineForRow i) for i in sortedLines)
     @repaint()
 
   getTextEditor: () ->
@@ -21,7 +25,7 @@ module.exports.ExampleViewer = class ExampleViewer
       "",
     ]
 
-    for line in @chosenLines
+    for line in @lineTexts
       lineTextStripped = line.replace /^\s+/, ''
       exampleCode.push ("        " + lineTextStripped)
 
