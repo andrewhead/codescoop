@@ -95,6 +95,20 @@ describe "ExampleView", ->
     # As a sanity check, the text at this location should be the symbol name
     (expect editor.getTextInBufferRange(markerBufferRange)).toBe "Line"
 
+  it "decorates the symbols that it marks up", ->
+    symbolSet = new SymbolSet()
+    model = new ExampleModel codeBuffer, new LineSet([1]), symbolSet
+    view = new ExampleView model, makeEditor()
+    model.setState ExampleModelState.PICK_UNDEFINED
+    symbolSet.addUndefinedUse { name: "Line", line: 1, start: 1, end: 5 }
+
+    # Make sure that the decoration is associated with the marker created
+    editor = view.getTextEditor()
+    decorations = editor.getDecorations { class: 'undefined-use' }
+    markers = editor.getMarkers()
+    (expect decorations.length).toBe 1
+    (expect decorations[0].getMarker()).toBe markers[0]
+
   it "skips focusing on undefined symbols not in the range of chosen lines", ->
 
     # This time, the undefined use appears on a line that's not within view.

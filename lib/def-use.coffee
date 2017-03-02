@@ -8,55 +8,53 @@ Symbols have 4 properties: name, line, start, end
 ###
 module.exports.DefUseAnalysis = class DefUseAnalysis
 
-  filePath: null
-  fileName: null
-  analysis: null
-
   constructor: (filePath, fileName) ->
     @filePath = filePath
     @fileName = fileName
 
+  _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
+    name: symbolAppearance.getSymbolNameSync()
+    # Both representations have the first line at 1
+    line: symbolAppearance.getLineNumberSync()
+    # The existing analysis starts at column index zero, but we
+    # want to refer to symbols by their visual appearnace in the text
+    # editor, where the column indexes start at 1
+    start: symbolAppearance.getStartPositionSync() + 1
+    end: symbolAppearance.getEndPositionSync() + 1
+
   getUndefinedUses: (lineIndexes) ->
 
-      # Convert the list of selected lines to a list that can be
-      # passed to our static analysis too.
-      lineList = java.newInstanceSync "java.util.ArrayList"
-      for lineIndex in lineIndexes
+    # Convert the list of selected lines to a list that can be
+    # passed to our static analysis too.
+    lineList = java.newInstanceSync "java.util.ArrayList"
+    for lineIndex in lineIndexes
 
-        # Note: the line indexes from the range are zero-indexed,
-        # while the indexes in Soot and in the visible editor are
-        # one-indexed.  So we add one to each of the lines before
-        # calling on the analysis methods.
-        lineList.addSync (lineIndex + 1)
+      # Note: the line indexes from the range are zero-indexed,
+      # while the indexes in Soot and in the visible editor are
+      # one-indexed.  So we add one to each of the lines before
+      # calling on the analysis methods.
+      lineList.addSync lineIndex
 
-      # The rest of the calls to DataflowAnalysis are pretty much
-      # just operations on lists and counting.  Can do synchronounsly
-      # for now to keep this code looking nice
-      usesListJavaObj = @analysis.getUndefinedUsesInLinesSync(lineList)
-      usesListJavaArr = usesListJavaObj.toArraySync()
+    # The rest of the calls to DataflowAnalysis are pretty much
+    # just operations on lists and counting.  Can do synchronounsly
+    # for now to keep this code looking nice
+    usesListJavaObj = @analysis.getUndefinedUsesInLinesSync(lineList)
+    usesListJavaArr = usesListJavaObj.toArraySync()
 
-      undefinedUses = []
-      for use in usesListJavaArr
-        # See note above about zero-indexing vs one-indexing
-        symbol =
-          name: use.getSymbolNameSync()
-          line: use.getLineNumberSync()
-          start: use.getStartPositionSync()
-          end: use.getEndPositionSync()
-        undefinedUses.push symbol
+    undefinedUses = []
+    for use in usesListJavaArr
+      # See note above about zero-indexing vs one-indexing
+      symbol = @_javaSymbolAppearanceToSymbol use
+      undefinedUses.push symbol
 
-      undefinedUses
+    undefinedUses
 
   getDefBeforeUse: (symbol) ->
     symbolJavaObj = new SymbolAppearance(
       symbol.name, symbol.line, symbol.start, symbol.end
     )
     definitionJavaObj = @analysis.getLatestDefinitionBeforeUseSync symbolJavaObj
-    definition =
-      name: definitionJavaObj.getSymbolNameSync()
-      line: definitionJavaObj.getLineNumberSync()
-      start: definitionJavaObj.getStartPositionSync()
-      end: definitionJavaObj.getEndPositionSync()
+    definition = @_javaSymbolAppearanceToSymbol definitionJavaObj
 
   run: (callback, err) ->
 
@@ -73,10 +71,4 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
       if (error)
         err error
       else
-        callback(@)
-        # plugin.highlightUndefined()
-
-    # At the same time as doing dataflow analysis, we also run the program
-    # through a debugger to get the values of the variables at each step.
-    # callback(@)
-    # plugin.refreshVariableValues()
+        callback @

@@ -108,6 +108,7 @@ module.exports.ExampleView = class ExampleView
 
   _clearMarkers: ->
     marker.destroy() for marker in @markers
+    @markers = []
 
   _insertBoilerplate: ->
 
@@ -165,6 +166,16 @@ module.exports.ExampleView = class ExampleView
       marker = @textEditor.markBufferRange range, { invalidate: "overlap" }
       @markers.push marker
 
+  _addUndefinedUseDecorations: ->
+    for marker in @markers
+      decoration = $ "<div>Click to define</div>"
+      params =
+        type: 'overlay'
+        class: 'undefined-use'
+        item: decoration
+        position: 'tail'
+      @textEditor.decorateMarker marker, params
+
   update: ->
     # We add in the code, then add the markers, then the boilerplate.
     # By adding the code first, we get to use the character offsets of
@@ -172,4 +183,5 @@ module.exports.ExampleView = class ExampleView
     @_addCodeLines()
     if @model.getState() is ExampleModelState.PICK_UNDEFINED
       @_addUndefinedUseMarkers()
+      @_addUndefinedUseDecorations()
     @_insertBoilerplate()

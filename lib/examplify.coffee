@@ -1,6 +1,7 @@
 { CompositeDisposable } = require 'atom'
 { CodeView } = require './code-view'
 { ExampleModel, ExampleView } = require './example-view'
+{ ExampleController } = require './example-controller'
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'
 { LineSet } = require './line-set'
@@ -129,6 +130,10 @@ module.exports.MainController = class MainController
     # Prepare views
     @codeView = new CodeView codeEditor, @lineSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
+
+    # Prepare controllers
+    @defUseAnalysis = new DefUseAnalysis codeEditor.getPath(), codeEditor.getTitle()
+    @exampleController = new ExampleController @exampleModel, @defUseAnalysis
 
   getLineSet: ->
     @lineSet

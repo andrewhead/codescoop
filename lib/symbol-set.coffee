@@ -1,5 +1,6 @@
 module.exports.SymbolSetProperty = SymbolSetProperty =
   UNDEFINED_USE_ADDED: 0
+  UNDEFINED_USES_SET: 1
 
 
 module.exports.SymbolSet = class SymbolSet
@@ -21,3 +22,7 @@ module.exports.SymbolSet = class SymbolSet
 
   getUndefinedUses: ->
     @undefinedUses
+
+  setUndefinedUses: (uses) ->
+    @undefinedUses = uses
+    @notifyObservers SymbolSetProperty.UNDEFINED_USES_SET, @undefinedUses
