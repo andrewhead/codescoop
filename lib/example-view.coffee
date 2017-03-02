@@ -5,31 +5,34 @@ $ = require 'jquery'
 
 module.exports.ExampleModelProperty = ExampleModelProperty =
   UNKNOWN: { value: -1, name: "unknown" }
-  LINES_CHANGED: { value: 0, name: "lines-changed" }
-  UNDEFINED_USE_ADDED: { value: 1, name: "undefined-use-added" }
+  ACTIVE_LINE_NUMBERS: { value: 0, name: "lines-changed" }
+  UNDEFINED_USES: { value: 1, name: "undefined-use-added" }
   STATE: { value: 2, name: "state" }
+  TARGET: { value: 3, name: "target "}
+  VALUE_MAP: { value: 4, name: "value-map" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
   VIEW: { value: 0, name: "view" }
   PICK_UNDEFINED: { value: 1, name: "pick-undefined" }
+  DEFINE: { value: 2, name: "define" }
 
 
 module.exports.ExampleModel = class ExampleModel
-
-  observers: []
-  state: ExampleModelState.VIEW
 
   ###
   lineNumbers are assumed to be 1-indexed, corresponding to the line
   numbers as they would appear in a text editor.
   ###
-  constructor: (codeBuffer, lineSet, symbols) ->
+  constructor: (codeBuffer, lineSet, symbols, valueMap) ->
+    @observers = []
+    @codeBuffer = codeBuffer
     @lineSet = lineSet
     @lineSet.addObserver @
     @symbols = symbols
     @symbols.addObserver @
-    @codeBuffer = codeBuffer
+    @valueMap = valueMap
+    @state = ExampleModelState.VIEW
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
     @notifyObservers object, propertyName, propertyValue
@@ -40,9 +43,9 @@ module.exports.ExampleModel = class ExampleModel
   notifyObservers: (object, propertyName, propertyValue) ->
     # For now, it's sufficient to bubble up the event
     if propertyName is LineSetProperty.ACTIVE_LINE_NUMBERS_CHANGED
-      propertyName = ExampleModelProperty.LINES_CHANGED
+      propertyName = ExampleModelProperty.ACTIVE_LINE_NUMBERS
     else if object is @symbols
-      propertyName = ExampleModelProperty.UNDEFINED_USE_ADDED
+      propertyName = ExampleModelProperty.UNDEFINED_USES
     else if object is @
       proprtyName = propertyName
     else
@@ -65,6 +68,20 @@ module.exports.ExampleModel = class ExampleModel
 
   getSymbols: ->
     @symbols
+
+  setTarget: (symbol) ->
+    @target = symbol
+    @notifyObservers this, ExampleModelProperty.TARGET, @target
+
+  getTarget: ->
+    @target
+
+  getValueMap: ->
+    @valueMap
+
+  setValueMap: (valueMap) ->
+    @valueMap = valueMap
+    @notifyObservers this, ExampleModelProperty.VALUE_MAP, @valueMap
 
 
 module.exports.ExampleView = class ExampleView
@@ -91,6 +108,7 @@ module.exports.ExampleView = class ExampleView
     @model.addObserver @
     @textEditor = textEditor
     @markers = []
+    @markerUses = {}
     @update()
 
   setChosenLines: (lineNumbers) ->
@@ -103,12 +121,16 @@ module.exports.ExampleView = class ExampleView
     @textEditor
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
-    @_clearMarkers() if propertyName is ExampleModelProperty.STATE
-    @update()
+    @update() if propertyName in [
+      ExampleModelProperty.STATE
+      ExampleModelProperty.UNDEFINED_USES
+      ExampleModelProperty.ACTIVE_LINE_NUMBERS
+    ]
 
   _clearMarkers: ->
     marker.destroy() for marker in @markers
     @markers = []
+    @markerUses = {}
 
   _insertBoilerplate: ->
 
@@ -156,27 +178,107 @@ module.exports.ExampleView = class ExampleView
     code = textLines.join "\n"
     @textEditor.setText code
 
+  # It's assumed that this is called before any boilerplate text and edits
+  # (besides the active lines) have been added to the buffer
+  _markUse: (use) ->
+
+    lineNumbers = @model.getLineSet().getActiveLineNumbers().copy()
+    lineNumbersSorted = lineNumbers.sort()
+    exampleLineNumber = (lineNumbersSorted.indexOf use.line)
+    return if exampleLineNumber is -1  # if use not in lines, skip it
+
+    range = new Range [exampleLineNumber, use.start - 1], [exampleLineNumber, use.end - 1]
+    marker = @textEditor.markBufferRange range, { invalidate: "overlap" }
+    @markers.push marker
+
+    # We need to hold onto the use that each marker refers to.  We use
+    # marker.id, using the recommendation of an error message that we
+    # encountered when trying to set custom properties
+    @markerUses[marker.id] = use
+
+    marker
+
   _addUndefinedUseMarkers: ->
-    @_clearMarkers()
     lineNumbers = @model.getLineSet().getActiveLineNumbers()
     for use in @model.getSymbols().getUndefinedUses()
-      exampleLineNumber = (lineNumbers.indexOf use.line)
-      continue if exampleLineNumber is -1
-      range = new Range [exampleLineNumber, use.start - 1], [exampleLineNumber, use.end - 1]
-      marker = @textEditor.markBufferRange range, { invalidate: "overlap" }
-      @markers.push marker
+      marker = @_markUse use
 
   _addUndefinedUseDecorations: ->
     for marker in @markers
+
+      use = @markerUses[marker.id]
+
+      # Add a button for highlighting the undefined use
       decoration = $ "<div>Click to define</div>"
+        .click =>
+          @model.setTarget use
       params =
         type: 'overlay'
-        class: 'undefined-use'
+        class: 'undefined-use-button'
         item: decoration
         position: 'tail'
       @textEditor.decorateMarker marker, params
 
+      # Then add highlighting to pinpoint the use
+      params =
+        type: 'highlight'
+        class: 'undefined-use-highlight'
+      @textEditor.decorateMarker marker, params
+
+  _addDefinitionWidget: ->
+
+    # Make a marker for the target use
+    targetUse = @model.getTarget()
+    marker = @_markUse targetUse
+
+    # Built up the interactive widget
+    decoration = $ "<div></div>"
+    originalText = @textEditor.getTextInBufferRange marker.getBufferRange()
+    valueText = @model.getValueMap()[targetUse.file][targetUse.line][targetUse.name]
+    setValueButton = $ "<div>Add Data</div>"
+    if valueText?
+      setValueButton
+        .attr "id", "set-value-button"
+        .addClass "definition-method-button"
+        .mouseover (event) =>
+          # XXX: Because an update may have clobbered the marker that
+          # this decoration was initially attached to, when a click occurs,
+          # we just find the only marker that is stored in this view.  It
+          # should be the definition marker, as there's only one.
+          marker = @markers[0]
+          @textEditor.setTextInBufferRange marker.getBufferRange(), valueText
+        .mouseout (event) =>
+          marker = @markers[0]
+          @textEditor.setTextInBufferRange marker.getBufferRange(), originalText
+    else
+      setValueButton.addClass 'disabled'
+    decoration.append setValueButton
+
+    addCodeButton = $ "<div>Add Code</div>"
+      .attr "id", "add-code-button"
+      .addClass "definition-method-button"
+      .mouseover (event) =>
+        def = @model.getSymbols().getDefinition()
+        @model.getLineSet().setSuggestedLineNumbers [def.line]
+      .mouseout (event) =>
+        def = @model.getSymbols().getDefinition()
+        @model.getLineSet().removeSuggestedLineNumber def.line
+      .click (event) =>
+        def = @model.getSymbols().getDefinition()
+        @model.getLineSet().removeSuggestedLineNumber def.line
+        @model.getLineSet().getActiveLineNumbers().push def.line
+    decoration.append addCodeButton
+
+    # Create a decoration from the element
+    params =
+      type: "overlay"
+      class: "definition-widget"
+      item: decoration
+      position: "tail"
+    @textEditor.decorateMarker marker, params
+
   update: ->
+    @_clearMarkers()
     # We add in the code, then add the markers, then the boilerplate.
     # By adding the code first, we get to use the character offsets of
     # each symbol to mark them, before inserting other boilerplate code
@@ -184,4 +286,6 @@ module.exports.ExampleView = class ExampleView
     if @model.getState() is ExampleModelState.PICK_UNDEFINED
       @_addUndefinedUseMarkers()
       @_addUndefinedUseDecorations()
+    else if @model.getState() is ExampleModelState.DEFINE
+      @_addDefinitionWidget()
     @_insertBoilerplate()

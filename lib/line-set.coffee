@@ -69,3 +69,14 @@ module.exports.LineSet = class LineSet
 
   getSuggestedLineNumbers: ->
     @suggestedLineNumbers
+
+  setSuggestedLineNumbers: (lineNumbers) ->
+    # Although this looks verbose, it's important that we manually transfer
+    # all new elements.  The current list of suggested line numbers has
+    # observers that will be trashed if we start the array from scratch.
+    @suggestedLineNumbers.splice(0, @suggestedLineNumbers.length)
+    for lineNumber in lineNumbers
+      @suggestedLineNumbers.push lineNumber
+
+  removeSuggestedLineNumber: (lineNumber) ->
+    @suggestedLineNumbers.splice((@suggestedLineNumbers.indexOf lineNumber), 1)

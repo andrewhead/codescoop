@@ -89,3 +89,16 @@ describe 'CodeView', () ->
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 0
     lineSet.getSuggestedLineNumbers().push 1
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 1
+
+  it 'removes suggested line highlighting when suggested line removed', ->
+
+    lineSet = new LineSet [], [2]
+    editor = _makeEditor()
+    codeView = new CodeView editor, lineSet
+    editorView = atom.views.getView(editor)
+    _addLines(editorView)
+
+    codeView.update()
+    expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 1
+    lineSet.removeSuggestedLineNumber(2)
+    expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 0

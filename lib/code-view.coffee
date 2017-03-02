@@ -34,7 +34,7 @@ module.exports.CodeView = class CodeView
 
   update: ->
 
-    editorView = atom.views.getView(@textEditor)
+    editorView = atom.views.getView @textEditor
     lines = $ ( editorView.querySelectorAll 'div.line' )
 
     # By default, no lines are chosen or unchosen

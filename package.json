@@ -3,8 +3,7 @@
   "main": "./lib/examplify",
   "version": "0.0.0",
   "description": "A short description of your package",
-  "keywords": [
-  ],
+  "keywords": [],
   "activationCommands": {
     "atom-workspace": "examplify:make-example-code"
   },
@@ -14,6 +13,7 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "java": "v0.8.0"
+    "java": "v0.8.0",
+    "lodash": "^4.17.4"
   }
 }

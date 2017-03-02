@@ -17,12 +17,11 @@ div.line.unchosen {
 }
 */
 
-/*
-atom-text-editor .highlight.undefined-use .region {
+
+atom-text-editor .highlight.undefined-use-highlight .region {
   background-color: @syntax-color-removed;
   opacity: .8;
 }
-*/
 
 atom-text-editor div.line {
   &.active {
@@ -32,7 +31,8 @@ atom-text-editor div.line {
     opacity: .5;
     &.suggested {
       opacity: 1;
-      background-color: @syntax-color-removed;
+      background-color: @syntax-color-renamed;
+      background-opacity: .5;
     }
   }
 }
@@ -42,7 +42,7 @@ atom-text-editor div.line.definition span {
   opacity: 1;
 }
 
-atom-overlay.undefined-use  {
+atom-overlay.undefined-use-button {
   // background-color: @tool-panel-background-color;
   background-color: @background-color-warning;
   border-color: @tool-panel-border-color;
@@ -51,7 +51,7 @@ atom-overlay.undefined-use  {
   font-family: @font-family;
 }
 
-atom-overlay.definition-option {
+atom-overlay.definition-widget {
   // background-color: @tool-panel-background-color;
   background-color: @background-color-info;
   border-color: @tool-panel-border-color;
@@ -60,7 +60,7 @@ atom-overlay.definition-option {
   font-family: @font-family;
 }
 
-div.definition-option {
+atom-overlay div.definition-method-button {
 
   &.disabled {
     color: @text-color-subtle;

@@ -13,6 +13,7 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     @fileName = fileName
 
   _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
+    file: @fileName
     name: symbolAppearance.getSymbolNameSync()
     # Both representations have the first line at 1
     line: symbolAppearance.getLineNumberSync()

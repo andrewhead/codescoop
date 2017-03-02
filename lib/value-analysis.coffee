@@ -1,6 +1,12 @@
 { JAVA_CLASSPATH, java } = require './paths'
 VariableTracer = java.import "VariableTracer"
 
+
+# In it's simplest form, this is just a JavaScript object, with data
+# accessible by indexing on source file name, line number, and variable name
+module.exports.ValueMap = class ValueMap
+
+
 # While this currently relies on a Map loaded from Java using the node-java
 # connector, it's reasonable to expect that this could also read in a
 # pre-written local file instead.
@@ -15,13 +21,32 @@ module.exports.ValueAnalysis = class ValueAnalysis
     @fileName = fileName
     @filePath = filePath
 
+  _constructValueMap: (javaMap) ->
+
+    valueMap = new ValueMap()
+
+    # This is a tedious and brute force of transfer from the Java object
+    # into a JavaScript object.
+    for sourceFileName in javaMap.keySetSync().toArraySync()
+      valueMap[sourceFileName] = {}
+      sourceFileLines = javaMap.getSync sourceFileName
+      for lineNumber in sourceFileLines.keySetSync().toArraySync()
+        valueMap[sourceFileName][lineNumber] = {}
+        variables = sourceFileLines.getSync lineNumber
+        for variableName in variables.keySetSync().toArraySync()
+          variableValue = variables.getSync variableName
+          valueMap[sourceFileName][lineNumber][variableName] =\
+            @_getPrintableValue variableValue
+
+    valueMap
+
   run: (callback, err) ->
     classname = @fileName.replace /\.java$/, ''
     pathToFile = @filePath.replace RegExp(@fileName + '$'), ''
     variableTracer = new VariableTracer()
-    variableTracer.run classname, pathToFile, (error, result) ->
+    variableTracer.run classname, pathToFile, (error, result) =>
       err error if error
-      callback(result)
+      callback (@_constructValueMap result)
       @values = result
 
   # Given a variable name and a line number, get a value that it was

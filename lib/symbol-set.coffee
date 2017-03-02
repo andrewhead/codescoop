@@ -1,6 +1,7 @@
 module.exports.SymbolSetProperty = SymbolSetProperty =
-  UNDEFINED_USE_ADDED: 0
-  UNDEFINED_USES_SET: 1
+  UNDEFINED_USE_ADDED: { value: 0, name: "undefined-use-added" }
+  UNDEFINED_USES: { value: 1, name: "undefined-uses" }
+  DEFINITION: { value: 2, name: "definition-set" }
 
 
 module.exports.SymbolSet = class SymbolSet
@@ -25,4 +26,10 @@ module.exports.SymbolSet = class SymbolSet
 
   setUndefinedUses: (uses) ->
     @undefinedUses = uses
-    @notifyObservers SymbolSetProperty.UNDEFINED_USES_SET, @undefinedUses
+    @notifyObservers SymbolSetProperty.UNDEFINED_USES, @undefinedUses
+
+  getDefinition: ->
+    @definition
+
+  setDefinition: (def) ->
+    @definition = def

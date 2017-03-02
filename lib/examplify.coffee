@@ -133,7 +133,8 @@ module.exports.MainController = class MainController
 
     # Prepare controllers
     @defUseAnalysis = new DefUseAnalysis codeEditor.getPath(), codeEditor.getTitle()
-    @exampleController = new ExampleController @exampleModel, @defUseAnalysis
+    @valueAnalysis = new ValueAnalysis codeEditor.getPath(), codeEditor.getTitle()
+    @exampleController = new ExampleController @exampleModel, @defUseAnalysis, @valueAnalysis
 
   getLineSet: ->
     @lineSet
