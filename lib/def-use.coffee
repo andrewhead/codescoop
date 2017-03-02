@@ -2,6 +2,7 @@
 DataflowAnalysis = java.import "DataflowAnalysis"
 SymbolAppearance = java.import "SymbolAppearance"
 
+
 ###
 Symbols have 4 properties: name, line, start, end
 ###

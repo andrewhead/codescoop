@@ -1,5 +1,6 @@
-$ = require 'jquery'
 { Range } = require 'atom'
+{ LineSetProperty } = require './line-set'
+$ = require 'jquery'
 
 CodeViewerState =
   EDITING: 1  # Highlighting inactive
@@ -7,8 +8,46 @@ CodeViewerState =
   SHOW_UNDEFINED: 3
   SHOW_DEFINITIONS: 4
 
-module.exports.CodeViewer = class CodeViewer
 
+module.exports.CodeView = class CodeView
+
+  constructor: (textEditor, lineSet) ->
+    @textEditor = textEditor
+    @lineSet = lineSet
+    @lineSet.addObserver @
+    @update()
+
+  getEditor: ->
+    @editor
+
+  _screenRowToLineNumber: (screenRow) ->
+    # We assume that the code is completely unfolded.  When this is true
+    # the 'screen row' of a line is one less than the line number as it
+    # appears in the text editor.
+    screenRow + 1
+
+  onPropertyChanged: (object, propertyName, propertyValue) ->
+    @update() if (
+      propertyName is LineSetProperty.ACTIVE_LINE_NUMBERS_CHANGED or
+      propertyName is LineSetProperty.SUGGESTED_LINE_NUMBERS_CHANGED
+    )
+
+  update: ->
+
+    editorView = atom.views.getView(@textEditor)
+    lines = $ ( editorView.querySelectorAll 'div.line' )
+
+    # By default, no lines are chosen or unchosen
+    ((lines.removeClass 'inactive').removeClass 'active').removeClass 'suggested'
+    for line in ($ _ for _ in lines)
+      lineNumber = @_screenRowToLineNumber (line.data 'screenRow')
+      line.addClass (
+        if (lineNumber in @lineSet.getActiveLineNumbers())\
+        then 'active' else 'inactive'
+        )
+      line.addClass 'suggested' if lineNumber in @lineSet.getSuggestedLineNumbers()
+
+  """
   chosenLines: []
   state: CodeViewerState.EXAMPLIFYING
   definitionMarkers: []
@@ -261,3 +300,4 @@ module.exports.CodeViewer = class CodeViewer
 
   lineTextForBufferRow: (index) ->
     @textEditor.lineTextForBufferRow index
+  """

@@ -17,19 +17,22 @@ div.line.unchosen {
 }
 */
 
+/*
 atom-text-editor .highlight.undefined-use .region {
   background-color: @syntax-color-removed;
   opacity: .8;
 }
+*/
 
 atom-text-editor div.line {
-  &.chosen {
+  &.active {
     opacity: 1;
   }
-  &.unchosen {
+  &.inactive {
     opacity: .5;
-    &.definition {
+    &.suggested {
       opacity: 1;
+      background-color: @syntax-color-removed;
     }
   }
 }

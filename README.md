@@ -46,6 +46,14 @@ cd java/
 ./runtests.sh
 ```
 
+### Style Guide
+
+When possible, I use this style guide for Coffeescript:
+https://github.com/polarmobile/coffeescript-style-guide
+
+When defining enums, define each field as an object.
+This make comparisons with an equals sign use values that are exclusive to each class, instead of comparing just on the fields of the object.
+
 <!--
 ![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
 -->
