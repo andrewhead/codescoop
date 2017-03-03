@@ -209,8 +209,12 @@ module.exports.ExampleView = class ExampleView
       use = @markerUses[marker.id]
 
       # Add a button for highlighting the undefined use
+      # I find it necessary to bind the use as data: when I don't do this,
+      # use takes on the last value that it had in this loop
       decoration = $ "<div>Click to define</div>"
-        .click =>
+        .data 'use', use
+        .click (event) =>
+          use = ($ (event.target)).data 'use'
           @model.setTarget use
       params =
         type: 'overlay'

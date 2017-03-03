@@ -55,7 +55,11 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
       symbol.name, symbol.line, symbol.start, symbol.end
     )
     definitionJavaObj = @analysis.getLatestDefinitionBeforeUseSync symbolJavaObj
-    definition = @_javaSymbolAppearanceToSymbol definitionJavaObj
+    if definitionJavaObj
+      definition = @_javaSymbolAppearanceToSymbol definitionJavaObj
+    else
+      definition = null
+    definition
 
   run: (callback, err) ->
 

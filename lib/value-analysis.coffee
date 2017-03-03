@@ -65,6 +65,8 @@ module.exports.ValueAnalysis = class ValueAnalysis
     @_getPrintableValue(value)
 
   _getPrintableValue: (value) ->
+    if value is null
+      return "null"
     if java.instanceOf value, "com.sun.jdi.StringReference"
       return "\"" + value.valueSync() + "\""
     else if java.instanceOf value, "com.sun.jdi.CharValue"
