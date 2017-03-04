@@ -25,5 +25,5 @@ on your machine.  Then, run this command, run this command
 (substituting in `language` for the language you want):
 
 ```bash
-antlr4 -Dlanguage=JavaScript <Language>.g4 -o <Language>
+antlr4 -Dlanguage=JavaScript <Language>.g4 -o <Language> -visitor
 ```
