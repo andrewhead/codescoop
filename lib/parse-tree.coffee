@@ -36,7 +36,9 @@ class SymbolSearcher extends JavaListener
     if @matchingContexts.length > 0 then @matchingContexts[0] else null
 
 
-module.exports.parse = (codeText) ->
+# During testing, we don't always want the parse for the full program.  This
+# method let's us do a parse starting starting at a specific rule
+module.exports.partialParse = partialParse = (codeText, ruleName) ->
 
   # REUSE: This boilerplate for constructing a parse tree using ANTLR
   # is based on the snippet from the ANTLR4 project:
@@ -46,8 +48,12 @@ module.exports.parse = (codeText) ->
   tokens = new CommonTokenStream lexer
   parser = new JavaParser tokens
   parser.buildParseTrees = true
-  antlrTreeRootCtx = parser.compilationUnit()
-  new ParseTree antlrTreeRootCtx
+  ctx = parser[ruleName]()
+
+
+module.exports.parse = (codeText) ->
+  ctx = partialParse codeText, "compilationUnit"
+  new ParseTree ctx
 
 
 ###

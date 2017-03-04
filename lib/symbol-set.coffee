@@ -4,14 +4,32 @@ module.exports.SymbolSetProperty = SymbolSetProperty =
   DEFINITION: { value: 2, name: "definition-set" }
 
 
+# Symbol position is ambiguous without knowing the file in which it was found.
+# This structure retains information about the file where a symbol was found.
+module.exports.File = class File
+
+  constructor: (path, fileName) ->
+    @path = path
+    @fileName = fileName
+
+  equals: (other) ->
+    (other.path is @path) and (other.fileName is @fileName)
+
+
 module.exports.Symbol = class Symbol
 
   # The range includes encompasses the start and end positions of the symbol
   # in the GitHub Atom text editor.  Lines and columns are zero-indexed.
-  constructor: (fileName, name, range) ->
-    @fileName = fileName
+  constructor: (file, name, range) ->
+    @file = file
     @name = name
     @range = range
+
+  equals: (other) ->
+
+    (@file.equals other.file) and
+      (@name is other.name) and
+      (@range.isEqual other.range)
 
 
 module.exports.SymbolSet = class SymbolSet
