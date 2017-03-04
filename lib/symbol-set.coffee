@@ -4,6 +4,16 @@ module.exports.SymbolSetProperty = SymbolSetProperty =
   DEFINITION: { value: 2, name: "definition-set" }
 
 
+module.exports.Symbol = class Symbol
+
+  # The range includes encompasses the start and end positions of the symbol
+  # in the GitHub Atom text editor.  Lines and columns are zero-indexed.
+  constructor: (fileName, name, range) ->
+    @fileName = fileName
+    @name = name
+    @range = range
+
+
 module.exports.SymbolSet = class SymbolSet
 
   constructor: ->
