@@ -6,12 +6,6 @@ ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 { ParseTree } = require './parse-tree'
 
 
-module.exports.ScopeType = ScopeType =
-  CLASS: { value: 0, name: "class" }
-  METHOD: { value: 1, name: "method" }
-  BLOCK: { value: 2, name: "block" }
-
-
 _symbolFromIdNode = (file, idNode) ->
   new Symbol file, idNode.text, (new Range \
     [idNode.line - 1, idNode.column],
@@ -74,6 +68,16 @@ class ParameterVisitor extends DeclarationVisitor
     @symbolsDeclared.push symbol
 
 
+# It is assumed that this will only be called on the context for the
+# enhancedForControl rule; otherwise, results may be unpredictable.
+class EnhancedForVisitor extends DeclarationVisitor
+
+  enterVariableDeclaratorId: (ctx) ->
+    idNode = ctx.children[0].symbol
+    symbol = _symbolFromIdNode @file, idNode
+    @symbolsDeclared.push symbol
+
+
 class MatchVisitor extends JavaListener
 
   # The constructor takes in a single argument:
@@ -93,10 +97,9 @@ class MatchVisitor extends JavaListener
 
 module.exports.Scope = class Scope
 
-  constructor: (file, ctx, type) ->
+  constructor: (file, ctx) ->
     @file = file
     @ctx = ctx
-    @type = type
 
   getCtx: ->
     @ctx
@@ -120,22 +123,66 @@ module.exports.Scope = class Scope
     ParseTreeWalker.walk blockVisitor, @ctx
     declaredSymbols = blockVisitor.getDeclaredSymbols()
 
-    # If this is a method, we also have to check the parameters
-    if @type is ScopeType.METHOD
-      methodDeclarationCtx = @ctx.parentCtx.parentCtx
-      parameterVisitor = new ParameterVisitor @file
-      ParseTreeWalker.walk parameterVisitor, methodDeclarationCtx
-      declaredSymbols = declaredSymbols.concat parameterVisitor.getDeclaredSymbols()
+  equals: (other) ->
+    (@ctx is other.ctx) and (@type is other.type)
 
-    # If this is a class, then we declared the class name right above
-    if @type is ScopeType.CLASS
-      symbol = _symbolFromIdNode @file, @ctx.parentCtx.children[1].symbol
-      declaredSymbols.push symbol
+
+module.exports.BlockScope = class BlockScope extends Scope
+
+  getDeclaredSymbols: ->
+    super()
+
+
+module.exports.ForLoopScope = class ForLoopScope extends Scope
+
+  getDeclaredSymbols: ->
+
+    declaredSymbols = super()
+
+    forControlCtx = @ctx.parentCtx.parentCtx.children[2]
+    forControlChildCtx = forControlCtx.children[0]
+
+    # If this is a typical for loop, look for declarations in the init section
+    if forControlChildCtx.ruleIndex is JavaParser.RULE_forInit
+      forInitVisitor = new BlockDeclarationVisitor @file, []
+      ParseTreeWalker.walk forInitVisitor, forControlChildCtx
+      declaredSymbols = declaredSymbols.concat forInitVisitor.getDeclaredSymbols()
+
+    # If this is an 'enhanced' for loop, use a custom visitor to find declarations.
+    else if forControlChildCtx.ruleIndex is JavaParser.RULE_enhancedForControl
+      enhancedForVisitor = new EnhancedForVisitor @file
+      ParseTreeWalker.walk enhancedForVisitor, forControlChildCtx
+      declaredSymbols = declaredSymbols.concat enhancedForVisitor.getDeclaredSymbols()
 
     declaredSymbols
 
-  equals: (other) ->
-    (@ctx is other.ctx) and (@type is other.type)
+
+module.exports.ClassScope = class ClassScope extends Scope
+
+  getDeclaredSymbols: ->
+
+    declaredSymbols = super()
+
+    # If this is a class, then we declared the class name right above
+    symbol = _symbolFromIdNode @file, @ctx.parentCtx.children[1].symbol
+    declaredSymbols.push symbol
+
+    declaredSymbols
+
+
+module.exports.MethodScope = class MethodScope extends Scope
+
+  getDeclaredSymbols: ->
+
+    declaredSymbols = super()
+
+    # If this is a method, we also have to check the parameters
+    methodDeclarationCtx = @ctx.parentCtx.parentCtx
+    parameterVisitor = new ParameterVisitor @file
+    ParseTreeWalker.walk parameterVisitor, methodDeclarationCtx
+    declaredSymbols = declaredSymbols.concat parameterVisitor.getDeclaredSymbols()
+
+    declaredSymbols
 
 
 module.exports.ScopeFinder = class ScopeFinder
@@ -147,19 +194,26 @@ module.exports.ScopeFinder = class ScopeFinder
     # Matching rules are in order of decreasing specificity:
     # scopes cannot match more than one rule, and will match earlier rules first.
     @scopeMatchRules = [{
-        type: ScopeType.CLASS,
+        type: ClassScope,
         rule: (ctx) => ctx.ruleIndex is JavaParser.RULE_classBody
       }, {
-        type: ScopeType.METHOD,
+        type: MethodScope,
         rule: (ctx) =>
           if ctx.ruleIndex is JavaParser.RULE_block and ctx.parentCtx?
             return ctx.parentCtx.ruleIndex in
               [JavaParser.RULE_methodBody, JavaParser.RULE_constructorBody]
           return false
       }, {
+        type: ForLoopScope,
+        rule: (ctx) =>
+          if ctx.ruleIndex is JavaParser.RULE_block
+            try
+              forText = ctx.parentCtx.parentCtx.children[0].symbol.text
+          forText? and (forText is "for")
+      }, {
         # This one should cover loops, conditionals, and
         # other blocks of statements not attached to control
-        type: ScopeType.BLOCK,
+        type: BlockScope,
         rule: (ctx) => ctx.ruleIndex is JavaParser.RULE_block
       }
     ]
@@ -175,7 +229,7 @@ module.exports.ScopeFinder = class ScopeFinder
       ParseTreeWalker.walk visitor, @parseTree.getRoot()
       for ctx in visitor.getMatchingContexts()
         if ctx not in matchedCtxs
-          scopes.push (new Scope @file, ctx, scopeMatchRule.type)
+          scopes.push (new scopeMatchRule.type @file, ctx)
           matchedCtxs.push ctx
 
     scopes

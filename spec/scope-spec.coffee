@@ -1,7 +1,8 @@
 { InputStream, CommonTokenStream } = require 'antlr4'
 { JavaLexer } = require '../lib/grammars/Java/JavaLexer'
 { JavaParser } = require '../lib/grammars/Java/JavaParser'
-{ ScopeFinder, Scope, ScopeType } = require '../lib/scope'
+{ ScopeFinder } = require '../lib/scope'
+{ BlockScope, ForLoopScope, MethodScope, ClassScope } = require '../lib/scope'
 { parse, partialParse } = require '../lib/parse-tree'
 { Symbol, File } = require '../lib/symbol-set'
 { Range } = require 'atom'
@@ -9,34 +10,15 @@
 
 describe "ScopeFinder", ->
 
-  _isScopeForMethod = (scope) =>
-    scope.getType() is ScopeType.METHOD and
-      scope.getCtx().parentCtx.ruleIndex is JavaParser.RULE_methodBody
+  _isScopeForMethod = (scope) => scope instanceof MethodScope
 
   _isScopeForConstructor = (scope) =>
-    scope.getType() is ScopeType.METHOD and
-      scope.getCtx().parentCtx.ruleIndex is JavaParser.RULE_constructorBody
+    (scope instanceof MethodScope) and
+      (scope.getCtx().parentCtx.ruleIndex is JavaParser.RULE_constructorBody)
 
-  _isScopeForForLoop = (scope) =>
-    ctx = scope.getCtx()
-    # As blocks for for-loops will be treated just like blocks that
-    # are not part of control structure, we traverse the tree around
-    # this scope to make sure it's attached to a nearby "for"
-    match = false
-    if scope.getType() is ScopeType.BLOCK
-      try
-        forText = scope.getCtx().parentCtx.parentCtx.children[0].symbol.text
-      if forText? and forText is "for"
-        match = true
-    match
+  _isScopeForForLoop = (scope) => scope instanceof ForLoopScope
 
-  _isScopeForStatementBlock = (scope) =>
-    # Because we know the only types of statement blocks in the code
-    # snippet will be blocks for the loop and method,
-    # we should be able to locate this block by just ignoring the others
-    (scope.getType() is ScopeType.BLOCK) and
-      not (_isScopeForForLoop scope) and
-      not (_isScopeForMethod scope)
+  _isScopeForStatementBlock = (scope) => scope instanceof BlockScope
 
   describe "after running on a parse tree", ->
 
@@ -69,8 +51,7 @@ describe "ScopeFinder", ->
       matchCount
 
     it "finds class blocks", ->
-      count = _countMatchingScopes (scope) =>
-        scope.getType() is ScopeType.CLASS
+      count = _countMatchingScopes (scope) => scope instanceof ClassScope
       (expect count).toBe 1
 
     it "finds method blocks", ->
@@ -136,13 +117,12 @@ describe "ScopeFinder", ->
     it "can find a symbol within class declarations", ->
       symbol = new Symbol fakeFile, "k", (new Range [1, 20], [1, 21])
       scopes = scopeFinder.findSymbolScopes symbol
-      count = _countSymbolScopes scopes, (scope) =>
-        scope.getType() is ScopeType.CLASS
+      count = _countSymbolScopes scopes, (scope) => scope instanceof ClassScope
       (expect count).toBe 1
 
     it "can find methods (not just variables!)", ->
       symbol = new Symbol fakeFile, "method1", (new Range [9, 14], [9, 21])
-      scopes = scopeFinder.findSymbolScopes
+      scopes = scopeFinder.findSymbolScopes symbol
       (expect (scopes.length >= 1)).toBe true
 
     it "finds multiple encapsulating scopes", ->
@@ -189,7 +169,7 @@ describe "Scope", ->
       "      }"
     ].join "\n"
     ctx = partialParse BLOCK_CODE, "block"
-    scope = new Scope fakeFile, ctx, ScopeType.BLOCK
+    scope = new BlockScope fakeFile, ctx
 
     it "produces a list of variables declared", ->
       symbols = scope.getDeclaredSymbols()
@@ -203,8 +183,39 @@ describe "Scope", ->
 
   describe "for a for loop", ->
 
-    xit "includes the variables declared in loop initialization", ->
-      (expect true).toBe false
+    it "includes the variables declared in loop initialization", ->
+
+      FOR_CODE = [
+        "      for (int i = 0; i < 2; i++) {"
+        "        System.out.println(i);"
+        "      }"
+      ].join "\n"
+      ctx = partialParse FOR_CODE, "statement"
+      blockCtx = ctx.children[4].children[0]
+      scope = new ForLoopScope fakeFile, blockCtx
+
+      symbols = scope.getDeclaredSymbols()
+      (expect symbols.length).toBe 1
+      (expect _isSymbolInList \
+        (new Symbol fakeFile, "i", (new Range [0, 15], [0, 16])),
+        symbols).toBe true
+
+    it "also includes declarations from enhanced for loop control", ->
+
+      ENHANCED_CONTROL_FOR_CODE = [
+        "      for (String s: strings) {"
+        "        System.out.println(s);"
+        "      }"
+      ].join "\n"
+      ctx = partialParse ENHANCED_CONTROL_FOR_CODE, "statement"
+      blockCtx = ctx.children[4].children[0]
+      scope = new ForLoopScope fakeFile, blockCtx
+
+      symbols = scope.getDeclaredSymbols()
+      (expect symbols.length).toBe 1
+      (expect _isSymbolInList \
+        (new Symbol fakeFile, "s", (new Range [0, 18], [0, 19])),
+        symbols).toBe true
 
   describe "for a method", ->
 
@@ -218,7 +229,7 @@ describe "Scope", ->
       "  }"
     ].join "\n"
     ctx = partialParse METHOD_CODE, "methodDeclaration"
-    scope = new Scope fakeFile, ctx.children[3].children[0], ScopeType.METHOD
+    scope = new MethodScope fakeFile, ctx.children[3].children[0]
     symbols = scope.getDeclaredSymbols()
 
     # This should hold true for all scopes, but we're only testing it
@@ -247,7 +258,7 @@ describe "Scope", ->
     ].join "\n"
 
     ctx = partialParse CLASS_CODE, "classDeclaration"
-    scope = new Scope fakeFile, ctx.children[2], ScopeType.CLASS
+    scope = new ClassScope fakeFile, ctx.children[2]
     symbols = scope.getDeclaredSymbols()
 
     it "produces a list of variables declared", ->
