@@ -1,4 +1,4 @@
-{ RangeSetProperty } = require '../range-set'
+{ RangeSetProperty } = require '../model/range-set'
 
 
 module.exports.ObservableArrayProperty = ObservableArrayProperty =

@@ -1,4 +1,4 @@
-{ Range, RangeSetProperty } = require './range-set'
+{ Range, RangeSetProperty } = require './model/range-set'
 $ = require 'jquery'
 
 CodeViewerState =

@@ -1,5 +1,5 @@
 $ = require 'jquery'
-{ Range, RangeSet, RangeSetProperty } = require './range-set'
+{ Range, RangeSet, RangeSetProperty } = require './model/range-set'
 
 
 module.exports.ExampleModelProperty = ExampleModelProperty =

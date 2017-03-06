@@ -1,4 +1,4 @@
-{ Range } = require '../lib/range-set'
+{ Range } = require '../lib/model/range-set'
 { MainController } = require '../lib/examplify'
 { PACKAGE_PATH } = require '../lib/paths'
 $ = require 'jquery'

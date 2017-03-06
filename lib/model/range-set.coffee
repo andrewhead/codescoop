@@ -1,4 +1,4 @@
-{ makeObservableArray } = require './model/observable-array'
+{ makeObservableArray } = require './observable-array'
 
 
 module.exports.Range = (require 'atom').Range

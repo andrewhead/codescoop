@@ -1,7 +1,7 @@
 { JAVA_CLASSPATH, java } = require './paths'
 DataflowAnalysis = java.import "DataflowAnalysis"
 SymbolAppearance = java.import "SymbolAppearance"
-{ Range } = require './range-set'
+{ Range } = require './model/range-set'
 { Symbol } = require './model/symbol-set'
 
 

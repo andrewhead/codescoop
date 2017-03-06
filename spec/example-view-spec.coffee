@@ -2,7 +2,7 @@
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/example-view'
 { makeObservableArray } = require '../lib/example-view'
 { Symbol, SymbolSet } = require '../lib/model/symbol-set'
-{ Range, RangeSet } = require '../lib/range-set'
+{ Range, RangeSet } = require '../lib/model/range-set'
 { ValueMap } = require '../lib/value-analysis'
 $ = require 'jquery'
 _ = require 'lodash'

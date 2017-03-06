@@ -4,7 +4,7 @@
 { ExampleController } = require './example-controller'
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'
-{ RangeSet } = require './range-set'
+{ RangeSet } = require './model/range-set'
 { SymbolSet } = require './model/symbol-set'
 $ = require 'jquery'
 
