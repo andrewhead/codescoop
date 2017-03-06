@@ -1,4 +1,4 @@
-{ Range } = require 'atom'
+{ Range } = require '../lib/range-set'
 { MainController } = require '../lib/examplify'
 $ = require 'jquery'
 
@@ -32,7 +32,8 @@ describe 'MainController', () ->
     selection = codeEditor.addSelectionForBufferRange selectedRange
 
     mainController = new MainController codeEditor, exampleEditor
-    (expect mainController.getLineSet().getActiveLineNumbers()).toEqual [2]
+    (expect mainController.getRangeSet().getActiveRanges()).toEqual \
+      [ new Range [1, 0], [1, 2] ]
 
   it 'highlights lines on the screen when invoked with a selection', ->
 

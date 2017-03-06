@@ -1,10 +1,9 @@
 { ExampleView } = require '../lib/example-view'
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/example-view'
 { makeObservableArray } = require '../lib/example-view'
-{ SymbolSet } = require '../lib/symbol-set'
-{ LineSet } = require '../lib/line-set'
+{ Symbol, SymbolSet } = require '../lib/symbol-set'
+{ Range, RangeSet } = require '../lib/range-set'
 { ValueMap } = require '../lib/value-analysis'
-{ Range } = require 'atom'
 $ = require 'jquery'
 _ = require 'lodash'
 
@@ -30,16 +29,16 @@ describe "ExampleModel", ->
       @propertyValue = value
 
   it "notifies observers when lines changed", ->
-    lineSet = new LineSet()
-    exampleModel = new ExampleModel codeBuffer, lineSet, new SymbolSet(), new ValueMap()
+    rangeSet = new RangeSet()
+    exampleModel = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), new ValueMap()
     exampleModel.addObserver observer
-    lineSet.getActiveLineNumbers().push 1
-    (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_LINE_NUMBERS
-    (expect observer.propertyValue).toEqual [1]
+    rangeSet.getActiveRanges().push new Range [0, 0], [0, 10]
+    (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_RANGES
+    (expect observer.propertyValue).toEqual [ new Range [0, 0], [0, 10] ]
 
   it "notifies observers when the list of undefined symbols changes", ->
     symbols = new SymbolSet()
-    exampleModel = new ExampleModel codeBuffer, new LineSet(), symbols, new ValueMap()
+    exampleModel = new ExampleModel codeBuffer, new RangeSet(), symbols, new ValueMap()
     exampleModel.addObserver observer
     symbols.addUndefinedUse { name: "sym", line: 1, start: 5, end: 6 }
     (expect observer.propertyName).toBe ExampleModelProperty.UNDEFINED_USES
@@ -49,7 +48,10 @@ describe "ExampleModel", ->
 describe "ExampleView", ->
 
   it "shows text for the lines in the model's list", ->
-    model = new ExampleModel codeBuffer, new LineSet([1, 2]), new SymbolSet(), new ValueMap()
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]),
+      new SymbolSet(), new ValueMap()
     view = new ExampleView model, makeEditor(), codeBuffer
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "int i = 0;").not.toBe -1
@@ -59,15 +61,15 @@ describe "ExampleView", ->
 
   it "updates text display when the list of lines changes", ->
 
-    lineSet = new LineSet [1, 2]
-    model = new ExampleModel codeBuffer, lineSet, new SymbolSet(), new ValueMap()
+    rangeSet = new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]
+    model = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), new ValueMap()
     view = new ExampleView model, makeEditor()
 
     # Remove first line from the list
-    lineSet.getActiveLineNumbers().splice 0, 1
+    rangeSet.getActiveRanges().splice 0, 1
 
     # Add another line index to the list
-    lineSet.getActiveLineNumbers().push 3
+    rangeSet.getActiveRanges().push new Range [2, 0], [2, 10]
 
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "int i = 0;").toBe -1
@@ -79,10 +81,13 @@ describe "ExampleView", ->
 
     symbolSet = new SymbolSet()
 
-    model = new ExampleModel codeBuffer, new LineSet([3]), symbolSet, new ValueMap()
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ new Range [2, 0], [2, 10] ] ),
+      symbolSet, new ValueMap()
     view = new ExampleView model, makeEditor()
     model.setState ExampleModelState.PICK_UNDEFINED
-    symbolSet.addUndefinedUse { name: "j", line: 3, start: 5, end: 6 }
+    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
 
     editor = view.getTextEditor()
     markers = editor.getMarkers()
@@ -101,10 +106,13 @@ describe "ExampleView", ->
   describe "after marking up a symbol", ->
 
     symbolSet = new SymbolSet()
-    model = new ExampleModel codeBuffer, new LineSet([3]), symbolSet, new ValueMap()
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ new Range [2, 0], [2, 10] ]),
+      symbolSet, new ValueMap()
     view = new ExampleView model, makeEditor()
     model.setState ExampleModelState.PICK_UNDEFINED
-    symbolSet.addUndefinedUse { name: "j", line: 3, start: 5, end: 6 }
+    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
 
     editor = view.getTextEditor()
     buttonDecorations = editor.getDecorations { class: 'undefined-use-button' }
@@ -122,16 +130,19 @@ describe "ExampleView", ->
       domElement = $ (buttonDecorations[0].getProperties()).item
       domElement.click()
       (expect model.getTarget()).toEqual \
-        { name: "j", line: 3, start: 5, end: 6 }
+        new Symbol "nofile", "j", new Range [2, 4], [2, 5]
 
   it "skips focusing on undefined symbols not in the range of chosen lines", ->
 
     # This time, the undefined use appears on a line that's not within view.
     # We shouldn't add any marks for the symbol.
     symbolSet = new SymbolSet()
-    symbolSet.addUndefinedUse { name: "j", line: 3, start: 5, end: 6 }
+    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
 
-    model = new ExampleModel codeBuffer, new LineSet([1]), symbolSet, new ValueMap()
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ new RangeSet [0, 0], [0, 10] ]),
+      symbolSet, new ValueMap()
     view = new ExampleView model, makeEditor()
     markers = view.getTextEditor().getMarkers()
     (expect markers.length).toBe 0
@@ -139,8 +150,11 @@ describe "ExampleView", ->
   it "skips focusing on undefined symbols if it's not in PICK_UNDEFINED mode", ->
 
     symbolSet = new SymbolSet()
-    symbolSet.addUndefinedUse { name: "Line", line: 3, start: 5, end: 6 }
-    model = new ExampleModel codeBuffer, new LineSet([3]), symbolSet, new ValueMap()
+    symbolSet.addUndefinedUse new Symbol "nofile", "Line", new Range [2, 4], [2, 5]
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ new Range [2, 0], [2, 10] ]),
+      symbolSet, new ValueMap()
     view = new ExampleView model, makeEditor()
 
     # Only show markers when we're picking from undefined uses
@@ -155,17 +169,20 @@ describe "ExampleView", ->
     valueMap = new ValueMap()
     _.extend valueMap, {
       'Example.java':
-        2: { i: '0' }
-        3: { i: '0', j: '0' }
-        4: { i: '1', j: '0' }
+        1: { i: '0' }
+        2: { i: '0', j: '0' }
+        3: { i: '1', j: '0' }
     }
-    symbolSet.setDefinition { name: "j", line: 2, start: 5, end: 6 }
-    model = new ExampleModel codeBuffer, new LineSet([3]), symbolSet, valueMap
+    symbolSet.setDefinition new Symbol "Example.java", "j", new Range [1, 4], [1, 5]
+    model = new ExampleModel \
+      codeBuffer,
+      (new RangeSet [ new Range [2, 0], [2, 10] ]),
+      symbolSet, valueMap
     view = new ExampleView model, makeEditor()
 
     # By setting a target and setting the state to DEFINE, the view should
     # update by adding a new marker to the undefined use
-    model.setTarget { file: "Example.java", name: "j", line: 3, start: 5, end: 6 }
+    model.setTarget new Symbol "Example.java", "j", new Range [2, 4], [2, 5]
     model.setState ExampleModelState.DEFINE
 
     it "adds a marker for defining the target", ->
@@ -191,24 +208,35 @@ describe "ExampleView", ->
       setValueButton = domElement.find "#set-value-button"
 
       it "shows suggestions when the mouse enters the definition button", ->
-        (expect model.getLineSet().getSuggestedLineNumbers()).toEqual []
+        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
         addCodeButton.mouseover()
-        (expect model.getLineSet().getSuggestedLineNumbers()).toEqual [2]
+        (expect model.getRangeSet().getSuggestedRanges()).toEqual \
+          [ new Range [1, 4], [1, 5] ]
 
       it "hides suggestions when the mouse leaves the definition button", ->
-        (expect model.getLineSet().getSuggestedLineNumbers()).toEqual [2]
+        (expect model.getRangeSet().getSuggestedRanges()).toEqual \
+          [ new Range [1, 4], [1, 5] ]
         addCodeButton.mouseout()
-        (expect model.getLineSet().getSuggestedLineNumbers()).toEqual []
+        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
 
       it "selects lines when the definition button is clicked", ->
+
+        _containsRange = (rangeList, range) =>
+          for otherRange in rangeList
+            if otherRange.isEqual range
+              return true
+          false
+
         # To realistically simulate a user, we send a mouse-over event
         # before we send the click event
         addCodeButton.mouseover()
         addCodeButton.click()
-        (expect 2 in model.getLineSet().getActiveLineNumbers()).toBe true
-        (expect 3 in model.getLineSet().getActiveLineNumbers()).toBe true
-        (expect model.getLineSet().getActiveLineNumbers().length).toBe 2
-        (expect model.getLineSet().getSuggestedLineNumbers()).toEqual []
+        (expect (_containsRange model.getRangeSet().getActiveRanges(),
+          new Range [ 1, 0 ], [ 1, 10 ])).toBe true
+        (expect (_containsRange model.getRangeSet().getActiveRanges(),
+          new Range [ 2, 0 ], [ 2, 10 ])).toBe true
+        (expect model.getRangeSet().getActiveRanges().length).toBe 2
+        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
 
       # Refresh the markers: the earlier changes to the data refreshed the
       # code view, so the old marker handles are stale

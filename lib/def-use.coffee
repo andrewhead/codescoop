@@ -1,6 +1,8 @@
 { JAVA_CLASSPATH, java } = require './paths'
 DataflowAnalysis = java.import "DataflowAnalysis"
 SymbolAppearance = java.import "SymbolAppearance"
+{ Range } = require './range-set'
+{ Symbol } = require './symbol-set'
 
 
 ###
@@ -13,17 +15,24 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     @fileName = fileName
 
   _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
-    file: @fileName
-    name: symbolAppearance.getSymbolNameSync()
-    # Both representations have the first line at 1
-    line: symbolAppearance.getLineNumberSync()
-    # The existing analysis starts at column index zero, but we
-    # want to refer to symbols by their visual appearnace in the text
-    # editor, where the column indexes start at 1
-    start: symbolAppearance.getStartPositionSync() + 1
-    end: symbolAppearance.getEndPositionSync() + 1
+    row = symbolAppearance.getLineNumberSync() - 1
+    start = symbolAppearance.getStartPositionSync()
+    end = symbolAppearance.getEndPositionSync()
+    name = symbolAppearance.getSymbolNameSync()
+    new Symbol @fileName, name,
+      new Range [row, start], [row, end]
 
-  getUndefinedUses: (lineIndexes) ->
+  getUndefinedUses: (ranges) ->
+
+    # XXX: For now, this analysis just looks in the lines of Java
+    # corresponding to the ranges.  We should fix this later.  In the
+    # meantime, we have to convert range rows back into 1-indexed line
+    # numbers for our dataflow analysis
+    lineIndexes = []
+    for range in ranges
+      for row in range.getRows()
+        if (row + 1) not in lineIndexes
+          lineIndexes.push (row + 1)
 
     # Convert the list of selected lines to a list that can be
     # passed to our static analysis too.
@@ -51,9 +60,14 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     undefinedUses
 
   getDefBeforeUse: (symbol) ->
+
+    # XXX: See other XXX note above about eventually supporting
+    # Java symbols that have ranges instead of single lines
     symbolJavaObj = new SymbolAppearance(
-      symbol.name, symbol.line, symbol.start, symbol.end
+      symbol.name, symbol.getRange().start.row + 1,
+      symbol.getRange().start.column, symbol.getRange().end.column
     )
+    console.log symbolJavaObj
     definitionJavaObj = @analysis.getLatestDefinitionBeforeUseSync symbolJavaObj
     if definitionJavaObj
       definition = @_javaSymbolAppearanceToSymbol definitionJavaObj

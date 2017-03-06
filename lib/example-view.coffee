@@ -1,11 +1,10 @@
 $ = require 'jquery'
-{ Range } = require 'atom'
-{ LineSet, LineSetProperty } = require './line-set'
+{ Range, RangeSet, RangeSetProperty } = require './range-set'
 
 
 module.exports.ExampleModelProperty = ExampleModelProperty =
   UNKNOWN: { value: -1, name: "unknown" }
-  ACTIVE_LINE_NUMBERS: { value: 0, name: "lines-changed" }
+  ACTIVE_RANGES: { value: 0, name: "lines-changed" }
   UNDEFINED_USES: { value: 1, name: "undefined-use-added" }
   STATE: { value: 2, name: "state" }
   TARGET: { value: 3, name: "target "}
@@ -24,11 +23,11 @@ module.exports.ExampleModel = class ExampleModel
   lineNumbers are assumed to be 1-indexed, corresponding to the line
   numbers as they would appear in a text editor.
   ###
-  constructor: (codeBuffer, lineSet, symbols, valueMap) ->
+  constructor: (codeBuffer, rangeSet, symbols, valueMap) ->
     @observers = []
     @codeBuffer = codeBuffer
-    @lineSet = lineSet
-    @lineSet.addObserver @
+    @rangeSet = rangeSet
+    @rangeSet.addObserver @
     @symbols = symbols
     @symbols.addObserver @
     @valueMap = valueMap
@@ -42,8 +41,8 @@ module.exports.ExampleModel = class ExampleModel
 
   notifyObservers: (object, propertyName, propertyValue) ->
     # For now, it's sufficient to bubble up the event
-    if propertyName is LineSetProperty.ACTIVE_LINE_NUMBERS_CHANGED
-      propertyName = ExampleModelProperty.ACTIVE_LINE_NUMBERS
+    if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
+      propertyName = ExampleModelProperty.ACTIVE_RANGES
     else if object is @symbols
       propertyName = ExampleModelProperty.UNDEFINED_USES
     else if object is @
@@ -60,8 +59,8 @@ module.exports.ExampleModel = class ExampleModel
   getState: ->
     @state
 
-  getLineSet: ->
-    @lineSet
+  getRangeSet: ->
+    @rangeSet
 
   getCodeBuffer: ->
     @codeBuffer
@@ -111,12 +110,6 @@ module.exports.ExampleView = class ExampleView
     @markerUses = {}
     @update()
 
-  setChosenLines: (lineNumbers) ->
-    @chosenLines = lineNumbers
-    # sortedLines = @chosenLines.sort()
-    # @lineTexts = ((@codeBuffer.lineForRow i) for i in sortedLines)
-    @update()
-
   getTextEditor: () ->
     @textEditor
 
@@ -124,7 +117,7 @@ module.exports.ExampleView = class ExampleView
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.UNDEFINED_USES
-      ExampleModelProperty.ACTIVE_LINE_NUMBERS
+      ExampleModelProperty.ACTIVE_RANGES
     ]
 
   _clearMarkers: ->
@@ -158,7 +151,7 @@ module.exports.ExampleView = class ExampleView
 
     # Find the end of the file and add the ending boilerplate
     lastLine = @textEditor.getLastBufferRow()
-    lastChar = @textEditor.lineTextForBufferRow(lastLine).length
+    lastChar = (@textEditor.lineTextForBufferRow lastLine).length
     range = new Range [lastLine, lastChar], [lastLine, lastChar]
     @textEditor.setTextInBufferRange(
       range,
@@ -166,29 +159,46 @@ module.exports.ExampleView = class ExampleView
     )
 
   _addCodeLines: ->
+
     # Make a copy here, as sort mutates the array, and we don't want to observe
     # each of the sorting events (would cause infinite recursion)
-    lineNumbers = @model.getLineSet().getActiveLineNumbers().copy()
-    lineNumbersSorted = lineNumbers.sort()
-    # Remember that row numbers in the buffer are zero-indexed.  But
-    # the line numbers we save are one-indexed, as they appear in the editor
-    textLines = (
-      (@model.getCodeBuffer().lineForRow (lineNumber - 1)) \
-      for lineNumber in lineNumbersSorted)
-    code = textLines.join "\n"
-    @textEditor.setText code
+    ranges = @model.getRangeSet().getActiveRanges().copy()
+    rangesSorted = ranges.sort (a, b) => a.compare b
+
+    rangeOffsets = []
+    text = ""
+
+    for range in rangesSorted
+      # We store the offset of each active range within the editor so that
+      # in the next step we can locate where the symbols have been moved,
+      # so we can add markers and decorations
+      rangeOffset = (text.split "\n").length - 1
+      rangeText = @model.getCodeBuffer().getTextInRange range
+      text += (rangeText + "\n")
+      rangeOffsets.push [range, rangeOffset]
+
+    @textEditor.setText text
+    rangeOffsets
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
-  _markUse: (use) ->
+  _markUse: (use, rangeOffsets) ->
 
-    lineNumbers = @model.getLineSet().getActiveLineNumbers().copy()
-    lineNumbersSorted = lineNumbers.sort()
-    exampleLineNumber = (lineNumbersSorted.indexOf use.line)
-    return if exampleLineNumber is -1  # if use not in lines, skip it
+    symbolInActiveRange = false
+    for activeRange in @model.getRangeSet().getActiveRanges()
+      if activeRange.containsRange use.getRange()
+        symbolInActiveRange = true
+        filteredRangeOffsets = rangeOffsets.filter (element) =>
+          activeRange.isEqual element[0]
+        rangeOffset = filteredRangeOffsets[0]
+        exampleRow = rangeOffset[1] +
+          (use.getRange().start.row - activeRange.start.row)
+    return if not symbolInActiveRange  # if use not in active ranges, skip it
 
-    range = new Range [exampleLineNumber, use.start - 1], [exampleLineNumber, use.end - 1]
-    marker = @textEditor.markBufferRange range, { invalidate: "overlap" }
+    markerRange = new Range \
+     [exampleRow, use.getRange().start.column],
+     [exampleRow, use.getRange().end.column]
+    marker = @textEditor.markBufferRange markerRange, { invalidate: "overlap" }
     @markers.push marker
 
     # We need to hold onto the use that each marker refers to.  We use
@@ -198,10 +208,9 @@ module.exports.ExampleView = class ExampleView
 
     marker
 
-  _addUndefinedUseMarkers: ->
-    lineNumbers = @model.getLineSet().getActiveLineNumbers()
+  _addUndefinedUseMarkers: (rangeOffsets) ->
     for use in @model.getSymbols().getUndefinedUses()
-      marker = @_markUse use
+      @_markUse use, rangeOffsets
 
   _addUndefinedUseDecorations: ->
     for marker in @markers
@@ -229,16 +238,19 @@ module.exports.ExampleView = class ExampleView
         class: 'undefined-use-highlight'
       @textEditor.decorateMarker marker, params
 
-  _addDefinitionWidget: ->
+  _addDefinitionWidget: (rangeOffsets) ->
 
     # Make a marker for the target use
     targetUse = @model.getTarget()
-    marker = @_markUse targetUse
+    marker = @_markUse targetUse, rangeOffsets
 
     # Built up the interactive widget
     decoration = $ "<div></div>"
     originalText = @textEditor.getTextInBufferRange marker.getBufferRange()
-    valueText = @model.getValueMap()[targetUse.file][targetUse.line][targetUse.name]
+    # XXX: This lookup uses the start row of the use, but what it should
+    # really do is get the line that is invoked by the debugger when this
+    # symbol is called, which might not be the same thing
+    valueText = @model.getValueMap()[targetUse.file][targetUse.getRange().start.row][targetUse.name]
     setValueButton = $ "<div>Add Data</div>"
     if valueText?
       setValueButton
@@ -263,14 +275,18 @@ module.exports.ExampleView = class ExampleView
       .addClass "definition-method-button"
       .mouseover (event) =>
         def = @model.getSymbols().getDefinition()
-        @model.getLineSet().setSuggestedLineNumbers [def.line]
+        @model.getRangeSet().setSuggestedRanges [def.getRange()]
       .mouseout (event) =>
         def = @model.getSymbols().getDefinition()
-        @model.getLineSet().removeSuggestedLineNumber def.line
+        @model.getRangeSet().removeSuggestedRange def.getRange()
       .click (event) =>
         def = @model.getSymbols().getDefinition()
-        @model.getLineSet().removeSuggestedLineNumber def.line
-        @model.getLineSet().getActiveLineNumbers().push def.line
+        @model.getRangeSet().removeSuggestedRange def.getRange()
+        # XXX: For now, we get the range of the first line of the def.
+        # In the future, we'll want to just get the relevant part
+        # of the statement and not the whole line.
+        @model.getRangeSet().getActiveRanges().push \
+          @model.getCodeBuffer().rangeForRow def.getRange().start.row
     decoration.append addCodeButton
 
     # Create a decoration from the element
@@ -286,10 +302,10 @@ module.exports.ExampleView = class ExampleView
     # We add in the code, then add the markers, then the boilerplate.
     # By adding the code first, we get to use the character offsets of
     # each symbol to mark them, before inserting other boilerplate code
-    @_addCodeLines()
+    activeRangeOffsets = @_addCodeLines()
     if @model.getState() is ExampleModelState.PICK_UNDEFINED
-      @_addUndefinedUseMarkers()
+      @_addUndefinedUseMarkers activeRangeOffsets
       @_addUndefinedUseDecorations()
     else if @model.getState() is ExampleModelState.DEFINE
-      @_addDefinitionWidget()
+      @_addDefinitionWidget activeRangeOffsets
     @_insertBoilerplate()

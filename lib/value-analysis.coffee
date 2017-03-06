@@ -4,6 +4,7 @@ VariableTracer = java.import "VariableTracer"
 
 # In it's simplest form, this is just a JavaScript object, with data
 # accessible by indexing on source file name, line number, and variable name
+# Line numbers are 0-indexes (to correspond to GitHub atom rows)
 module.exports.ValueMap = class ValueMap
 
 
@@ -31,11 +32,14 @@ module.exports.ValueAnalysis = class ValueAnalysis
       valueMap[sourceFileName] = {}
       sourceFileLines = javaMap.getSync sourceFileName
       for lineNumber in sourceFileLines.keySetSync().toArraySync()
-        valueMap[sourceFileName][lineNumber] = {}
+        # Remember: in the data structure we return, we want to
+        # let values be accessed by zero-indexed row number.
+        correctedLineNumber = lineNumber - 1
+        valueMap[sourceFileName][correctedLineNumber] = {}
         variables = sourceFileLines.getSync lineNumber
         for variableName in variables.keySetSync().toArraySync()
           variableValue = variables.getSync variableName
-          valueMap[sourceFileName][lineNumber][variableName] =\
+          valueMap[sourceFileName][correctedLineNumber][variableName] =\
             @_getPrintableValue variableValue
 
     valueMap
@@ -48,21 +52,6 @@ module.exports.ValueAnalysis = class ValueAnalysis
       err error if error
       callback (@_constructValueMap result)
       @values = result
-
-  # Given a variable name and a line number, get a value that it was
-  # defined to have when the code was run.
-  getValue: (fileName, variableName, lineNumber) ->
-    # Any one of the nested maps might return null if there's no value
-    # for the key, so we do a null check for each layer of lookup.
-    if values?
-      lineToVariableMap = values.getSync fileName
-      if lineToVariableMap?
-        variableToValueMap = lineToVariableMap.getSync lineNumber
-        if variableToValueMap?
-          value = variableToValueMap.getSync variableName
-
-    # For the time being, we reutnr a string that could be put in a program
-    @_getPrintableValue(value)
 
   _getPrintableValue: (value) ->
     if value is null

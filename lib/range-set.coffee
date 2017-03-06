@@ -1,27 +1,30 @@
-module.exports.LineSetProperty = LineSetProperty =
+module.exports.Range = (require 'atom').Range
+
+
+module.exports.RangeSetProperty = RangeSetProperty =
   UNKNOWN: { value: -1, name: "unknown" }
-  ACTIVE_LINE_NUMBERS_CHANGED: { value: 0, name: "active-line-numbers-changed" }
-  SUGGESTED_LINE_NUMBERS_CHANGED: { value: 1, name: "suggested-line-numbers-changed" }
+  ACTIVE_RANGES_CHANGED: { value: 0, name: "active-ranges-changed" }
+  SUGGESTED_RANGES_CHANGED: { value: 1, name: "suggested-line-numbers-changed" }
 
 
-module.exports.LineSet = class LineSet
+module.exports.RangeSet = class RangeSet
 
-  constructor: (activeLineNumbers, suggestedLineNumbers)->
-    @activeLineNumbers = @_makeObservableArray activeLineNumbers
-    @suggestedLineNumbers = @_makeObservableArray suggestedLineNumbers
-    @activeLineNumbers.addObserver @
-    @suggestedLineNumbers.addObserver @
+  constructor: (activeRanges, suggestedRanges)->
+    @activeRanges = @_makeObservableArray activeRanges
+    @suggestedRanges = @_makeObservableArray suggestedRanges
+    @activeRanges.addObserver @
+    @suggestedRanges.addObserver @
     @observers = []
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
-    if object is @activeLineNumbers
-      propertyName = LineSetProperty.ACTIVE_LINE_NUMBERS_CHANGED
-      propertyValue = @getActiveLineNumbers()
-    else if object is @suggestedLineNumbers
-      propertyName = LineSetProperty.SUGGESTED_LINE_NUMBERS_CHANGED
-      propertyValue = @getSuggestedLineNumbers()
+    if object is @activeRanges
+      propertyName = RangeSetProperty.ACTIVE_RANGES_CHANGED
+      propertyValue = @getActiveRanges()
+    else if object is @suggestedRanges
+      propertyName = RangeSetProperty.SUGGESTED_RANGES_CHANGED
+      propertyValue = @getSuggestedRanges()
     else
-      propertyName = LineSetProperty.UNKNOWN
+      propertyName = RangeSetProperty.UNKNOWN
     @notifyObservers this, propertyName, propertyValue
 
   addObserver: (observer) ->
@@ -58,25 +61,25 @@ module.exports.LineSet = class LineSet
         # to make sure that any mutations made to the array after
         # notification also get noticed.
         target[property] = value
-        target.notifyObservers proxy, LineSetProperty.ARRAY_CHANGE, proxy
+        target.notifyObservers proxy, RangeSetProperty.ARRAY_CHANGE, proxy
         true
     }
 
     proxy
 
-  getActiveLineNumbers: ->
-    @activeLineNumbers
+  getActiveRanges: ->
+    @activeRanges
 
-  getSuggestedLineNumbers: ->
-    @suggestedLineNumbers
+  getSuggestedRanges: ->
+    @suggestedRanges
 
-  setSuggestedLineNumbers: (lineNumbers) ->
+  setSuggestedRanges: (ranges) ->
     # Although this looks verbose, it's important that we manually transfer
     # all new elements.  The current list of suggested line numbers has
     # observers that will be trashed if we start the array from scratch.
-    @suggestedLineNumbers.splice(0, @suggestedLineNumbers.length)
-    for lineNumber in lineNumbers
-      @suggestedLineNumbers.push lineNumber
+    @suggestedRanges.splice(0, @suggestedRanges.length)
+    for range in ranges
+      @suggestedRanges.push range
 
-  removeSuggestedLineNumber: (lineNumber) ->
-    @suggestedLineNumbers.splice((@suggestedLineNumbers.indexOf lineNumber), 1)
+  removeSuggestedRange: (range) ->
+    @suggestedRanges.splice((@suggestedRanges.indexOf range), 1)

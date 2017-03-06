@@ -1,7 +1,7 @@
 { parse, ParseTree } = require "../lib/parse-tree"
 { JavaParser } = require "../lib/grammars/Java/JavaParser"
 { Symbol, File } = require "../lib/symbol-set"
-{ Range } = require "atom"
+{ Range } = require "../lib/range-set"
 
 JAVA_CODE = [
   "public class Example {"

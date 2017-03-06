@@ -2,7 +2,7 @@
 { JavaListener } = require './grammars/Java/JavaListener'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 { Symbol, File } = require './symbol-set'
-{ Range } = require 'atom'
+{ Range } = require './range-set'
 { ParseTree } = require './parse-tree'
 
 

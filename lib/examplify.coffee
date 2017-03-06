@@ -4,7 +4,7 @@
 { ExampleController } = require './example-controller'
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'
-{ LineSet } = require './line-set'
+{ RangeSet } = require './range-set'
 { SymbolSet } = require './symbol-set'
 $ = require 'jquery'
 
@@ -38,15 +38,15 @@ module.exports.MainController = class MainController
   constructor: (codeEditor, exampleEditor) ->
 
     selectedRange = codeEditor.getSelectedBufferRange()
-    activeLineNumbers = (row + 1 for row in selectedRange.getRows())
+    activeRanges = [ selectedRange ]
 
     # Prepare models (data)
-    @lineSet = new LineSet activeLineNumbers
+    @rangeSet = new RangeSet activeRanges
     @symbols = new SymbolSet()
-    @exampleModel = new ExampleModel codeEditor.getBuffer(), @lineSet, @symbols
+    @exampleModel = new ExampleModel codeEditor.getBuffer(), @rangeSet, @symbols
 
     # Prepare views
-    @codeView = new CodeView codeEditor, @lineSet
+    @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
 
     # Prepare controllers
@@ -54,5 +54,5 @@ module.exports.MainController = class MainController
     @valueAnalysis = new ValueAnalysis codeEditor.getPath(), codeEditor.getTitle()
     @exampleController = new ExampleController @exampleModel, @defUseAnalysis, @valueAnalysis
 
-  getLineSet: ->
-    @lineSet
+  getRangeSet: ->
+    @rangeSet

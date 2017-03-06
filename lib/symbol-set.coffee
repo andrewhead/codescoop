@@ -26,10 +26,12 @@ module.exports.Symbol = class Symbol
     @range = range
 
   equals: (other) ->
-
     (@file.equals other.file) and
       (@name is other.name) and
       (@range.isEqual other.range)
+
+  getRange: ->
+    @range
 
 
 module.exports.SymbolSet = class SymbolSet

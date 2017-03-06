@@ -5,7 +5,7 @@
 { BlockScope, ForLoopScope, MethodScope, ClassScope } = require '../lib/scope'
 { parse, partialParse } = require '../lib/parse-tree'
 { Symbol, File } = require '../lib/symbol-set'
-{ Range } = require 'atom'
+{ Range } = require '../lib/range-set'
 
 
 describe "ScopeFinder", ->

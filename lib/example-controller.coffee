@@ -8,8 +8,8 @@ module.exports.ExampleController = class ExampleController
     @defUseAnalysis = defUseAnalysis
     @defUseAnalysis.run ((analysis) =>
         @model.setState ExampleModelState.PICK_UNDEFINED
-        activeLineNumbers = @model.getLineSet().getActiveLineNumbers()
-        undefinedUses = @defUseAnalysis.getUndefinedUses activeLineNumbers
+        activeRanges = @model.getRangeSet().getActiveRanges()
+        undefinedUses = @defUseAnalysis.getUndefinedUses activeRanges
         @model.getSymbols().setUndefinedUses undefinedUses
         ),
       console.error
@@ -29,8 +29,8 @@ module.exports.ExampleController = class ExampleController
         @model.getSymbols().setDefinition def
 
     else if @model.getState() is ExampleModelState.DEFINE
-      if propertyName is ExampleModelProperty.ACTIVE_LINE_NUMBERS
+      if propertyName is ExampleModelProperty.ACTIVE_RANGES
         @model.setState ExampleModelState.PICK_UNDEFINED
-        activeLineNumbers = propertyValue
-        undefinedUses = @defUseAnalysis.getUndefinedUses activeLineNumbers
+        activeRanges = propertyValue
+        undefinedUses = @defUseAnalysis.getUndefinedUses activeRanges
         @model.getSymbols().setUndefinedUses undefinedUses

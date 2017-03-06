@@ -1,5 +1,5 @@
 { CodeView } = require '../lib/code-view'
-{ LineSet } = require '../lib/line-set'
+{ Range, RangeSet } = require '../lib/range-set'
 $ = require 'jquery'
 
 
@@ -26,9 +26,9 @@ describe 'CodeView', () ->
 
   it 'highlights the chosen lines and dims the rest', ->
 
-    lineSet = new LineSet [2]
+    rangeSet = new RangeSet [ new Range [1, 0], [1, 5] ]
     editor = _makeEditor()
-    codeView = new CodeView editor, lineSet
+    codeView = new CodeView editor, rangeSet
 
     # It looks like headless editors don't ge populated with buffer rows.
     # So let's go ahead and make the buffer rows we expect to appear
@@ -45,9 +45,9 @@ describe 'CodeView', () ->
 
   it 'updates highlighting when the chosen lines are modified', ->
 
-    lineSet = new LineSet []
+    rangeSet = new RangeSet []
     editor = _makeEditor()
-    codeView = new CodeView editor, lineSet
+    codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView(editor)
     _addLines(editorView)
 
@@ -56,14 +56,14 @@ describe 'CodeView', () ->
     # the view should update the DOM automatically
     codeView.update()
     expect(($ (editorView.querySelectorAll 'div.lines .active')).length).toBe 0
-    lineSet.getActiveLineNumbers().push 1
+    rangeSet.getActiveRanges().push new Range [1, 0], [1, 5]
     expect(($ (editorView.querySelectorAll 'div.lines .active')).length).toBe 1
 
   it 'adds an extra highlight to suggested lines', ->
 
-    lineSet = new LineSet [], [2]
+    rangeSet = new RangeSet [], [ new Range [1, 0], [1, 5] ]
     editor = _makeEditor()
-    codeView = new CodeView editor, lineSet
+    codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView(editor)
     _addLines(editorView)
 
@@ -76,9 +76,9 @@ describe 'CodeView', () ->
 
   it 'updates suggested line highlighting when suggested lines change', ->
 
-    lineSet = new LineSet [], []
+    rangeSet = new RangeSet [], []
     editor = _makeEditor()
-    codeView = new CodeView editor, lineSet
+    codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView(editor)
     _addLines(editorView)
 
@@ -87,18 +87,18 @@ describe 'CodeView', () ->
     # the view should update the DOM automatically
     codeView.update()
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 0
-    lineSet.getSuggestedLineNumbers().push 1
+    rangeSet.getSuggestedRanges().push new Range [0, 0], [0, 5]
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 1
 
   it 'removes suggested line highlighting when suggested line removed', ->
 
-    lineSet = new LineSet [], [2]
+    rangeSet = new RangeSet [], [ new Range [1, 0], [1, 5] ]
     editor = _makeEditor()
-    codeView = new CodeView editor, lineSet
+    codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView(editor)
     _addLines(editorView)
 
     codeView.update()
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 1
-    lineSet.removeSuggestedLineNumber(2)
+    rangeSet.removeSuggestedRange new Range [1, 0], [1, 5]
     expect(($ (editorView.querySelectorAll 'div.lines .suggested')).length).toBe 0
