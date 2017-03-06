@@ -2,7 +2,7 @@
 DataflowAnalysis = java.import "DataflowAnalysis"
 SymbolAppearance = java.import "SymbolAppearance"
 { Range } = require './range-set'
-{ Symbol } = require './symbol-set'
+{ Symbol } = require './model/symbol-set'
 
 
 ###

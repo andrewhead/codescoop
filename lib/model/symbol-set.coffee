@@ -1,3 +1,6 @@
+{ makeObservableArray } = require './observable-array'
+
+
 module.exports.SymbolSetProperty = SymbolSetProperty =
   UNDEFINED_USE_ADDED: { value: 0, name: "undefined-use-added" }
   UNDEFINED_USES: { value: 1, name: "undefined-uses" }
@@ -30,13 +33,20 @@ module.exports.Symbol = class Symbol
       (@name is other.name) and
       (@range.isEqual other.range)
 
+  getFile: ->
+    @file
+
   getRange: ->
     @range
+
+  getName: ->
+    @name
 
 
 module.exports.SymbolSet = class SymbolSet
 
-  constructor: ->
+  constructor: (allSymbols = undefined) ->
+    @allSymbols = makeObservableArray (allSymbols or [])
     @undefinedUses = []
     @observers = []
 
@@ -63,3 +73,6 @@ module.exports.SymbolSet = class SymbolSet
 
   setDefinition: (def) ->
     @definition = def
+
+  getAllSymbols: ->
+    @allSymbols

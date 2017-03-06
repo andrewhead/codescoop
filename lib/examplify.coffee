@@ -5,7 +5,7 @@
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'
 { RangeSet } = require './range-set'
-{ SymbolSet } = require './symbol-set'
+{ SymbolSet } = require './model/symbol-set'
 $ = require 'jquery'
 
 

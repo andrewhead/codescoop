@@ -1,4 +1,4 @@
-{ SymbolSet, SymbolSetProperty } = require '../lib/symbol-set'
+{ SymbolSet, SymbolSetProperty } = require '../lib/model/symbol-set'
 
 describe "SymbolSet", ->
 

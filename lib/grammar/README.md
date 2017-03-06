@@ -10,9 +10,9 @@ that I've already generated, from your Coffeescript.  This
 will look kind of like this:
 
 ```javascript
-{ LanguageLexer } = require './grammars/Language/LanguageLexer'
-{ LanguageLexer } = require './grammars/Language/LanguageParser'
-{ LanguageListener } = require './grammars/Language/LanguageListener'
+{ LanguageLexer } = require './grammar/Language/LanguageLexer'
+{ LanguageLexer } = require './grammar/Language/LanguageParser'
+{ LanguageListener } = require './grammar/Language/LanguageListener'
 ```
 
 Of course, you'll have to substitute `language` with the

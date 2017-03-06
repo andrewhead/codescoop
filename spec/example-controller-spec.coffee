@@ -2,7 +2,7 @@
 { ExampleController } = require '../lib/example-controller'
 { DefUseAnalysis } = require '../lib/def-use'
 { Range, RangeSet } = require '../lib/range-set'
-{ Symbol, SymbolSet } = require '../lib/symbol-set'
+{ Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { ValueAnalysis, ValueMap } = require '../lib/value-analysis'
 { PACKAGE_PATH } = require '../lib/paths'
 

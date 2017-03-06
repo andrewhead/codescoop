@@ -1,7 +1,7 @@
 { ExampleView } = require '../lib/example-view'
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/example-view'
 { makeObservableArray } = require '../lib/example-view'
-{ Symbol, SymbolSet } = require '../lib/symbol-set'
+{ Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { Range, RangeSet } = require '../lib/range-set'
 { ValueMap } = require '../lib/value-analysis'
 $ = require 'jquery'

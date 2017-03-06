@@ -1,7 +1,7 @@
-{ JavaParser } = require './grammars/Java/JavaParser'
-{ JavaListener } = require './grammars/Java/JavaListener'
+{ JavaParser } = require './grammar/Java/JavaParser'
+{ JavaListener } = require './grammar/Java/JavaListener'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
-{ Symbol, File } = require './symbol-set'
+{ Symbol, File } = require './model/symbol-set'
 { Range } = require './range-set'
 { ParseTree } = require './parse-tree'
 

@@ -1,7 +1,7 @@
 { InputStream, CommonTokenStream } = require 'antlr4'
-{ JavaLexer } = require './grammars/Java/JavaLexer'
-{ JavaParser } = require './grammars/Java/JavaParser'
-{ JavaListener } = require './grammars/Java/JavaListener'
+{ JavaLexer } = require './grammar/Java/JavaLexer'
+{ JavaParser } = require './grammar/Java/JavaParser'
+{ JavaListener } = require './grammar/Java/JavaListener'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 
@@ -22,10 +22,10 @@ class SymbolSearcher extends JavaListener
     # that comes immediately after it.
     nodeEndColumn = nodeStartColumn + (node.symbol.stop - node.symbol.start)
 
-    if (nodeLine is (@symbol.range.start.row + 1)) and
-       (nodeStartColumn is @symbol.range.start.column) and
-       (nodeEndColumn is (@symbol.range.end.column - 1)) and
-       (node.symbol.text is @symbol.name)
+    if (nodeLine is (@symbol.getRange().start.row + 1)) and
+       (nodeStartColumn is @symbol.getRange().start.column) and
+       (nodeEndColumn is (@symbol.getRange().end.column - 1)) and
+       (node.symbol.text is @symbol.getName())
       @matchingContexts.push node
 
   getMatchingCtx: ->

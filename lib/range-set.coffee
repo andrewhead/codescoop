@@ -1,3 +1,6 @@
+{ makeObservableArray } = require './model/observable-array'
+
+
 module.exports.Range = (require 'atom').Range
 
 
@@ -10,8 +13,8 @@ module.exports.RangeSetProperty = RangeSetProperty =
 module.exports.RangeSet = class RangeSet
 
   constructor: (activeRanges, suggestedRanges)->
-    @activeRanges = @_makeObservableArray activeRanges
-    @suggestedRanges = @_makeObservableArray suggestedRanges
+    @activeRanges = makeObservableArray activeRanges
+    @suggestedRanges = makeObservableArray suggestedRanges
     @activeRanges.addObserver @
     @suggestedRanges.addObserver @
     @observers = []
@@ -34,38 +37,6 @@ module.exports.RangeSet = class RangeSet
     # TODO: Have different events for changes to the different line sets
     for observer in @observers
       observer.onPropertyChanged object, propertyName, propertyValue
-
-  _makeObservableArray: (array = undefined) ->
-
-    array or= []
-
-    array.observers = []
-
-    array.addObserver = (observer) ->
-      @observers.push observer
-
-    array.notifyObservers = (object, propertyName, propertyValue) ->
-      for observer in @observers
-        observer.onPropertyChanged object, propertyName, propertyValue
-
-    # It should be easy to copy the array, so that people can modify a copy of
-    # the array without needing to observe it
-    array.copy = ->
-      @concat()
-
-    # REUSE: Snippet for watching change to array is based on
-    # answer from http://stackoverflow.com/questions/35610242
-    proxy = new Proxy array, {
-      set: (target, property, value, receiver) ->
-        # Importantly, we provide the proxy instead of the array
-        # to make sure that any mutations made to the array after
-        # notification also get noticed.
-        target[property] = value
-        target.notifyObservers proxy, RangeSetProperty.ARRAY_CHANGE, proxy
-        true
-    }
-
-    proxy
 
   getActiveRanges: ->
     @activeRanges

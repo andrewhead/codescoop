@@ -1,6 +1,6 @@
 { parse, ParseTree } = require "../lib/parse-tree"
-{ JavaParser } = require "../lib/grammars/Java/JavaParser"
-{ Symbol, File } = require "../lib/symbol-set"
+{ JavaParser } = require "../lib/grammar/Java/JavaParser"
+{ Symbol, File } = require "../lib/model/symbol-set"
 { Range } = require "../lib/range-set"
 
 JAVA_CODE = [
