@@ -1,5 +1,6 @@
 { Range } = require '../lib/range-set'
 { MainController } = require '../lib/examplify'
+{ PACKAGE_PATH } = require '../lib/paths'
 $ = require 'jquery'
 
 
@@ -14,9 +15,61 @@ _makeCodeEditor = =>
   codeEditor
 
 
-describe 'MainController', () ->
+describe "The Examplify Plugin", ->
 
-  it 'updates the line set to the selected lines when invoked', ->
+  TEST_FILENAME = PACKAGE_PATH + "/java/tests/analysis_examples/Example.java"
+  workspaceElement = undefined
+  activationPromise = undefined
+  examplifyPackage = undefined
+
+  # Based on boilerplate test spec code by GitHub Atom
+  beforeEach =>
+
+    workspaceElement = (atom.views.getView atom.workspace)
+    activationPromise = atom.packages.activatePackage 'examplify'
+
+    # Open up our example file
+    waitsForPromise =>
+      atom.workspace.open TEST_FILENAME
+
+  it "adds lines to the active set when the context menu is clicked", ->
+
+    # Note: it seems like activation needs to be ordered is:
+    # 1. Make activation promise above
+    # 2. Dispatch a command that will do activation
+    # 3. `waitForPromise` on the activation
+    # 4. `runs` the rest of the code
+
+    # Make a selection, and start creating example code!
+    editor = atom.workspace.getActiveTextEditor()
+    editor.setSelectedBufferRange new Range [5, 0], [5, 43]
+    atom.commands.dispatch workspaceElement, "examplify:make-example-code"
+
+    waitsForPromise =>
+      activationPromise
+
+    # After activating the package, we want to wait until the controller
+    # is initialized, so we can add another selection
+    runs =>
+      examplifyPackage = atom.packages.getActivePackage 'examplify'
+    waitsFor =>
+      examplifyPackage.mainModule.controller
+
+    runs =>
+
+      # Initially, there should only be one selection in the active set...
+      controller = examplifyPackage.mainModule.controller
+      (expect controller.getModel().getRangeSet().getActiveRanges().length).toBe 1
+
+      # After we make another selection, it should get added to the active set
+      editor.setSelectedBufferRange new Range [4, 0], [4, 35]
+      atom.commands.dispatch workspaceElement, "examplify:add-selection-to-example"
+      (expect controller.getModel().getRangeSet().getActiveRanges().length).toBe 2
+
+
+describe "MainController", ->
+
+  it "updates the line set to the selected lines when invoked", ->
 
     codeEditor = _makeCodeEditor()
     exampleEditor = atom.workspace.buildTextEditor()

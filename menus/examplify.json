@@ -4,6 +4,10 @@
       {
         "label": "Create example from selection",
         "command": "examplify:make-example-code"
+      },
+      {
+        "label": "Add selection to example",
+        "command": "examplify:add-selection-to-example"
       }
     ]
   },

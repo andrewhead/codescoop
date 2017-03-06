@@ -15,16 +15,21 @@ EXAMPLE_FILE_NAME = "SmallScoop.java"
 module.exports = plugin =
 
   subscriptions: null
+  # controller: null
 
   activate: (state) ->
-
     @subscriptions = new CompositeDisposable()
-    @subscriptions.add (atom.commands.add 'atom-workspace', {
-      'examplify:make-example-code': ->
-        codeEditor = atom.workspace.getActiveTextEditor()
-        (atom.workspace.open EXAMPLE_FILE_NAME, { split: 'right' }).then (exampleEditor) =>
-          mainController = new MainController codeEditor, exampleEditor
-    })
+    @subscriptions.add (atom.commands.add 'atom-workspace',
+      'examplify:make-example-code': =>
+        @codeEditor = atom.workspace.getActiveTextEditor()
+        (atom.workspace.open EXAMPLE_FILE_NAME, { split: 'right' }).then \
+          (exampleEditor) =>
+            @controller = new MainController @codeEditor, exampleEditor
+      'examplify:add-selection-to-example': =>
+        selectedRange = @codeEditor.getSelectedBufferRange()
+        rangeSet = @controller.getModel().getRangeSet()
+        rangeSet.getActiveRanges().push selectedRange
+    )
 
   deactivate: () ->
     this.subscriptions.dispose()
@@ -54,5 +59,9 @@ module.exports.MainController = class MainController
     @valueAnalysis = new ValueAnalysis codeEditor.getPath(), codeEditor.getTitle()
     @exampleController = new ExampleController @exampleModel, @defUseAnalysis, @valueAnalysis
 
+  # These accessors are here to let us test the controller
   getRangeSet: ->
     @rangeSet
+
+  getModel: ->
+    @exampleModel
