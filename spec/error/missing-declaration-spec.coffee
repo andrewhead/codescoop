@@ -1,4 +1,4 @@
-{ MissingDeclarationError, MissingDeclarationDetector } = require '../../lib/error/missing-declarations'
+{ MissingDeclarationError, MissingDeclarationDetector } = require '../../lib/error/missing-declaration'
 { parse } = require '../../lib/parse-tree'
 { Symbol, SymbolSet } = require '../../lib/model/symbol-set'
 { Range, RangeSet } = require '../../lib/model/range-set'

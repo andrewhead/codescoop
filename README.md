@@ -75,6 +75,19 @@ running the command.  The options do the following:
 When possible, I use this style guide for Coffeescript:
 https://github.com/polarmobile/coffeescript-style-guide
 
+#### Equality checks
+
+When implementing equality checks, call the method `equals`.
+The method should take in another object as a parameter and
+return a Boolean of whether the two objects are equal.
+
+#### Accessors
+
+Members of an object should only be accessed by other
+objects through accessors (`get` methods).
+
+#### Enums
+
 When defining enums, define each field as an object.  This
 make comparisons with an equals sign use values that are
 exclusive to each class, instead of comparing just on the
