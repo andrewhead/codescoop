@@ -1,37 +1,44 @@
 public class SymbolAppearance {
 
     private final String mSymbolName;
-    private final int mLineNumber;
-    private final int mStartPosition;
-    private final int mEndPosition;
+    private final int mStartLine;
+    private final int mStartColumn;
+    private final int mEndLine;
+    private final int mEndColumn;
 
-    public SymbolAppearance(String pSymbolName, int pLineNumber, int pStartPosition, 
-            int pEndPosition) {
+    public SymbolAppearance(String pSymbolName, int pStartLine, int pStartColumn, 
+            int pEndLine, int pEndColumn) {
         this.mSymbolName = pSymbolName;
-        this.mLineNumber = pLineNumber;
-        this.mStartPosition = pStartPosition;
-        this.mEndPosition = pEndPosition;
+        this.mStartLine = pStartLine;
+        this.mStartColumn = pStartColumn;
+        this.mEndLine = pEndLine;
+        this.mEndColumn = pEndColumn;
     }
 
     public String getSymbolName() {
         return this.mSymbolName;
     }
 
-    public int getLineNumber() {
-        return this.mLineNumber;
+    public int getStartLine() {
+        return this.mStartLine;
     }
 
-    public int getStartPosition() {
-        return this.mStartPosition;
+    public int getStartColumn() {
+        return this.mStartColumn;
     }
 
-    public int getEndPosition() {
-        return this.mEndPosition;
+    public int getEndLine() {
+        return this.mEndLine;
+    }
+
+    public int getEndColumn() {
+        return this.mEndColumn;
     }
 
     public String toString() {
-        return ("(" + this.getSymbolName() + ", L" + this.getLineNumber() + " [" +
-                this.getStartPosition() + ", " + this.getEndPosition() + "])");
+        return ("(" + this.getSymbolName() + ": " +
+                "[L" + this.getStartLine() + "C" + this.getStartColumn() + ", " +
+                "L" + this.getEndLine() + "C" + this.getEndColumn() + "])");
     }
 
     public boolean equals(Object other) {
@@ -41,18 +48,20 @@ public class SymbolAppearance {
         SymbolAppearance otherAppearance = (SymbolAppearance) other;
         return (
             otherAppearance.getSymbolName() == this.getSymbolName() &&
-            otherAppearance.getLineNumber() == this.getLineNumber() &&
-            otherAppearance.getStartPosition() == this.getStartPosition() &&
-            otherAppearance.getEndPosition() == this.getEndPosition()
+            otherAppearance.getStartLine() == this.getStartLine() &&
+            otherAppearance.getStartColumn() == this.getStartColumn() &&
+            otherAppearance.getEndLine() == this.getEndLine() &&
+            otherAppearance.getEndColumn() == this.getEndColumn()
         );
     }
 
     public int hashCode() {
         return (
             this.mSymbolName.hashCode() *
-            this.mLineNumber *
-            this.mStartPosition *
-            this.mEndPosition
+            this.mStartLine *
+            this.mStartColumn *
+            this.mEndLine *
+            this.mEndColumn
         );
     }
 

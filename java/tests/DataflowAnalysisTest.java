@@ -34,9 +34,9 @@ public class DataflowAnalysisTest {
         // Note that the way that definitions are reported are:
         // * on the first line that definitions occur, the symbol span
         // * on the next lines that definitions occur, the full line
-        SymbolAppearance iDef1 = new SymbolAppearance("i", 5, 8, 9);
-        SymbolAppearance jDef1 = new SymbolAppearance("j", 6, 8, 9);
-        SymbolAppearance iDef2 = new SymbolAppearance("i", 7, 4, 13);
+        SymbolAppearance iDef1 = new SymbolAppearance("i", 5, 8, 5, 9);
+        SymbolAppearance jDef1 = new SymbolAppearance("j", 6, 8, 6, 9);
+        SymbolAppearance iDef2 = new SymbolAppearance("i", 7, 4, 7, 13);
         assertTrue(defs.contains(iDef1));
         assertTrue(defs.contains(jDef1));
         assertTrue(defs.contains(iDef2));
@@ -80,10 +80,10 @@ public class DataflowAnalysisTest {
         Set<SymbolAppearance> usesWithoutTemps = excludeTempAppearances(uses);
 
         assertEquals(4, usesWithoutTemps.size());
-        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("i", 6, 12, 13)));
-        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("j", 7, 8, 9)));
-        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("j", 9, 23, 24)));
-        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("i", 9, 27, 28)));
+        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("i", 6, 12, 6, 13)));
+        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("j", 7, 8, 7, 9)));
+        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("j", 9, 23, 9, 24)));
+        assertTrue(usesWithoutTemps.contains(new SymbolAppearance("i", 9, 27, 9, 28)));
 
     }
     
@@ -115,12 +115,12 @@ public class DataflowAnalysisTest {
 
         Set<SymbolAppearance> iDefs = namesToDefs.get("i");
         assertEquals(2, iDefs.size());
-        assertTrue(iDefs.contains(new SymbolAppearance("i", 5, 8, 9)));
-        assertTrue(iDefs.contains(new SymbolAppearance("i", 7, 4, 13)));
+        assertTrue(iDefs.contains(new SymbolAppearance("i", 5, 8, 5, 9)));
+        assertTrue(iDefs.contains(new SymbolAppearance("i", 7, 4, 7, 13)));
 
         Set<SymbolAppearance> jDefs = namesToDefs.get("j");
         assertEquals(1, jDefs.size());
-        assertTrue(jDefs.contains(new SymbolAppearance("j", 6, 8, 9)));
+        assertTrue(jDefs.contains(new SymbolAppearance("j", 6, 8, 6, 9)));
 
     }
 
@@ -132,15 +132,15 @@ public class DataflowAnalysisTest {
 
         Set<SymbolAppearance> line5Defs = linesToDefs.get(5);
         assertEquals(1, excludeTempAppearances(line5Defs).size());
-        assertTrue(line5Defs.contains(new SymbolAppearance("i", 5, 8, 9)));
+        assertTrue(line5Defs.contains(new SymbolAppearance("i", 5, 8, 5, 9)));
 
         Set<SymbolAppearance> line6Defs = linesToDefs.get(6);
         assertEquals(1, excludeTempAppearances(line6Defs).size());
-        assertTrue(line6Defs.contains(new SymbolAppearance("j", 6, 8, 9)));
+        assertTrue(line6Defs.contains(new SymbolAppearance("j", 6, 8, 6, 9)));
 
         Set<SymbolAppearance> line7Defs = linesToDefs.get(7);
         assertEquals(1, excludeTempAppearances(line7Defs).size());
-        assertTrue(line7Defs.contains(new SymbolAppearance("i", 7, 4, 13)));
+        assertTrue(line7Defs.contains(new SymbolAppearance("i", 7, 4, 7, 13)));
 
         assertNull(linesToDefs.get(8));  // Nothing on line 8
 
@@ -157,16 +157,16 @@ public class DataflowAnalysisTest {
 
         Set<SymbolAppearance> line6Uses = linesToUses.get(6);
         assertEquals(1, excludeTempAppearances(line6Uses).size());
-        assertTrue(line6Uses.contains(new SymbolAppearance("i", 6, 12, 13)));
+        assertTrue(line6Uses.contains(new SymbolAppearance("i", 6, 12, 6, 13)));
 
         Set<SymbolAppearance> line7Uses = linesToUses.get(7);
         assertEquals(1, excludeTempAppearances(line7Uses).size());
-        assertTrue(line7Uses.contains(new SymbolAppearance("j", 7, 8, 9)));
+        assertTrue(line7Uses.contains(new SymbolAppearance("j", 7, 8, 7, 9)));
 
         Set<SymbolAppearance> line9Uses = linesToUses.get(9);
         assertEquals(2, excludeTempAppearances(line9Uses).size());
-        assertTrue(line9Uses.contains(new SymbolAppearance("j", 9, 23, 24)));
-        assertTrue(line9Uses.contains(new SymbolAppearance("i", 9, 27, 28)));
+        assertTrue(line9Uses.contains(new SymbolAppearance("j", 9, 23, 9, 24)));
+        assertTrue(line9Uses.contains(new SymbolAppearance("i", 9, 27, 9, 28)));
 
     }
 
@@ -178,7 +178,7 @@ public class DataflowAnalysisTest {
         lines.add(6);
         Set<SymbolAppearance> undefinedSymbols = dataflowAnalysis.getUndefinedUsesInLines(lines);
         assertEquals(1, excludeTempAppearances(undefinedSymbols).size());
-        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 6, 12, 13)));
+        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 6, 12, 6, 13)));
 
         // All symbols used are probably also defined here
         lines = new ArrayList<Integer>();
@@ -192,8 +192,8 @@ public class DataflowAnalysisTest {
         lines.add(9);
         undefinedSymbols = dataflowAnalysis.getUndefinedUsesInLines(lines);
         assertEquals(2, excludeTempAppearances(undefinedSymbols).size());
-        assertTrue(undefinedSymbols.contains(new SymbolAppearance("j", 9, 23, 24)));
-        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 9, 27, 28)));
+        assertTrue(undefinedSymbols.contains(new SymbolAppearance("j", 9, 23, 9, 24)));
+        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 9, 27, 9, 28)));
 
         // Find the same undefined symbol in two places
         lines = new ArrayList<Integer>();
@@ -201,8 +201,8 @@ public class DataflowAnalysisTest {
         lines.add(6);
         undefinedSymbols = dataflowAnalysis.getUndefinedUsesInLines(lines);
         assertEquals(2, excludeTempAppearances(undefinedSymbols).size());
-        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 6, 12, 13)));
-        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 9, 27, 28)));
+        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 6, 12, 6, 13)));
+        assertTrue(undefinedSymbols.contains(new SymbolAppearance("i", 9, 27, 9, 28)));
 
     }
 
@@ -211,17 +211,17 @@ public class DataflowAnalysisTest {
 
         // Simple case: there is one definition, and it's right above
         SymbolAppearance definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
-            new SymbolAppearance("i", 6, 12, 13));
-        assertEquals(new SymbolAppearance("i", 5, 8, 9), definition);
+            new SymbolAppearance("i", 6, 12, 6, 13));
+        assertEquals(new SymbolAppearance("i", 5, 8, 5, 9), definition);
 
         // If there are multiple definitions, just get the one right above it (the case with i)
         definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
-            new SymbolAppearance("i", 9, 27, 28));
-        assertEquals(new SymbolAppearance("i", 7, 4, 13), definition);
+            new SymbolAppearance("i", 9, 27, 9, 28));
+        assertEquals(new SymbolAppearance("i", 7, 4, 7, 13), definition);
 
         // Pathological case: there is no line above where the symbol is defined
         definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
-            new SymbolAppearance("x", 5, 4, 5));
+            new SymbolAppearance("x", 5, 4, 5, 5));
         assertNull(definition);
 
     }

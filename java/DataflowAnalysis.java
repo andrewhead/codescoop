@@ -82,9 +82,9 @@ public class DataflowAnalysis {
         // and also before the symbol's use
         if (definitions != null) {
             for (SymbolAppearance definition: definitions) {
-                if (definition.getLineNumber() < use.getLineNumber() && (
+                if (definition.getStartLine() < use.getStartLine() && (
                         latestDefinition == null ||
-                        definition.getLineNumber() > latestDefinition.getLineNumber())) {
+                        definition.getStartLine() > latestDefinition.getStartLine())) {
                     latestDefinition = definition;
                 }
             }
@@ -112,8 +112,8 @@ public class DataflowAnalysis {
                     Set<SymbolAppearance> definitions = definitionsByName.get(use.getSymbolName());
                     if (definitions != null) {
                         for (SymbolAppearance definition: definitions) {
-                            if (lines.contains(definition.getLineNumber()) &&
-                                    definition.getLineNumber() < line) {
+                            if (lines.contains(definition.getStartLine()) &&
+                                    definition.getStartLine() < line) {
                                 useDefined = true;
                                 break;
                             }
@@ -183,11 +183,11 @@ public class DataflowAnalysis {
             new HashMap<Integer, Set<SymbolAppearance>>());
 
         for (SymbolAppearance use: uses) {
-            int lineNumber = use.getLineNumber();
-            Set<SymbolAppearance> lineUses = linesToUses.get(lineNumber);
+            int startLine = use.getStartLine();
+            Set<SymbolAppearance> lineUses = linesToUses.get(startLine);
             if (lineUses == null) {
                 lineUses = new HashSet<SymbolAppearance>();
-                linesToUses.put(lineNumber, lineUses);
+                linesToUses.put(startLine, lineUses);
             }
             lineUses.add(use);
         }
@@ -204,11 +204,11 @@ public class DataflowAnalysis {
             new HashMap<Integer, Set<SymbolAppearance>>());
 
         for (SymbolAppearance definition: definitions) {
-            int lineNumber = definition.getLineNumber();
-            Set<SymbolAppearance> lineDefinitions = linesToDefinitions.get(lineNumber);
+            int startLine = definition.getStartLine();
+            Set<SymbolAppearance> lineDefinitions = linesToDefinitions.get(startLine);
             if (lineDefinitions == null) {
                 lineDefinitions = new HashSet<SymbolAppearance>();
-                linesToDefinitions.put(lineNumber, lineDefinitions);
+                linesToDefinitions.put(startLine, lineDefinitions);
             }
             lineDefinitions.add(definition);
         }
@@ -309,6 +309,7 @@ public class DataflowAnalysis {
                                     local.getName(),
                                     positionTag.startLn(),
                                     positionTag.startPos(),
+                                    positionTag.endLn(),
                                     positionTag.endPos()
                                 );
                                 definitions.add(definition);
@@ -344,6 +345,7 @@ public class DataflowAnalysis {
                             localValueBox.getValue().toString(),
                             positionTag.startLn(),
                             positionTag.startPos(),
+                            positionTag.endLn(),
                             positionTag.endPos()
                         );
                         uses.add(use);
