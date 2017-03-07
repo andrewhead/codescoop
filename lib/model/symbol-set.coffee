@@ -45,8 +45,11 @@ module.exports.Symbol = class Symbol
 
 module.exports.SymbolSet = class SymbolSet
 
-  constructor: (allSymbols = undefined) ->
-    @allSymbols = makeObservableArray (allSymbols or [])
+  constructor: (symbolArrays = undefined) ->
+    symbolArrays or= {}
+    @uses = makeObservableArray (symbolArrays.uses or [])
+    @defs = makeObservableArray (symbolArrays.defs or [])
+    @allSymbols = makeObservableArray (symbolArrays.all or [])
     @undefinedUses = []
     @observers = []
 
@@ -76,3 +79,9 @@ module.exports.SymbolSet = class SymbolSet
 
   getAllSymbols: ->
     @allSymbols
+
+  getUses: ->
+    @uses
+
+  getDefs: ->
+    @defs

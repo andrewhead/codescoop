@@ -1,7 +1,7 @@
-{ MissingDeclarationError, MissingDeclarationDetector } = require '../lib/error/missing-declarations'
-{ parse } = require '../lib/parse-tree'
-{ Symbol, SymbolSet } = require '../lib/model/symbol-set'
-{ Range, RangeSet } = require '../lib/model/range-set'
+{ MissingDeclarationError, MissingDeclarationDetector } = require '../../lib/error/missing-declarations'
+{ parse } = require '../../lib/parse-tree'
+{ Symbol, SymbolSet } = require '../../lib/model/symbol-set'
+{ Range, RangeSet } = require '../../lib/model/range-set'
 
 
 describe "MissingDeclarationDetector", ->
@@ -16,13 +16,14 @@ describe "MissingDeclarationDetector", ->
       "  }"
       "}"
     ].join "\n"
-    symbolSet = new SymbolSet [
-      new Symbol "Example.java", "args", new Range [1, 35], [1, 39]
-      new Symbol "Example.java", "i", new Range [2, 8], [2, 9]
-      new Symbol "Example.java", "j", new Range [3, 8], [3, 9]
-      new Symbol "Example.java", "i", new Range [3, 12], [3, 13]
-      new Symbol "Example.java", "args", new Range [4, 19], [4, 23]
-    ]
+    symbolSet = new SymbolSet {
+      all: [
+        new Symbol "Example.java", "args", new Range [1, 35], [1, 39]
+        new Symbol "Example.java", "i", new Range [2, 8], [2, 9]
+        new Symbol "Example.java", "j", new Range [3, 8], [3, 9]
+        new Symbol "Example.java", "i", new Range [3, 12], [3, 13]
+        new Symbol "Example.java", "args", new Range [4, 19], [4, 23]
+      ]}
     detector = new MissingDeclarationDetector()
 
     it "returns nothing when all symbols are declared", ->
@@ -64,10 +65,11 @@ describe "MissingDeclarationDetector", ->
     ].join "\n"
     # This is an incomplete set of the symbols that would be detected, but
     # it should be enough to run the declaration error detector.
-    symbolSet = new SymbolSet [
-      new Symbol "Example.java", "memberInt", new Range [4, 4], [4, 13]
-      new Symbol "Example.java", "memberMethod", new Range [6, 4], [6, 16]
-    ]
+    symbolSet = new SymbolSet {
+      all: [
+        new Symbol "Example.java", "memberInt", new Range [4, 4], [4, 13]
+        new Symbol "Example.java", "memberMethod", new Range [6, 4], [6, 16]
+      ]}
     detector = new MissingDeclarationDetector()
 
     # In practice, we hope that programmers don't include class declarations

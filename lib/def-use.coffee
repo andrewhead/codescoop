@@ -15,12 +15,13 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     @fileName = fileName
 
   _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
-    row = symbolAppearance.getLineNumberSync() - 1
-    start = symbolAppearance.getStartPositionSync()
-    end = symbolAppearance.getEndPositionSync()
     name = symbolAppearance.getSymbolNameSync()
+    startRow = symbolAppearance.getStartLineSync() - 1
+    endRow = symbolAppearance.getEndLineSync() - 1
+    startColumn = symbolAppearance.getStartColumnSync()
+    endColumn = symbolAppearance.getEndColumnSync()
     new Symbol @fileName, name,
-      new Range [row, start], [row, end]
+      new Range [startRow, startColumn], [endRow, endColumn]
 
   getUndefinedUses: (ranges) ->
 
@@ -64,8 +65,9 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     # XXX: See other XXX note above about eventually supporting
     # Java symbols that have ranges instead of single lines
     symbolJavaObj = new SymbolAppearance(
-      symbol.name, symbol.getRange().start.row + 1,
-      symbol.getRange().start.column, symbol.getRange().end.column
+      symbol.name,
+      symbol.getRange().start.row + 1, symbol.getRange().start.column,
+      symbol.getRange().end.row + 1, symbol.getRange().end.column
     )
     console.log symbolJavaObj
     definitionJavaObj = @analysis.getLatestDefinitionBeforeUseSync symbolJavaObj
