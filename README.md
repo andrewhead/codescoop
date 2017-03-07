@@ -59,7 +59,7 @@ generate intermediate representation.  To run soot, use the
 following commands:
 
 ```bash
-CLASSPATH=$JAVA_HOME/jre/lib/rt.jar:libs/*:. java soot.Main -cp $CLASSPATH Example -src-prec java -f J
+CLASSPATH=$JAVA_HOME/jre/lib/rt.jar:libs/*:. java soot.Main Example -src-prec java -f J
 ```
 
 Substitute `Example` with the name of your `.java` file
@@ -69,8 +69,6 @@ running the command.  The options do the following:
 * `-src-prec java`: runs Soot on a `.java` file instead of a
     `.class` file
 * `-f J`: produces a Jimple IR file (instead of a class)
-* `-cp $CLASSPATH`: makes the libraries on the classpath
-    available to Soot (needed to run Soot)
 
 ### Style Guide
 
