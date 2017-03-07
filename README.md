@@ -34,6 +34,7 @@ Then you should also compile the dataflow code:
 ```bash
 # Assuming you're starting back in the main directory
 SOOT_JARS=`ls -d -1 $PWD/java/libs/*.jar | tr '\n' ':'`
+JAVA_HOME=`/usr/libexec/java_home -v 1.7`
 JAVA_HOME_LIBS=`ls -d -1 $JAVA_HOME/jre/lib/*.jar | tr '\n' ':'`
 cd java/
 javac -cp $SOOT_JARS:$JAVA_HOME_LIBS:. DataflowAnalysis.java
@@ -52,7 +53,7 @@ cd java/
 
 ### Running Soot
 
-After falling the dependency instructions above, you should
+After following the dependency instructions above, you should
 be able to run [Soot](https://github.com/Sable/soot) to
 generate intermediate representation.  To run soot, use the
 following commands:
