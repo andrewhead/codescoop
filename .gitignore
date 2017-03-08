@@ -1,3 +1,6 @@
+# Developer-specific configuration
+lib/config/java-home.coffee
+
 # Logs
 logs
 *.log
