@@ -52,6 +52,9 @@ module.exports.RangeSet = class RangeSet
     for range in ranges
       @suggestedRanges.push range
 
+  addSuggestedRange: (range) ->
+    @suggestedRanges.push range
+
   removeSuggestedRange: (range) ->
     @suggestedRanges.splice((@suggestedRanges.indexOf range), 1)
 

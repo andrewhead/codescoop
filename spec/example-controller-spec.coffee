@@ -2,120 +2,184 @@
 { ExampleController } = require '../lib/example-controller'
 { DefUseAnalysis } = require '../lib/def-use'
 { Range, RangeSet } = require '../lib/model/range-set'
-{ Symbol, SymbolSet } = require '../lib/model/symbol-set'
+{ File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { ValueAnalysis, ValueMap } = require '../lib/value-analysis'
+{ RangeAddition } = require '../lib/edit/range-addition'
 { PACKAGE_PATH } = require '../lib/paths'
 
+
 describe "ExampleController", ->
+
+  testFile = new File \
+    PACKAGE_PATH + "/java/tests/analysis_examples/Example.java", "Example.java"
 
   _makeCodeBuffer = =>
     editor = atom.workspace.buildTextEditor()
     editor.getBuffer()
 
+  _makeDefaultModel = =>
+    new ExampleModel _makeCodeBuffer(), new RangeSet(), new SymbolSet(),
+      (jasmine.createSpyObj 'parseTree', ['getRoot']), new ValueMap()
+
+  describe "when in the ANALYSIS state", ->
+
+    defUseAnalysis = new DefUseAnalysis testFile
+    valueAnalysis = new ValueAnalysis testFile
+    model = new ExampleModel _makeCodeBuffer(),
+      (new RangeSet [ new Range [5, 0], [5, 10] ]), new SymbolSet(),
+      (jasmine.createSpyObj 'parseTree', ['getRoot']), new ValueMap()
+
+    # These variables will be set by our first test case
+    controller = undefined
+    defs = undefined
+    valueMap = undefined
+
+    it "enters the IDLE state when initial analyses finish", ->
+
+      runs ->
+        controller = new ExampleController model, [], defUseAnalysis, valueAnalysis
+
+      # After creating the controller, we wait for analyses to finish
+      waitsFor =>
+        defs = model.getSymbols().getDefs()
+        valueMap = model.getValueMap()
+        ((defs.length > 0) and ("Example.java" of valueMap))
+
+      runs ->
+        (expect model.getState()).toEqual ExampleModelState.IDLE
+
+        _in = (symbol, symbols) =>
+          for otherSymbol in symbols
+            return true if otherSymbol.equals symbol
+          false
+
+        # Check that the analyses have updated the model with valid symbols
+        (expect _in \
+          (new Symbol testFile, "j", new Range [5, 8], [5, 9]),
+          defs).toBe true
+
   _makeMockDefUseAnalysis = =>
     # For the sake of fast timing, we mock out the def-use analysis.
     # We control the definition that it returns when looking for the earliest
     # definition before the symbol, trusting in practice it will do the right thing.
-    defUseAnalysis = jasmine.createSpyObj 'defUseAnalysis',
-      ['run', 'getDefBeforeUse']
-    defUseAnalysis.getDefBeforeUse = (use) =>
-      new Symbol "Example.java", "item", new Range [0, 5], [0, 8]
-    defUseAnalysis.getUndefinedUses = (activeRanges) =>
-      [ new Symbol "Example.java", "item", new Range [1, 12], [1, 16] ]
+    defUseAnalysis = jasmine.createSpyObj 'defUseAnalysis', ['run', 'getDefs', 'getUses']
+    defUseAnalysis.getDefs = => []
+    defUseAnalysis.getUses = => []
+    defUseAnalysis.run = (success, error) => success defUseAnalysis
     defUseAnalysis
 
-  _makeDefaultModel = =>
-    new ExampleModel _makeCodeBuffer(), new RangeSet(), new SymbolSet(), new ValueMap()
+  describe "when in the IDLE state", ->
 
-  testFilePath = PACKAGE_PATH + "/java/tests/analysis_examples/Example.java"
-  testFileName = "Example.java"
+    correctors = [
+        name: "mock-corrector"
+        checker:
+          detectErrors: (parseTree, rangeSet, symbolSet) => []
+        suggester:
+          getSuggestions: (error, parseTree, rangeSet, symbolSet) => []
+        fixer:
+          applyFixes: (suggestion, rangeSet, symbolSet) => true
+    ]
 
-  it "updates model state to PICK_UNDEFINED when analysis done", ->
+    it "leaves the state at IDLE if no errors found", ->
+      model = _makeDefaultModel()
+      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      (expect model.getState()).toBe ExampleModelState.IDLE
 
-    defUseAnalysis = new DefUseAnalysis testFilePath, testFileName
+    it "applies correctors when new lines are added", ->
+
+      # Spy on the first corrector to make sure that it was used to detect errors
+      model = _makeDefaultModel()
+      new ExampleController model, correctors, _makeMockDefUseAnalysis()
+
+      # Update the corrector to return errors, as if they were caused by
+      # the addition of new ranges.  XXX: this will cause this corrector
+      # to return errors in the upcoming tests too.
+      firstCorrector = correctors[0]
+      firstCorrector.checker.detectErrors = (parseTree, rangeSet, symbolSet) =>
+        [ "error1", "error2"]
+      (spyOn firstCorrector.checker, "detectErrors").andCallThrough()
+      (expect firstCorrector.checker.detectErrors).not.toHaveBeenCalled()
+
+      # Once we update the active ranges, the corrector should be applied
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
+
+    it "applies correctors in the order they were added to the controller", ->
+
+      # The first corrector returns a non-empty list of errors
+      # (even a set of string).  Because it returns some errors, the second
+      # corrector (initialized below) should never be invoked.
+      firstCorrector = correctors[0]
+      secondCorrector =
+        name: "mock-corrector-2"
+        checker: { detectErrors: (parseTree, rangeSet, symbolSet) => [] }
+        suggester: { getSuggestions: (error, parseTree, rangeSet, symbolSet) => [] }
+        fixer: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
+      correctors.push secondCorrector
+
+      (spyOn firstCorrector.checker, "detectErrors").andCallThrough()
+      (spyOn secondCorrector.checker, "detectErrors").andCallThrough()
+
+      model = _makeDefaultModel()
+      new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+
+      (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
+      (expect secondCorrector.checker.detectErrors).not.toHaveBeenCalled()
+
+    it "updates to ERROR_CHOICE when lines are chosen and errors found", ->
+      model = _makeDefaultModel()
+      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
+
+    it "updates model errors when lines are chosen and errors are found", ->
+      model = _makeDefaultModel()
+      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      (expect model.getErrors()).toEqual [ "error1", "error2" ]
+
+    it "transitions to ERROR_CHOICE if it enters IDLE with errors", ->
+      model = _makeDefaultModel()
+      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
+
+
+  describe "when in the ERROR_CHOICE state", ->
+
+    it "updates the state to RESOLUTION when an error is chosen", ->
+
+      # A mock corrector that does nothing but detect an error
+      correctors = [ { checker: { detectErrors: -> [ "error" ] } } ]
+
+      # The next three lines get us into the ERROR_CHOICE state
+      model = _makeDefaultModel()
+      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+
+      # Here, we simulate the choice of an error
+      model.setErrorChoice "error"
+      (expect model.getState()).toBe ExampleModelState.RESOLUTION
+
+  describe "when in the RESOLUTION state", ->
+
+    # These lines get the controller into the RESOLUTION state
+    correctors = [ { checker: { detectErrors: -> [ "error" ] } } ]
     model = _makeDefaultModel()
-
-    # Some time after the controller is created, the state should
-    # transition to PICK_UNDEFINED (though it may take some time)
-    runs =>
-      controller = new ExampleController model, defUseAnalysis
-    waitsFor =>
-      model.getState() == ExampleModelState.PICK_UNDEFINED
-    , "the controller to transition the state to PICK_UNDEFINED", 2000
-
-  it "udates the symbol set using analysis results", ->
-
-    defUseAnalysis = new DefUseAnalysis testFilePath, testFileName
-    model = new ExampleModel _makeCodeBuffer(),
-      (new RangeSet [ new Range [5, 0], [5, 10] ]),
-      new SymbolSet(), new ValueMap()
-
-    # Also, this list of undefined uses should be updated to those learned
-    # from the def-use analysis
-    runs ->
-      controller = new ExampleController model, defUseAnalysis
-    waitsFor =>
-      undefinedUses = model.getSymbols().getUndefinedUses()
-      use = undefinedUses[0]
-      (undefinedUses.length is 1 and
-        (use.name is "i") and
-        (use.getRange().start.row is 5) and
-        (use.getRange().start.column is 12) and
-        (use.getRange().end.column is 13))
-    , "undefined uses should be set once analysis complete", 2000
-
-  it "updates the variable map with results of variable analysis", ->
-
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    valueAnalysis = new ValueAnalysis testFilePath, testFileName
-    model = _makeDefaultModel()
-
-    runs ->
-      controller = new ExampleController model, defUseAnalysis, valueAnalysis
-    waitsFor =>
-      valueMap = model.getValueMap()
-      ("Example.java" of valueMap) and
-        (5 of valueMap["Example.java"]) and
-        ("i" of valueMap["Example.java"][5]) and
-        (valueMap["Example.java"][5]["i"] is "1")
-    , "value map should be updated by the controller", 2000
-
-  describe "when a target has been set", ->
-
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    model = _makeDefaultModel()
-    controller = new ExampleController model, defUseAnalysis
-
-    # Here is the stimulus that causes the state change in the model
-    model.setState ExampleModelState.PICK_UNDEFINED
-    model.setTarget new Symbol "Example.java", "item", new Range [1, 12], [1, 16]
-
-    it "updates the state to DEFINE", ->
-      (expect model.getState()).toBe ExampleModelState.DEFINE
-
-    it "adds a definition to the symbol set", ->
-      (expect model.getSymbols().getDefinition()).toEqual \
-        new Symbol "Example.java", "item", new Range [0, 5], [0, 8]
-
-  it "updates the state from DEFINE to PICK_UNDEFINED when new line added", ->
-
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    model = _makeDefaultModel()
-    controller = new ExampleController model, defUseAnalysis
-    model.setState ExampleModelState.DEFINE
-
-    (expect model.getState()).toBe ExampleModelState.DEFINE
-    model.getRangeSet().getActiveRanges().push new Range [6, 0], [6, 10]
-    (expect model.getState()).toBe ExampleModelState.PICK_UNDEFINED
-
-  it "updates the undefined uses after new definitions", ->
-
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    model = _makeDefaultModel()
-    controller = new ExampleController model, defUseAnalysis
-    model.setState ExampleModelState.DEFINE
-
-    (expect model.getSymbols().getUndefinedUses()).toEqual []
+    controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
     model.getRangeSet().getActiveRanges().push new Range [1, 0], [1, 10]
-    (expect model.getSymbols().getUndefinedUses()).toEqual \
-      [ new Symbol "Example.java", "item", new Range [1, 12], [1, 16] ]
+    model.setErrorChoice "error"
+
+    # Before faking the resolution, pretend the errors have gone away
+    correctors[0].checker.detectErrors = => []
+
+    model.setResolutionChoice new RangeAddition new Range [0, 0], [0, 10]
+
+    it "updates the state to IDLE when a resolution was chosen", ->
+      (expect model.getState()).toBe ExampleModelState.IDLE
+
+    it "applies the corrector's fix", ->
+      activeRanges = model.getRangeSet().getActiveRanges()
+      (expect activeRanges.length).toBe 2
+      (expect activeRanges[1]).toEqual new Range [0, 0], [0, 10]

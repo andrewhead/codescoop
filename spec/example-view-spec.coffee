@@ -1,9 +1,12 @@
 { ExampleView } = require '../lib/example-view'
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/example-view'
 { makeObservableArray } = require '../lib/example-view'
-{ Symbol, SymbolSet } = require '../lib/model/symbol-set'
+{ File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { Range, RangeSet } = require '../lib/model/range-set'
 { ValueMap } = require '../lib/value-analysis'
+{ MissingDefinitionError } = require '../lib/error/missing-definition'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggestor/suggestion'
+{ Replacement } = require '../lib/edit/replacement'
 $ = require 'jquery'
 _ = require 'lodash'
 
@@ -18,6 +21,7 @@ editor.setText [
   "j = j + 1;"
   ].join '\n'
 codeBuffer = editor.getBuffer()
+TEST_FILE = new File "fake/path", "FakeClass.java"
 
 
 describe "ExampleModel", ->
@@ -28,9 +32,11 @@ describe "ExampleModel", ->
       @propertyName = name
       @propertyValue = value
 
+  parseTree = jasmine.createSpyObj "parseTree", [ "getRoot" ]
+
   it "notifies observers when lines changed", ->
     rangeSet = new RangeSet()
-    exampleModel = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), new ValueMap()
+    exampleModel = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), parseTree, new ValueMap()
     exampleModel.addObserver observer
     rangeSet.getActiveRanges().push new Range [0, 0], [0, 10]
     (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_RANGES
@@ -38,7 +44,7 @@ describe "ExampleModel", ->
 
   it "notifies observers when the list of undefined symbols changes", ->
     symbols = new SymbolSet()
-    exampleModel = new ExampleModel codeBuffer, new RangeSet(), symbols, new ValueMap()
+    exampleModel = new ExampleModel codeBuffer, new RangeSet(), symbols, parseTree, new ValueMap()
     exampleModel.addObserver observer
     symbols.addUndefinedUse { name: "sym", line: 1, start: 5, end: 6 }
     (expect observer.propertyName).toBe ExampleModelProperty.UNDEFINED_USES
@@ -47,11 +53,12 @@ describe "ExampleModel", ->
 
 describe "ExampleView", ->
 
+  parseTree = jasmine.createSpyObj "parseTree", [ "getRoot" ]
+
   it "shows text for the lines in the model's list", ->
-    model = new ExampleModel \
-      codeBuffer,
+    model = new ExampleModel codeBuffer,
       (new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]),
-      new SymbolSet(), new ValueMap()
+      new SymbolSet(), parseTree, new ValueMap()
     view = new ExampleView model, makeEditor(), codeBuffer
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "int i = 0;").not.toBe -1
@@ -62,7 +69,7 @@ describe "ExampleView", ->
   it "updates text display when the list of lines changes", ->
 
     rangeSet = new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]
-    model = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), new ValueMap()
+    model = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), parseTree, new ValueMap()
     view = new ExampleView model, makeEditor()
 
     # Remove first line from the list
@@ -77,46 +84,47 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "i = j + 1;").not.toBe -1
     expect(exampleText.indexOf "j = j + 1;").toBe -1
 
-  it "focuses undefined symbols in PICK_UNDEFINED mode", ->
+  it "marks up symbols with errors in ERROR_CHOICE mode", ->
 
     symbolSet = new SymbolSet()
 
-    model = new ExampleModel \
-      codeBuffer,
-      (new RangeSet [ new Range [2, 0], [2, 10] ] ),
-      symbolSet, new ValueMap()
+    model = new ExampleModel codeBuffer,
+      (new RangeSet [ new Range [2, 0], [3, 10] ] ),
+      symbolSet, parseTree, new ValueMap()
     view = new ExampleView model, makeEditor()
-    model.setState ExampleModelState.PICK_UNDEFINED
-    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
+
+    model.setErrors [
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5])
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [3, 4], [3, 5])
+    ]
+    model.setState ExampleModelState.ERROR_CHOICE
 
     editor = view.getTextEditor()
     markers = editor.getMarkers()
-    (expect markers.length).toBe 1
+    (expect markers.length).toBe 2
 
-    # Note that the range that's marked is going to be different from the
-    # original symbol position, as its position in the new editor will
-    # be different from its position in the old code buffer, due to
-    # pretty-printing and modifications to the code
+    # The marked range will be different from original symbol position, due to
+    # filtering to active lines and pretty-printing
     markerBufferRange = markers[0].getBufferRange()
     (expect markerBufferRange).toEqual new Range [4, 12], [4, 13]
-
-    # As a sanity check, the text at this location should be the symbol name
     (expect editor.getTextInBufferRange(markerBufferRange)).toBe "j"
 
   describe "after marking up a symbol", ->
 
     symbolSet = new SymbolSet()
-    model = new ExampleModel \
-      codeBuffer,
+    model = new ExampleModel codeBuffer,
       (new RangeSet [ new Range [2, 0], [2, 10] ]),
-      symbolSet, new ValueMap()
+      symbolSet, parseTree, new ValueMap()
     view = new ExampleView model, makeEditor()
-    model.setState ExampleModelState.PICK_UNDEFINED
-    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
+
+    model.setErrors [
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5])
+    ]
+    model.setState ExampleModelState.ERROR_CHOICE
 
     editor = view.getTextEditor()
-    buttonDecorations = editor.getDecorations { class: 'undefined-use-button' }
-    highlightDecorations = editor.getDecorations { class: 'undefined-use-highlight' }
+    buttonDecorations = editor.getDecorations { class: 'error-choice-button' }
+    highlightDecorations = editor.getDecorations { class: 'error-choice-highlight' }
     markers = editor.getMarkers()
 
     it "decorates the symbol", ->
@@ -129,41 +137,31 @@ describe "ExampleView", ->
     it "updates the target when the decoration is clicked", ->
       domElement = $ (buttonDecorations[0].getProperties()).item
       domElement.click()
-      (expect model.getTarget()).toEqual \
-        new Symbol "nofile", "j", new Range [2, 4], [2, 5]
+      errorChoice = model.getErrorChoice()
+      (expect errorChoice instanceof MissingDefinitionError).toBe true
+      (expect errorChoice.getSymbol()).toEqual \
+        new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
 
-  it "skips focusing on undefined symbols not in the range of chosen lines", ->
-
-    # This time, the undefined use appears on a line that's not within view.
-    # We shouldn't add any marks for the symbol.
-    symbolSet = new SymbolSet()
-    symbolSet.addUndefinedUse new Symbol "nofile", "j", new Range [2, 4], [2, 5]
-
-    model = new ExampleModel \
-      codeBuffer,
-      (new RangeSet [ new RangeSet [0, 0], [0, 10] ]),
-      symbolSet, new ValueMap()
-    view = new ExampleView model, makeEditor()
-    markers = view.getTextEditor().getMarkers()
-    (expect markers.length).toBe 0
-
-  it "skips focusing on undefined symbols if it's not in PICK_UNDEFINED mode", ->
+  it "doesn't highlight symbols with errors when it's in IDLE mode", ->
 
     symbolSet = new SymbolSet()
-    symbolSet.addUndefinedUse new Symbol "nofile", "Line", new Range [2, 4], [2, 5]
-    model = new ExampleModel \
-      codeBuffer,
+    model = new ExampleModel codeBuffer,
       (new RangeSet [ new Range [2, 0], [2, 10] ]),
-      symbolSet, new ValueMap()
+      symbolSet, parseTree, new ValueMap()
     view = new ExampleView model, makeEditor()
+
+    model.setErrors [
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5])
+    ]
+    model.setState ExampleModelState.ERROR_CHOICE
 
     # Only show markers when we're picking from undefined uses
-    model.setState ExampleModelState.PICK_UNDEFINED
+    model.setState ExampleModelState.ERROR_CHOICE
     (expect view.getTextEditor().getMarkers().length).toBe 1
-    model.setState ExampleModelState.VIEW
+    model.setState ExampleModelState.IDLE
     (expect view.getTextEditor().getMarkers().length).toBe 0
 
-  describe "when the state is set to DEFINE", ->
+  describe "when the state is set to RESOLUTION", ->
 
     symbolSet = new SymbolSet()
     valueMap = new ValueMap()
@@ -174,18 +172,23 @@ describe "ExampleView", ->
         3: { i: '1', j: '0' }
     }
     symbolSet.setDefinition new Symbol "Example.java", "j", new Range [1, 4], [1, 5]
-    model = new ExampleModel \
-      codeBuffer,
+    model = new ExampleModel codeBuffer,
       (new RangeSet [ new Range [2, 0], [2, 10] ]),
-      symbolSet, valueMap
+      symbolSet, parseTree, valueMap
     view = new ExampleView model, makeEditor()
 
-    # By setting a target and setting the state to DEFINE, the view should
-    # update by adding a new marker to the undefined use
-    model.setTarget new Symbol "Example.java", "j", new Range [2, 4], [2, 5]
-    model.setState ExampleModelState.DEFINE
+    # By setting a chosen error, a set of suggestions, and the model state
+    # to RESOLUTION, a decoration should be added for resolving the symbol
+    model.setErrorChoice new MissingDefinitionError \
+      new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
+    model.setSuggestions [
+      new SymbolSuggestion new Symbol TEST_FILE, "j", new Range [1, 4], [1, 5]
+      new PrimitiveValueSuggestion "1"
+      new PrimitiveValueSuggestion "0"
+    ]
+    model.setState ExampleModelState.RESOLUTION
 
-    it "adds a marker for defining the target", ->
+    it "adds a marker for resolving the error", ->
       editor = view.getTextEditor()
       markers = editor.getMarkers()
       (expect markers.length).toBe 1
@@ -195,7 +198,7 @@ describe "ExampleView", ->
     describe "creates a new widget such that", ->
 
       editor = view.getTextEditor()
-      decorations = editor.getDecorations { class: 'definition-widget' }
+      decorations = editor.getDecorations { class: 'resolution-widget' }
       decoration = decorations[0]
       markers = editor.getMarkers()
 
@@ -204,53 +207,78 @@ describe "ExampleView", ->
         (expect decoration.getMarker()).toBe markers[0]
 
       domElement = $ decoration.getProperties().item
-      addCodeButton = domElement.find "#add-code-button"
-      setValueButton = domElement.find "#set-value-button"
 
-      it "shows suggestions when the mouse enters the definition button", ->
-        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
-        addCodeButton.mouseover()
-        (expect model.getRangeSet().getSuggestedRanges()).toEqual \
-          [ new Range [1, 4], [1, 5] ]
+      it "has a header for each class of suggestion", ->
+        headers = ($ domElement).find 'div.resolution-class-header'
+        (expect headers.length).toBe 2
+        (expect ($ headers[0]).text()).toEqual "Add code"
+        (expect ($ headers[1]).text()).toEqual "Set value"
 
-      it "hides suggestions when the mouse leaves the definition button", ->
-        (expect model.getRangeSet().getSuggestedRanges()).toEqual \
-          [ new Range [1, 4], [1, 5] ]
-        addCodeButton.mouseout()
-        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
+      it "shows suggestions when the mouse enters the header for a class, " +
+         "and hides them when the mouse leaves the block", ->
 
-      it "selects lines when the definition button is clicked", ->
+        # Default: no suggestions
+        valueBlock = $ (($ domElement).find 'div.resolution-class-block')[1]
+        suggestions = valueBlock.find 'div.suggestion'
+        (expect suggestions.length).toBe 0
 
-        _containsRange = (rangeList, range) =>
-          for otherRange in rangeList
-            if otherRange.isEqual range
-              return true
-          false
+        # When mousing over the header, show the suggestions
+        valueHeader = valueBlock.find 'div.resolution-class-header'
+        valueHeader.mouseover()
+        suggestions = valueBlock.find 'div.suggestion'
+        (expect suggestions.length).toBe 2
+        (expect ($ suggestions[0]).text()).toEqual "1"
 
-        # To realistically simulate a user, we send a mouse-over event
-        # before we send the click event
-        addCodeButton.mouseover()
-        addCodeButton.click()
-        (expect (_containsRange model.getRangeSet().getActiveRanges(),
-          new Range [ 1, 0 ], [ 1, 10 ])).toBe true
-        (expect (_containsRange model.getRangeSet().getActiveRanges(),
-          new Range [ 2, 0 ], [ 2, 10 ])).toBe true
-        (expect model.getRangeSet().getActiveRanges().length).toBe 2
-        (expect model.getRangeSet().getSuggestedRanges()).toEqual []
+        # When moving the mouse out of the block, hide the suggestions
+        valueBlock.mouseout()
+        suggestions = valueBlock.find 'div.suggestion'
+        (expect suggestions.length).toBe 0
 
-      # Refresh the markers: the earlier changes to the data refreshed the
-      # code view, so the old marker handles are stale
-      getTextInCurrentMarkerBufferRange = =>
-        markers = editor.getMarkers()
-        markerBufferRange = markers[0].getBufferRange()
-        editor.getTextInBufferRange markerBufferRange
+      it "highlights suggested lines for symbol suggestions on mouse over", ->
 
-      it "shows values when the mouse enters the data button", ->
-        (expect getTextInCurrentMarkerBufferRange()).toEqual 'j'
-        setValueButton.mouseover()
-        (expect getTextInCurrentMarkerBufferRange()).toEqual '0'
+        codeBlock = $ (($ domElement).find 'div.resolution-class-block')[0]
+        codeHeader = codeBlock.find 'div.resolution-class-header'
+        codeHeader.mouseover()
+        codeHeader.mouseout()
+        codeSuggestion = $ (codeBlock.find 'div.suggestion')[0]
 
-      it "restores values when the mouse leaves the data button", ->
-        (expect getTextInCurrentMarkerBufferRange()).toEqual '0'
-        setValueButton.mouseout()
-        (expect getTextInCurrentMarkerBufferRange()).toEqual 'j'
+        # Simulate the mouse entering and exiting the suggestion button
+        suggestedRanges = model.getRangeSet().getSuggestedRanges()
+        (expect suggestedRanges.length).toBe 0
+        codeSuggestion.mouseover()
+        (expect suggestedRanges.length).toBe 1
+        (expect suggestedRanges[0]).toEqual new Range [1, 4], [1, 5]
+        codeBlock.mouseout()
+        (expect suggestedRanges.length).toBe 0
+
+      it "chooses a resolution when the resolution is clicked", ->
+
+        codeBlock = $ (($ domElement).find 'div.resolution-class-block')[0]
+        codeHeader = codeBlock.find 'div.resolution-class-header'
+        codeHeader.mouseover()
+        codeHeader.mouseout()
+        codeSuggestion = $ (codeBlock.find 'div.suggestion')[0]
+        codeSuggestion.mouseover()
+
+        (expect model.getResolutionChoice()).toBe null
+        codeSuggestion.click()
+        resolutionChoice = model.getResolutionChoice()
+        (expect resolutionChoice instanceof SymbolSuggestion).toBe true
+
+      it "previews values when the mouse enters the primitive suggestion button", ->
+
+        valueBlock = $ (($ domElement).find 'div.resolution-class-block')[1]
+        valueHeader = valueBlock.find 'div.resolution-class-header'
+        valueHeader.mouseover()
+        valueHeader.mouseout()
+        valueSuggestion = $ (valueBlock.find 'div.suggestion')[0]
+        valueSuggestion.mouseover()
+
+        (expect model.getEdits().length).toBe 1
+        edit = model.getEdits()[0]
+        (expect edit instanceof Replacement)
+        (expect edit.getRange(), new Range [1, 4], [1, 5])
+        (expect edit.getText(), "1")
+
+        valueSuggestion.mouseout()
+        (expect model.getEdits().length).toBe 0

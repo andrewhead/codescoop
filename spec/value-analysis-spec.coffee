@@ -1,5 +1,7 @@
 { ValueAnalysis } = require '../lib/value-analysis'
 { PACKAGE_PATH } = require '../lib/paths'
+{ File } = require '../lib/model/symbol-set'
+
 
 describe "ValueAnalysis", ->
 
@@ -7,7 +9,7 @@ describe "ValueAnalysis", ->
 
     testFilePath = PACKAGE_PATH + "/java/tests/analysis_examples/Example.java"
     testFileName = "Example.java"
-    valueAnalysis = new ValueAnalysis testFilePath, testFileName
+    valueAnalysis = new ValueAnalysis new File testFilePath, testFileName
 
     it "includes the runtime data from executing the code", ->
 

@@ -15,8 +15,16 @@ module.exports.File = class File
     @path = path
     @fileName = fileName
 
+  getName: ->
+    @fileName
+
+  getPath: ->
+    @path
+
   equals: (other) ->
-    (other.path is @path) and (other.fileName is @fileName)
+    (other instanceof File) and
+      (other.getPath() is @path) and
+      (other.getName() is @fileName)
 
 
 module.exports.Symbol = class Symbol
@@ -80,8 +88,14 @@ module.exports.SymbolSet = class SymbolSet
   getAllSymbols: ->
     @allSymbols
 
+  setUses: (uses) ->
+    @uses.reset uses
+
   getUses: ->
     @uses
+
+  setDefs: (defs) ->
+    @defs.reset defs
 
   getDefs: ->
     @defs

@@ -5,7 +5,7 @@
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'
 { RangeSet } = require './model/range-set'
-{ SymbolSet } = require './model/symbol-set'
+{ File, SymbolSet } = require './model/symbol-set'
 $ = require 'jquery'
 
 
@@ -55,8 +55,9 @@ module.exports.MainController = class MainController
     @exampleView = new ExampleView @exampleModel, exampleEditor
 
     # Prepare controllers
-    @defUseAnalysis = new DefUseAnalysis codeEditor.getPath(), codeEditor.getTitle()
-    @valueAnalysis = new ValueAnalysis codeEditor.getPath(), codeEditor.getTitle()
+    codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
+    @defUseAnalysis = new DefUseAnalysis codeEditorFile
+    @valueAnalysis = new ValueAnalysis codeEditorFile
     @exampleController = new ExampleController @exampleModel, @defUseAnalysis, @valueAnalysis
 
   # These accessors are here to let us test the controller

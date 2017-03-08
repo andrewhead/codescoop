@@ -5,14 +5,14 @@ SymbolAppearance = java.import "SymbolAppearance"
 { Symbol } = require './model/symbol-set'
 
 
-###
-Symbols have 4 properties: name, line, start, end
-###
+# The naming convention differs slightly for this file.
+# Any object that represents an object in the Java
+# runtime has the suffix "J".  No objects with this suffix
+# should be passed out from this interface.
 module.exports.DefUseAnalysis = class DefUseAnalysis
 
-  constructor: (filePath, fileName) ->
-    @filePath = filePath
-    @fileName = fileName
+  constructor: (file) ->
+    @file = file
 
   _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
     name = symbolAppearance.getSymbolNameSync()
@@ -20,7 +20,7 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
     endRow = symbolAppearance.getEndLineSync() - 1
     startColumn = symbolAppearance.getStartColumnSync()
     endColumn = symbolAppearance.getEndColumnSync()
-    new Symbol @fileName, name,
+    new Symbol @file, name,
       new Range [startRow, startColumn], [endRow, endColumn]
 
   getUndefinedUses: (ranges) ->
@@ -60,6 +60,22 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
 
     undefinedUses
 
+  getDefs: ->
+    defsJ = @analysis.getDefinitionsSync()
+    defsArrayJ = defsJ.toArraySync()
+    defs = []
+    for def in defsArrayJ
+      defs.push @_javaSymbolAppearanceToSymbol def
+    defs
+
+  getUses: ->
+    usesJ = @analysis.getUsesSync()
+    usesArrayJ = usesJ.toArraySync()
+    uses = []
+    for use in usesArrayJ
+      uses.push @_javaSymbolAppearanceToSymbol use
+    uses
+
   getDefBeforeUse: (symbol) ->
 
     # XXX: See other XXX note above about eventually supporting
@@ -69,7 +85,6 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
       symbol.getRange().start.row + 1, symbol.getRange().start.column,
       symbol.getRange().end.row + 1, symbol.getRange().end.column
     )
-    console.log symbolJavaObj
     definitionJavaObj = @analysis.getLatestDefinitionBeforeUseSync symbolJavaObj
     if definitionJavaObj
       definition = @_javaSymbolAppearanceToSymbol definitionJavaObj
@@ -79,8 +94,8 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
 
   run: (callback, err) ->
 
-    className = @fileName.replace /\.java$/, ''
-    pathToFile = @filePath.replace RegExp(@fileName + '$'), ''
+    className = @file.getName().replace /\.java$/, ''
+    pathToFile = @file.getPath().replace RegExp(@file.getName() + '$'), ''
 
     # Make sure that Soot will be able to find the source file
     sootClasspath = (java.classpath.join ':') + ":" + pathToFile

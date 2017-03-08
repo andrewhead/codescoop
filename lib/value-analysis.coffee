@@ -13,14 +13,11 @@ module.exports.ValueMap = class ValueMap
 # pre-written local file instead.
 module.exports.ValueAnalysis = class ValueAnalysis
 
-  fileName: null
-  filePath: null
   variableTracer: null
   values: null
 
-  constructor: (filePath, fileName) ->
-    @fileName = fileName
-    @filePath = filePath
+  constructor: (file) ->
+    @file = file
 
   _constructValueMap: (javaMap) ->
 
@@ -45,10 +42,10 @@ module.exports.ValueAnalysis = class ValueAnalysis
     valueMap
 
   run: (callback, err) ->
-    classname = @fileName.replace /\.java$/, ''
-    pathToFile = @filePath.replace RegExp(@fileName + '$'), ''
+    className = @file.getName().replace /\.java$/, ''
+    pathToFile = @file.getPath().replace RegExp(@file.getName() + '$'), ''
     variableTracer = new VariableTracer()
-    variableTracer.run classname, pathToFile, (error, result) =>
+    variableTracer.run className, pathToFile, (error, result) =>
       err error if error
       callback (@_constructValueMap result)
       @values = result

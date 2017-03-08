@@ -36,4 +36,12 @@ module.exports.makeObservableArray = (array = undefined) ->
       true
   }
 
+  # This function should be used to fully reset the contents of the array.
+  # Although it looks verbose compared to just defining a new array, we
+  # do this manually to make sure not to clobber the observers of the array.
+  array.reset = (elements) ->
+    @splice(0, @length)
+    for element in elements
+      @push element
+
   proxy

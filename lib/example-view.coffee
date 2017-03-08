@@ -1,5 +1,10 @@
 $ = require 'jquery'
+{ makeObservableArray } = require './model/observable-array'
 { Range, RangeSet, RangeSetProperty } = require './model/range-set'
+{ MissingDefinitionError } = require './error/missing-definition'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require './suggestor/suggestion'
+{ SymbolSuggestionView } = require "./view/symbol-suggestion"
+{ PrimitiveValueSuggestionView } = require "./view/primitive-value-suggestion"
 
 
 module.exports.ExampleModelProperty = ExampleModelProperty =
@@ -7,31 +12,48 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   ACTIVE_RANGES: { value: 0, name: "lines-changed" }
   UNDEFINED_USES: { value: 1, name: "undefined-use-added" }
   STATE: { value: 2, name: "state" }
-  TARGET: { value: 3, name: "target "}
-  VALUE_MAP: { value: 4, name: "value-map" }
+  ERROR_CHOICE: { value: 3, name: "error-choice"}
+  RESOLUTION_CHOICE: { value: 4, name: "resolution-choice" }
+  VALUE_MAP: { value: 5, name: "value-map" }
+  ERRORS: { value: 6, name: "errors" }
+  SUGGESTIONS: { value: 7, name: "suggestions" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
-  VIEW: { value: 0, name: "view" }
-  PICK_UNDEFINED: { value: 1, name: "pick-undefined" }
-  DEFINE: { value: 2, name: "define" }
+  ANALYSIS: { value: 0, name: "analysis" }
+  IDLE: { value: 1, name: "idle" }
+  ERROR_CHOICE: { value: 2, name: "error-choice" }
+  RESOLUTION: { value: 3, name: "resolution" }
 
 
 module.exports.ExampleModel = class ExampleModel
 
-  ###
-  lineNumbers are assumed to be 1-indexed, corresponding to the line
-  numbers as they would appear in a text editor.
-  ###
-  constructor: (codeBuffer, rangeSet, symbols, valueMap) ->
+  constructor: (codeBuffer, rangeSet, symbols, parseTree, valueMap) ->
+
     @observers = []
-    @codeBuffer = codeBuffer
+
     @rangeSet = rangeSet
     @rangeSet.addObserver @
+
     @symbols = symbols
     @symbols.addObserver @
+
+    @errors = makeObservableArray []
+    @errors.addObserver @
+
+    @suggestions = makeObservableArray []
+    @suggestions.addObserver @
+
+    @edits = makeObservableArray []
+    @edits.addObserver @
+
+    @codeBuffer = codeBuffer
+    @parseTree = parseTree
     @valueMap = valueMap
-    @state = ExampleModelState.VIEW
+    @errorChoice = null
+    @resolutionChoice = null
+
+    @state = ExampleModelState.ANALYSIS
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
     @notifyObservers object, propertyName, propertyValue
@@ -68,19 +90,45 @@ module.exports.ExampleModel = class ExampleModel
   getSymbols: ->
     @symbols
 
-  setTarget: (symbol) ->
-    @target = symbol
-    @notifyObservers this, ExampleModelProperty.TARGET, @target
+  setErrorChoice: (error) ->
+    @errorChoice = error
+    @notifyObservers @, ExampleModelProperty.ERROR_CHOICE, @errorChoice
 
-  getTarget: ->
-    @target
+  getErrorChoice: ->
+    @errorChoice
+
+  setResolutionChoice: (resolution) ->
+    @resolutionChoice = resolution
+    @notifyObservers @, ExampleModelProperty.RESOLUTION_CHOICE, @resolutionChoice
+
+  getResolutionChoice: ->
+    @resolutionChoice
 
   getValueMap: ->
     @valueMap
 
   setValueMap: (valueMap) ->
     @valueMap = valueMap
-    @notifyObservers this, ExampleModelProperty.VALUE_MAP, @valueMap
+    @notifyObservers @, ExampleModelProperty.VALUE_MAP, @valueMap
+
+  setErrors: (errors) ->
+    @errors.reset errors
+    @notifyObservers @, ExampleModelProperty.ERRORS, @errors
+
+  getErrors: ->
+    @errors
+
+  getParseTree: ->
+    @parseTree
+
+  setSuggestions: (suggestions) ->
+    @suggestions.reset suggestions
+
+  getSuggestions: ->
+    @suggestions
+
+  getEdits: ->
+    @edits
 
 
 module.exports.ExampleView = class ExampleView
@@ -116,9 +164,21 @@ module.exports.ExampleView = class ExampleView
   onPropertyChanged: (object, propertyName, propertyValue) ->
     @update() if propertyName in [
       ExampleModelProperty.STATE
-      ExampleModelProperty.UNDEFINED_USES
+      # ExampleModelProperty.UNDEFINED_USES
       ExampleModelProperty.ACTIVE_RANGES
     ]
+
+  update: ->
+    @_clearMarkers()
+    # We add in the code, then add the markers, then the boilerplate.
+    # By adding the code first, we get to use the character offsets of
+    # each symbol to mark them, before inserting other boilerplate code
+    activeRangeOffsets = @_addCodeLines()
+    if @model.getState() is ExampleModelState.ERROR_CHOICE
+      @_markErrors @model.getErrors(), activeRangeOffsets
+    else if @model.getState() is ExampleModelState.RESOLUTION
+      @_addDefinitionWidget @model.getSuggestions(), activeRangeOffsets
+    @_insertBoilerplate()
 
   _clearMarkers: ->
     marker.destroy() for marker in @markers
@@ -182,7 +242,7 @@ module.exports.ExampleView = class ExampleView
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
-  _markUse: (use, rangeOffsets) ->
+  _markSymbol: (use, rangeOffsets) ->
 
     symbolInActiveRange = false
     for activeRange in @model.getRangeSet().getActiveRanges()
@@ -208,26 +268,30 @@ module.exports.ExampleView = class ExampleView
 
     marker
 
-  _addUndefinedUseMarkers: (rangeOffsets) ->
-    for use in @model.getSymbols().getUndefinedUses()
-      @_markUse use, rangeOffsets
+  _markErrors: (errors, rangeOffsets) ->
+    for error in errors
+      if error instanceof MissingDefinitionError
+        marker = @_markSymbol error.getSymbol(), rangeOffsets
+        marker.examplifyError = error
+    @_addErrorDecorations()
 
-  _addUndefinedUseDecorations: ->
+  _addErrorDecorations: ->
+
     for marker in @markers
 
-      use = @markerUses[marker.id]
+      error = marker.examplifyError
 
       # Add a button for highlighting the undefined use
       # I find it necessary to bind the use as data: when I don't do this,
       # use takes on the last value that it had in this loop
       decoration = $ "<div>Click to define</div>"
-        .data 'use', use
+        .data 'error', error
         .click (event) =>
-          use = ($ (event.target)).data 'use'
-          @model.setTarget use
+          use = ($ (event.target)).data 'error'
+          @model.setErrorChoice error
       params =
         type: 'overlay'
-        class: 'undefined-use-button'
+        class: 'error-choice-button'
         item: decoration
         position: 'tail'
       @textEditor.decorateMarker marker, params
@@ -235,77 +299,84 @@ module.exports.ExampleView = class ExampleView
       # Then add highlighting to pinpoint the use
       params =
         type: 'highlight'
-        class: 'undefined-use-highlight'
+        class: 'error-choice-highlight'
       @textEditor.decorateMarker marker, params
 
-  _addDefinitionWidget: (rangeOffsets) ->
+  _addDefinitionWidget: (suggestions, rangeOffsets) ->
 
     # Make a marker for the target use
-    targetUse = @model.getTarget()
-    marker = @_markUse targetUse, rangeOffsets
+    errorChoice = @model.getErrorChoice()
+    marker = @_markSymbol errorChoice.getSymbol(), rangeOffsets
 
     # Built up the interactive widget
     decoration = $ "<div></div>"
     originalText = @textEditor.getTextInBufferRange marker.getBufferRange()
-    # XXX: This lookup uses the start row of the use, but what it should
-    # really do is get the line that is invoked by the debugger when this
-    # symbol is called, which might not be the same thing
-    valueText = @model.getValueMap()[targetUse.file][targetUse.getRange().start.row][targetUse.name]
-    setValueButton = $ "<div>Add Data</div>"
-    if valueText?
-      setValueButton
-        .attr "id", "set-value-button"
-        .addClass "definition-method-button"
-        .mouseover (event) =>
-          # XXX: Because an update may have clobbered the marker that
-          # this decoration was initially attached to, when a click occurs,
-          # we just find the only marker that is stored in this view.  It
-          # should be the definition marker, as there's only one.
-          marker = @markers[0]
-          @textEditor.setTextInBufferRange marker.getBufferRange(), valueText
-        .mouseout (event) =>
-          marker = @markers[0]
-          @textEditor.setTextInBufferRange marker.getBufferRange(), originalText
-    else
-      setValueButton.addClass 'disabled'
-    decoration.append setValueButton
 
-    addCodeButton = $ "<div>Add Code</div>"
-      .attr "id", "add-code-button"
-      .addClass "definition-method-button"
-      .mouseover (event) =>
-        def = @model.getSymbols().getDefinition()
-        @model.getRangeSet().setSuggestedRanges [def.getRange()]
-      .mouseout (event) =>
-        def = @model.getSymbols().getDefinition()
-        @model.getRangeSet().removeSuggestedRange def.getRange()
-      .click (event) =>
-        def = @model.getSymbols().getDefinition()
-        @model.getRangeSet().removeSuggestedRange def.getRange()
-        # XXX: For now, we get the range of the first line of the def.
-        # In the future, we'll want to just get the relevant part
-        # of the statement and not the whole line.
-        @model.getRangeSet().getActiveRanges().push \
-          @model.getCodeBuffer().rangeForRow def.getRange().start.row
-    decoration.append addCodeButton
+    # Get names of all suggestion classes
+    suggestionClasses = []
+    suggestionsByClass = {}
+    for suggestion in suggestions
+
+      # Start making a list of all types of suggestions
+      class_ = suggestion.constructor.name
+      suggestionClasses.push class_ if (class_ not in suggestionClasses)
+
+      # Group suggestions by class
+      if class_ not of suggestionsByClass
+        suggestionsByClass[class_] = []
+      suggestionsByClass[class_].push suggestion
+
+    _textForClass = (className) =>
+      return "Set value" if className is "PrimitiveValueSuggestion"
+      return "Add code" if className is "SymbolSuggestion"
+
+    # Add a UI element for each class of suggestion
+    classHeaders = {}
+    for class_ in suggestionClasses
+      classBlock = $ "<div></div>"
+        .addClass "resolution-class-block"
+        .mouseout (event) =>
+          block = ($ event.target)
+          # Propagate mouseout to suggestions and remove suggestions
+          (block.find 'div.suggestion').each ->
+            ($ @).mouseout()
+            ($ @).remove()
+      classHeader = $ "<div></div>"
+        .addClass "resolution-class-header"
+        .text _textForClass class_
+        .data "suggestions", suggestionsByClass[class_]
+        .data "block", classBlock
+        .data "class", class_
+      classBlock.append classHeader
+      decoration.append classBlock
+      classHeaders[class_] = classHeader
+
+    _textForSuggestion = (suggestion) =>
+      if suggestion instanceof SymbolSuggestion
+        return "L" + suggestion.getSymbol().getRange().start.row
+      else if suggestion instanceof PrimitiveValueSuggestion
+        return suggestion.getValueString()
+
+    _makeSuggestionOption = (suggestion, model) =>
+      if suggestion instanceof SymbolSuggestion
+        option = new SymbolSuggestionView suggestion, model
+      else if suggestion instanceof PrimitiveValueSuggestion
+        option = new PrimitiveValueSuggestionView suggestion, model, marker
+      option
+
+    # For each suggestion, add another block when hovering over the header
+    for class_, header of classHeaders
+      header.mouseover (event) =>
+        target = ($ event.target)
+        block = target.data "block"
+        for suggestion in target.data "suggestions"
+          option = _makeSuggestionOption suggestion, @model
+          block.append option
 
     # Create a decoration from the element
     params =
       type: "overlay"
-      class: "definition-widget"
+      class: "resolution-widget"
       item: decoration
       position: "tail"
     @textEditor.decorateMarker marker, params
-
-  update: ->
-    @_clearMarkers()
-    # We add in the code, then add the markers, then the boilerplate.
-    # By adding the code first, we get to use the character offsets of
-    # each symbol to mark them, before inserting other boilerplate code
-    activeRangeOffsets = @_addCodeLines()
-    if @model.getState() is ExampleModelState.PICK_UNDEFINED
-      @_addUndefinedUseMarkers activeRangeOffsets
-      @_addUndefinedUseDecorations()
-    else if @model.getState() is ExampleModelState.DEFINE
-      @_addDefinitionWidget activeRangeOffsets
-    @_insertBoilerplate()

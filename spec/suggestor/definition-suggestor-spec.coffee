@@ -5,7 +5,7 @@
 { Range, RangeSet } = require "../../lib/model/range-set"
 { parse } = require "../../lib/parse-tree"
 
-fdescribe "DefinitionSuggestor", ->
+describe "DefinitionSuggestor", ->
 
   parseTree = parse [
     "public class Example {"
