@@ -1,6 +1,7 @@
 $ = require 'jquery'
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require './model/example-model'
 { Range, RangeSet } = require './model/range-set'
+{ Replacement } = require './edit/replacement'
 { MissingDefinitionError } = require './error/missing-definition'
 { SymbolSuggestion, PrimitiveValueSuggestion } = require './suggestor/suggestion'
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
@@ -40,8 +41,8 @@ module.exports.ExampleView = class ExampleView
   onPropertyChanged: (object, propertyName, propertyValue) ->
     @update() if propertyName in [
       ExampleModelProperty.STATE
-      # ExampleModelProperty.UNDEFINED_USES
       ExampleModelProperty.ACTIVE_RANGES
+      ExampleModelProperty.EDITS
     ]
 
   update: ->
@@ -50,49 +51,17 @@ module.exports.ExampleView = class ExampleView
     # By adding the code first, we get to use the character offsets of
     # each symbol to mark them, before inserting other boilerplate code
     activeRangeOffsets = @_addCodeLines()
+    @_applyReplacements activeRangeOffsets
     if @model.getState() is ExampleModelState.ERROR_CHOICE
       @_markErrors @model.getErrors(), activeRangeOffsets
     else if @model.getState() is ExampleModelState.RESOLUTION
-      @_addDefinitionWidget @model.getSuggestions(), activeRangeOffsets
+      @_addResolutionWidget @model.getSuggestions(), activeRangeOffsets
     @_insertBoilerplate()
 
   _clearMarkers: ->
     marker.destroy() for marker in @markers
     @markers = []
     @markerUses = {}
-
-  _insertBoilerplate: ->
-
-    # Indent the existing lines
-    # XXX: Brittle solution, at some point should do pretty-printing
-    for rowNumber in [0..@textEditor.getLastBufferRow()]
-      @textEditor.setIndentationForBufferRow rowNumber, @programTemplate.mainIndentLevel
-
-    # XXX: Manually correct columns that may have stated at 0 while indenting
-    # was done.  There's gotta be a better solution.
-    # Note that by doing this before we insert text, we also solve the problem
-    # where, if one of the symbols appears at the very top left of the editor,
-    # its marker range grows to include the starter boilerplate.  Score!
-    for marker in @markers
-      markerRange = marker.getBufferRange()
-      if markerRange.start.column is 0
-        markerRange.start.column = @programTemplate.mainIndentLevel * @textEditor.getTabLength()
-        marker.setBufferRange markerRange
-
-    # Add the starter boilerplate to the start of the example
-    @textEditor.setTextInBufferRange(
-      (new Range [0, 0], [0, 0]),
-      @programTemplate.start
-    )
-
-    # Find the end of the file and add the ending boilerplate
-    lastLine = @textEditor.getLastBufferRow()
-    lastChar = (@textEditor.lineTextForBufferRow lastLine).length
-    range = new Range [lastLine, lastChar], [lastLine, lastChar]
-    @textEditor.setTextInBufferRange(
-      range,
-      @programTemplate.end
-    )
 
   _addCodeLines: ->
 
@@ -116,31 +85,35 @@ module.exports.ExampleView = class ExampleView
     @textEditor.setText text
     rangeOffsets
 
-  # It's assumed that this is called before any boilerplate text and edits
-  # (besides the active lines) have been added to the buffer
-  _markSymbol: (use, rangeOffsets) ->
-
+  _getAdjustedSymbolRange: (symbol, rangeOffsets) ->
     symbolInActiveRange = false
     for activeRange in @model.getRangeSet().getActiveRanges()
-      if activeRange.containsRange use.getRange()
+      if activeRange.containsRange symbol.getRange()
         symbolInActiveRange = true
         filteredRangeOffsets = rangeOffsets.filter (element) =>
           activeRange.isEqual element[0]
         rangeOffset = filteredRangeOffsets[0]
         exampleRow = rangeOffset[1] +
-          (use.getRange().start.row - activeRange.start.row)
-    return if not symbolInActiveRange  # if use not in active ranges, skip it
+          (symbol.getRange().start.row - activeRange.start.row)
+        break
+    return null if not symbolInActiveRange  # if use not in active ranges, skip it
+    return new Range \
+      [exampleRow, symbol.getRange().start.column],
+      [exampleRow, symbol.getRange().end.column]
 
-    markerRange = new Range \
-     [exampleRow, use.getRange().start.column],
-     [exampleRow, use.getRange().end.column]
-    marker = @textEditor.markBufferRange markerRange, { invalidate: "overlap" }
+  # It's assumed that this is called before any boilerplate text and edits
+  # (besides the active lines) have been added to the buffer
+  _markSymbol: (symbol, rangeOffsets) ->
+
+    adjustedRange = @_getAdjustedSymbolRange symbol, rangeOffsets
+    return if not adjustedRange?
+    marker = @textEditor.markBufferRange adjustedRange, { invalidate: "overlap" }
     @markers.push marker
 
     # We need to hold onto the use that each marker refers to.  We use
     # marker.id, using the recommendation of an error message that we
     # encountered when trying to set custom properties
-    @markerUses[marker.id] = use
+    @markerUses[marker.id] = symbol
 
     marker
 
@@ -178,7 +151,7 @@ module.exports.ExampleView = class ExampleView
         class: 'error-choice-highlight'
       @textEditor.decorateMarker marker, params
 
-  _addDefinitionWidget: (suggestions, rangeOffsets) ->
+  _addResolutionWidget: (suggestions, rangeOffsets) ->
 
     # Make a marker for the target use
     errorChoice = @model.getErrorChoice()
@@ -220,3 +193,43 @@ module.exports.ExampleView = class ExampleView
       item: decoration
       position: "tail"
     @textEditor.decorateMarker marker, params
+
+  _applyReplacements: (rangeOffsets) ->
+    for edit in @model.getEdits()
+      if edit instanceof Replacement
+        symbol = edit.getSymbol()
+        adjustedRange = @_getAdjustedSymbolRange symbol, rangeOffsets
+        @textEditor.setTextInBufferRange adjustedRange, edit.getText()
+
+  _insertBoilerplate: ->
+
+    # Indent the existing lines
+    # XXX: Brittle solution, at some point should do pretty-printing
+    for rowNumber in [0..@textEditor.getLastBufferRow()]
+      @textEditor.setIndentationForBufferRow rowNumber, @programTemplate.mainIndentLevel
+
+    # XXX: Manually correct columns that may have stated at 0 while indenting
+    # was done.  There's gotta be a better solution.
+    # Note that by doing this before we insert text, we also solve the problem
+    # where, if one of the symbols appears at the very top left of the editor,
+    # its marker range grows to include the starter boilerplate.  Score!
+    for marker in @markers
+      markerRange = marker.getBufferRange()
+      if markerRange.start.column is 0
+        markerRange.start.column = @programTemplate.mainIndentLevel * @textEditor.getTabLength()
+        marker.setBufferRange markerRange
+
+    # Add the starter boilerplate to the start of the example
+    @textEditor.setTextInBufferRange(
+      (new Range [0, 0], [0, 0]),
+      @programTemplate.start
+    )
+
+    # Find the end of the file and add the ending boilerplate
+    lastLine = @textEditor.getLastBufferRow()
+    lastChar = (@textEditor.lineTextForBufferRow lastLine).length
+    range = new Range [lastLine, lastChar], [lastLine, lastChar]
+    @textEditor.setTextInBufferRange(
+      range,
+      @programTemplate.end
+    )

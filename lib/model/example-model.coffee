@@ -5,13 +5,13 @@
 module.exports.ExampleModelProperty = ExampleModelProperty =
   UNKNOWN: { value: -1, name: "unknown" }
   ACTIVE_RANGES: { value: 0, name: "lines-changed" }
-  UNDEFINED_USES: { value: 1, name: "undefined-use-added" }
   STATE: { value: 2, name: "state" }
   ERROR_CHOICE: { value: 3, name: "error-choice"}
   RESOLUTION_CHOICE: { value: 4, name: "resolution-choice" }
   VALUE_MAP: { value: 5, name: "value-map" }
   ERRORS: { value: 6, name: "errors" }
   SUGGESTIONS: { value: 7, name: "suggestions" }
+  EDITS: { value: 8, name: "edits" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -62,6 +62,8 @@ module.exports.ExampleModel = class ExampleModel
       propertyName = ExampleModelProperty.ACTIVE_RANGES
     else if object is @symbols
       propertyName = ExampleModelProperty.UNDEFINED_USES
+    else if object is @edits
+      propertyName = ExampleModelProperty.EDITS
     else if object is @
       proprtyName = propertyName
     else

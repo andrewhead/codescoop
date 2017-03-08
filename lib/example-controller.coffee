@@ -79,19 +79,3 @@ module.exports.ExampleController = class ExampleController
           @model.getRangeSet().getActiveRanges().push propertyValue.getRange()
 
         @model.setState ExampleModelState.IDLE
-
-    ###
-    if @model.getState() is ExampleModelState.PICK_UNDEFINED
-      if propertyName is ExampleModelProperty.TARGET
-        use = propertyValue
-        # @model.setState ExampleModelState.DEFINE
-        def = @defUseAnalysis.getDefBeforeUse use
-        @model.getSymbols().setDefinition def
-
-    else if @model.getState() is ExampleModelState.DEFINE
-      if propertyName is ExampleModelProperty.ACTIVE_RANGES
-        # @model.setState ExampleModelState.PICK_UNDEFINED
-        activeRanges = propertyValue
-        undefinedUses = @defUseAnalysis.getUndefinedUses activeRanges
-        @model.getSymbols().setUndefinedUses undefinedUses
-    ###

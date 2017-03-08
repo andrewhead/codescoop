@@ -9,8 +9,7 @@ module.exports.PrimitiveValueSuggestionView = \
   constructor: (suggestion, model, errorMarker) ->
     super suggestion, model, suggestion.getValueString()
     # Pre-package the replacement so we can refer to the same one for all events
-    @replacement = new Replacement \
-      errorMarker.getBufferRange(), suggestion.getValueString()
+    @replacement = new Replacement suggestion.getSymbol(), suggestion.getValueString()
 
   preview: ->
     @model.getEdits().push @replacement

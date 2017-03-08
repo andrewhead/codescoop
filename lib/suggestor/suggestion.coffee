@@ -12,8 +12,12 @@ module.exports.SymbolSuggestion = class SymbolSuggestion
 # a string representation of its value.
 module.exports.PrimitiveValueSuggestion = class PrimitiveValueSuggestion
 
-  constructor: (valueString) ->
+  constructor: (symbol, valueString) ->
+    @symbol = symbol
     @valueString = valueString
+
+  getSymbol: ->
+    @symbol
 
   getValueString: ->
     @valueString

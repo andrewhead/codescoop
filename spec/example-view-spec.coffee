@@ -57,6 +57,22 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "i = j + 1;").not.toBe -1
     expect(exampleText.indexOf "j = j + 1;").toBe -1
 
+  it "applies replacement edits by changing the text immediately", ->
+
+    rangeSet = new RangeSet [
+      (new Range [0, 0], [0, 10]),
+      new Range [1, 0], [1, 10]
+    ]
+    model = new ExampleModel codeBuffer, rangeSet, new SymbolSet(),
+      parseTree, new ValueMap()
+    editor = makeEditor()
+    view = new ExampleView model, editor
+
+    symbol = new Symbol TEST_FILE, "i", new Range [1, 8], [1, 9]
+    model.getEdits().push new Replacement symbol, "42"
+    exampleText = view.getTextEditor().getText()
+    expect(exampleText.indexOf "int j = 42;").not.toBe -1
+
   it "marks up symbols with errors in ERROR_CHOICE mode", ->
 
     symbolSet = new SymbolSet()
@@ -144,7 +160,6 @@ describe "ExampleView", ->
         2: { i: '0', j: '0' }
         3: { i: '1', j: '0' }
     }
-    symbolSet.setDefinition new Symbol "Example.java", "j", new Range [1, 4], [1, 5]
     model = new ExampleModel codeBuffer,
       (new RangeSet [ new Range [2, 0], [2, 10] ]),
       symbolSet, parseTree, valueMap
@@ -152,12 +167,14 @@ describe "ExampleView", ->
 
     # By setting a chosen error, a set of suggestions, and the model state
     # to RESOLUTION, a decoration should be added for resolving the symbol
+    useSymbol = new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
+    defSymbol = new Symbol TEST_FILE, "j", new Range [1, 4], [1, 5]
     model.setErrorChoice new MissingDefinitionError \
       new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
     model.setSuggestions [
-      new SymbolSuggestion new Symbol TEST_FILE, "j", new Range [1, 4], [1, 5]
-      new PrimitiveValueSuggestion "1"
-      new PrimitiveValueSuggestion "0"
+      new SymbolSuggestion defSymbol
+      new PrimitiveValueSuggestion useSymbol, "1"
+      new PrimitiveValueSuggestion useSymbol, "0"
     ]
     model.setState ExampleModelState.RESOLUTION
 
@@ -250,7 +267,7 @@ describe "ExampleView", ->
         (expect model.getEdits().length).toBe 1
         edit = model.getEdits()[0]
         (expect edit instanceof Replacement)
-        (expect edit.getRange(), new Range [1, 4], [1, 5])
+        (expect edit.getSymbol().getRange(), new Range [1, 4], [1, 5])
         (expect edit.getText(), "1")
 
         valueSuggestion.mouseout()

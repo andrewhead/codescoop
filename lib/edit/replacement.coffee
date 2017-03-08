@@ -1,11 +1,11 @@
 module.exports.Replacement = class Replacement
 
-  constructor: (range, text) ->
-    @range = range
+  constructor: (symbol, text) ->
+    @symbol = symbol
     @text = text
 
-  getRange: ->
-    @range
+  getSymbol: ->
+    @symbol
 
   getText: ->
     @text

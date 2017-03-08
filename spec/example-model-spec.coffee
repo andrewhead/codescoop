@@ -32,11 +32,3 @@ describe "ExampleModel", ->
     rangeSet.getActiveRanges().push new Range [0, 0], [0, 10]
     (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_RANGES
     (expect observer.propertyValue).toEqual [ new Range [0, 0], [0, 10] ]
-
-  it "notifies observers when the list of undefined symbols changes", ->
-    symbols = new SymbolSet()
-    exampleModel = new ExampleModel codeBuffer, new RangeSet(), symbols, parseTree, new ValueMap()
-    exampleModel.addObserver observer
-    symbols.addUndefinedUse { name: "sym", line: 1, start: 5, end: 6 }
-    (expect observer.propertyName).toBe ExampleModelProperty.UNDEFINED_USES
-    (expect observer.propertyValue).toEqual { name: "sym", line: 1, start: 5, end: 6 }
