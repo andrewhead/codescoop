@@ -9,9 +9,6 @@ module.exports.MissingDefinitionError = class MissingDefinitionError
 
 module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
 
-  constructor: (file) ->
-    @file = file
-
   detectErrors: (parseTree, rangeSet, symbolSet) ->
 
     activeUses = rangeSet.getActiveSymbols symbolSet.getUses()

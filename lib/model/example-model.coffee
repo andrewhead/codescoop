@@ -12,6 +12,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   ERRORS: { value: 6, name: "errors" }
   SUGGESTIONS: { value: 7, name: "suggestions" }
   EDITS: { value: 8, name: "edits" }
+  ACTIVE_CORRECTOR: { value: 9, name: "active-corrector" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -47,6 +48,7 @@ module.exports.ExampleModel = class ExampleModel
     @valueMap = valueMap
     @errorChoice = null
     @resolutionChoice = null
+    @activeCorrector = null
 
     @state = ExampleModelState.ANALYSIS
 
@@ -93,6 +95,13 @@ module.exports.ExampleModel = class ExampleModel
 
   getErrorChoice: ->
     @errorChoice
+
+  setActiveCorrector: (corrector) ->
+    @activeCorrector = corrector
+    @notifyObservers @, ExampleModelProperty.ACTIVE_CORRECTOR, @activeCorrector
+
+  getActiveCorrector: ->
+    @activeCorrector
 
   setResolutionChoice: (resolution) ->
     @resolutionChoice = resolution

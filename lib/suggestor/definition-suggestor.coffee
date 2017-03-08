@@ -4,9 +4,13 @@
 
 module.exports.DefinitionSuggestor = class DefinitionSuggestor
 
-  getSuggestions: (error, parseTree, rangeSet, symbolSet) ->
+  getSuggestions: (error, model) ->
 
     use = error.getSymbol()
+
+    parseTree = model.getParseTree()
+    rangeSet = model.getRangeSet()
+    symbolSet = model.getSymbols()
 
     scopeFinder = new ScopeFinder use.getFile(), parseTree
     useScopes = scopeFinder.findSymbolScopes use

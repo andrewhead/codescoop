@@ -1,16 +1,27 @@
-{ ExampleModelState, ExampleModelProperty } = require './model/example-model'
-{ RangeAddition } = require './edit/range-addition'
+{ ExampleModelState, ExampleModelProperty } = require "./model/example-model"
+{ MissingDefinitionDetector } = require "./error/missing-definition"
+{ DefinitionSuggestor } = require "./suggestor/definition-suggestor"
+{ RangeAddition } = require "./edit/range-addition"
 
 
 module.exports.ExampleController = class ExampleController
 
-  constructor: (model, correctors, defUseAnalysis, valueAnalysis) ->
+  constructor: (model, analyses, correctors) ->
 
     # Listen to all changes in the model
     @model = model
     @model.addObserver @
 
+    defUseAnalysis = analyses.defUseAnalysis
+    valueAnalysis = analyses.valueAnalysis
+
     @correctors = correctors
+    # Load default correctors if none were passed in
+    if not @correctors?
+      @correctors = [
+          checker: new MissingDefinitionDetector()
+          suggesters: [ new DefinitionSuggestor() ]
+      ]
 
     # Before the state can update, the analyses must complete
     @_startAnalyses defUseAnalysis, valueAnalysis
@@ -55,7 +66,17 @@ module.exports.ExampleController = class ExampleController
       if errors.length > 0
         @model.setState ExampleModelState.ERROR_CHOICE
         @model.setErrors errors
+        @model.setActiveCorrector corrector
         break
+
+  getSuggestions: ->
+    error = @model.getErrorChoice()
+    activeCorrector = @model.getActiveCorrector()
+    suggestions = []
+    for suggester in activeCorrector.suggesters
+      suggesterSuggestions = suggester.getSuggestions error, @model
+      suggestions = suggestions.concat suggesterSuggestions
+    suggestions
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
 
@@ -69,6 +90,8 @@ module.exports.ExampleController = class ExampleController
     else if @model.getState() is ExampleModelState.ERROR_CHOICE
 
       if (propertyName is ExampleModelProperty.ERROR_CHOICE) and propertyValue?
+        suggestions = @getSuggestions()
+        @model.setSuggestions suggestions
         @model.setState ExampleModelState.RESOLUTION
 
     else if @model.getState() is ExampleModelState.RESOLUTION
@@ -78,4 +101,5 @@ module.exports.ExampleController = class ExampleController
         if propertyValue instanceof RangeAddition
           @model.getRangeSet().getActiveRanges().push propertyValue.getRange()
 
+        @model.setActiveCorrector null
         @model.setState ExampleModelState.IDLE

@@ -37,7 +37,7 @@ describe "ExampleController", ->
     it "enters the IDLE state when initial analyses finish", ->
 
       runs ->
-        controller = new ExampleController model, [], defUseAnalysis, valueAnalysis
+        controller = new ExampleController model, { defUseAnalysis, valueAnalysis }, []
 
       # After creating the controller, we wait for analyses to finish
       waitsFor =>
@@ -71,18 +71,16 @@ describe "ExampleController", ->
   describe "when in the IDLE state", ->
 
     correctors = [
-        name: "mock-corrector"
         checker:
           detectErrors: (parseTree, rangeSet, symbolSet) => []
-        suggester:
-          getSuggestions: (error, parseTree, rangeSet, symbolSet) => []
-        fixer:
-          applyFixes: (suggestion, rangeSet, symbolSet) => true
+        # Checkers will also have suggesters, but that isn't important here.
     ]
+    defUseAnalysis = _makeMockDefUseAnalysis()
+    analyses = { defUseAnalysis }
 
     it "leaves the state at IDLE if no errors found", ->
       model = _makeDefaultModel()
-      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      controller = new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.IDLE
 
@@ -90,7 +88,7 @@ describe "ExampleController", ->
 
       # Spy on the first corrector to make sure that it was used to detect errors
       model = _makeDefaultModel()
-      new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      new ExampleController model, analyses, correctors
 
       # Update the corrector to return errors, as if they were caused by
       # the addition of new ranges.  XXX: this will cause this corrector
@@ -122,7 +120,7 @@ describe "ExampleController", ->
       (spyOn secondCorrector.checker, "detectErrors").andCallThrough()
 
       model = _makeDefaultModel()
-      new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
 
       (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
@@ -130,44 +128,72 @@ describe "ExampleController", ->
 
     it "updates to ERROR_CHOICE when lines are chosen and errors found", ->
       model = _makeDefaultModel()
-      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      controller = new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
 
     it "updates model errors when lines are chosen and errors are found", ->
       model = _makeDefaultModel()
-      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      controller = new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getErrors()).toEqual [ "error1", "error2" ]
 
     it "transitions to ERROR_CHOICE if it enters IDLE with errors", ->
       model = _makeDefaultModel()
-      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+      controller = new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
+
+    it "saves a reference to the corrector that found the error", ->
+      correctors = [ { checker: { detectErrors: -> ["error"] } } ]
+      model = _makeDefaultModel()
+      (expect model.getActiveCorrector()).toBe null
+      controller = new ExampleController model, analyses, correctors
+      (expect model.getActiveCorrector()).toBe correctors[0]
 
 
   describe "when in the ERROR_CHOICE state", ->
 
+    defUseAnalysis = _makeMockDefUseAnalysis()
+    analyses = { defUseAnalysis }
+
+    # A mock corrector that does nothing but detect an error
+    # and give primitive fix suggestions
+    correctors = [{
+      checker: { detectErrors: -> [ "error" ] }
+      suggesters: [
+        { getSuggestions: (error) -> if error is "error" then [1, 2] else [] }
+        { getSuggestions: (error) -> if error is "error" then [3] else [4] }
+        { getSuggestions: (error) -> [5] }
+      ]
+    }]
+
+    # These lines get us into the ERROR_CHOICE state
+    model = _makeDefaultModel()
+    controller = new ExampleController model, analyses, correctors
+
+    # Here, we simulate the choice of an error
+    model.setErrorChoice "error"
+
     it "updates the state to RESOLUTION when an error is chosen", ->
-
-      # A mock corrector that does nothing but detect an error
-      correctors = [ { checker: { detectErrors: -> [ "error" ] } } ]
-
-      # The next three lines get us into the ERROR_CHOICE state
-      model = _makeDefaultModel()
-      controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
-
-      # Here, we simulate the choice of an error
-      model.setErrorChoice "error"
       (expect model.getState()).toBe ExampleModelState.RESOLUTION
+
+    it "populates the resolution options for the error from all suggestors", ->
+      (expect model.getSuggestions()).toEqual [1, 2, 3, 5]
+
 
   describe "when in the RESOLUTION state", ->
 
+    defUseAnalysis = _makeMockDefUseAnalysis()
+    analyses = { defUseAnalysis }
+
     # These lines get the controller into the RESOLUTION state
-    correctors = [ { checker: { detectErrors: -> [ "error" ] } } ]
+    correctors = [{
+      checker: { detectErrors: -> [ "error" ] }
+      suggesters: [ { getSuggestions: -> [1] } ]
+    }]
     model = _makeDefaultModel()
-    controller = new ExampleController model, correctors, _makeMockDefUseAnalysis()
+    controller = new ExampleController model, analyses, correctors
     model.getRangeSet().getActiveRanges().push new Range [1, 0], [1, 10]
     model.setErrorChoice "error"
 
@@ -183,3 +209,6 @@ describe "ExampleController", ->
       activeRanges = model.getRangeSet().getActiveRanges()
       (expect activeRanges.length).toBe 2
       (expect activeRanges[1]).toEqual new Range [0, 0], [0, 10]
+
+    it "sets the active corrector back to nothing", ->
+      (expect model.getActiveCorrector()).toBe null
