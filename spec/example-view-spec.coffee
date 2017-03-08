@@ -3,7 +3,7 @@
 { makeObservableArray } = require '../lib/example-view'
 { File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { Range, RangeSet } = require '../lib/model/range-set'
-{ ValueMap } = require '../lib/value-analysis'
+{ ValueMap } = require '../lib/analysis/value-analysis'
 { MissingDefinitionError } = require '../lib/error/missing-definition'
 { SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggestor/suggestion'
 { Replacement } = require '../lib/edit/replacement'

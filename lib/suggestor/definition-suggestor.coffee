@@ -1,5 +1,5 @@
 { SymbolSuggestion } = require './suggestion'
-{ ScopeFinder } = require '../scope'
+{ ScopeFinder } = require '../analysis/scope'
 
 
 module.exports.DefinitionSuggestor = class DefinitionSuggestor

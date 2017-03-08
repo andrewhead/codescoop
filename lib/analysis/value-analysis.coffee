@@ -1,4 +1,4 @@
-{ JAVA_CLASSPATH, java } = require './paths'
+{ JAVA_CLASSPATH, java } = require '../config/paths'
 VariableTracer = java.import "VariableTracer"
 
 

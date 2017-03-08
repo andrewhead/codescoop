@@ -1,7 +1,7 @@
+{ JavaLexer } = require '../grammar/Java/JavaLexer'
+{ JavaParser } = require '../grammar/Java/JavaParser'
+{ JavaListener } = require '../grammar/Java/JavaListener'
 { InputStream, CommonTokenStream } = require 'antlr4'
-{ JavaLexer } = require './grammar/Java/JavaLexer'
-{ JavaParser } = require './grammar/Java/JavaParser'
-{ JavaListener } = require './grammar/Java/JavaListener'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 

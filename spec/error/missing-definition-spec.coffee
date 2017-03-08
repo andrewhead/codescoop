@@ -1,5 +1,5 @@
 { MissingDefinitionError, MissingDefinitionDetector } = require '../../lib/error/missing-definition'
-{ parse } = require '../../lib/parse-tree'
+{ parse } = require '../../lib/analysis/parse-tree'
 { Symbol, SymbolSet } = require '../../lib/model/symbol-set'
 { Range, RangeSet } = require '../../lib/model/range-set'
 

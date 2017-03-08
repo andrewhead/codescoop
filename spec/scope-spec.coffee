@@ -1,9 +1,9 @@
 { InputStream, CommonTokenStream } = require 'antlr4'
 { JavaLexer } = require '../lib/grammar/Java/JavaLexer'
 { JavaParser } = require '../lib/grammar/Java/JavaParser'
-{ ScopeFinder } = require '../lib/scope'
-{ BlockScope, ForLoopScope, MethodScope, ClassScope } = require '../lib/scope'
-{ parse, partialParse } = require '../lib/parse-tree'
+{ ScopeFinder } = require '../lib/analysis/scope'
+{ BlockScope, ForLoopScope, MethodScope, ClassScope } = require '../lib/analysis/scope'
+{ parse, partialParse } = require '../lib/analysis/parse-tree'
 { Symbol, File } = require '../lib/model/symbol-set'
 { Range } = require '../lib/model/range-set'
 

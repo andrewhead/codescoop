@@ -1,11 +1,11 @@
 { ExampleModel, ExampleModelState } = require '../lib/model/example-model'
 { ExampleController } = require '../lib/example-controller'
-{ DefUseAnalysis } = require '../lib/def-use'
+{ DefUseAnalysis } = require '../lib/analysis/def-use'
 { Range, RangeSet } = require '../lib/model/range-set'
 { File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
-{ ValueAnalysis, ValueMap } = require '../lib/value-analysis'
+{ ValueAnalysis, ValueMap } = require '../lib/analysis/value-analysis'
 { RangeAddition } = require '../lib/edit/range-addition'
-{ PACKAGE_PATH } = require '../lib/paths'
+{ PACKAGE_PATH } = require '../lib/config/paths'
 
 
 describe "ExampleController", ->

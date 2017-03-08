@@ -1,9 +1,9 @@
-{ JavaParser } = require './grammar/Java/JavaParser'
-{ JavaListener } = require './grammar/Java/JavaListener'
-ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
-{ Symbol, File } = require './model/symbol-set'
-{ Range } = require './model/range-set'
+{ JavaParser } = require '../grammar/Java/JavaParser'
+{ JavaListener } = require '../grammar/Java/JavaListener'
+{ Symbol, File } = require '../model/symbol-set'
+{ Range } = require '../model/range-set'
 { ParseTree } = require './parse-tree'
+ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 
 _symbolFromIdNode = (file, idNode) ->
