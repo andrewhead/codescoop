@@ -5,6 +5,7 @@ This way we can configure the classpath for the module only once
 ###
 fs = require 'fs'
 java = require 'java'
+{ JAVA_HOME } = require './config/java-home'
 
 PACKAGE_PATH = atom.packages.resolvePackagePath 'examplify'
 
@@ -18,9 +19,6 @@ javaLibs.forEach (libName) =>
   if (libName.endsWith '.jar')
     JAVA_CLASSPATH.push (JAVA_LIBS_DIR + '/' + libName)
 
-# Sorry, you'll need to modify this for the Java home on your computer.
-# I'm hard-coding it so I can do this fast locally
-JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home"
 jreLibs = fs.readdirSync (JAVA_HOME + '/jre/lib')
 jreLibs.forEach (libName) =>
   if (libName.endsWith '.jar')
