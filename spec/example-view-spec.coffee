@@ -239,13 +239,13 @@ describe "ExampleView", ->
         codeBlock = $ (($ domElement).find 'div.resolution-class-block')[0]
         codeHeader = codeBlock.find 'div.resolution-class-header'
         codeHeader.mouseover()
-        codeHeader.mouseout()
         codeSuggestion = $ (codeBlock.find 'div.suggestion')[0]
 
         # Simulate the mouse entering and exiting the suggestion button
         suggestedRanges = model.getRangeSet().getSuggestedRanges()
         (expect suggestedRanges.length).toBe 0
         codeSuggestion.mouseover()
+        codeHeader.mouseout()
         (expect suggestedRanges.length).toBe 1
         (expect suggestedRanges[0]).toEqual new Range [1, 4], [1, 5]
         codeBlock.mouseout()
@@ -256,9 +256,9 @@ describe "ExampleView", ->
         codeBlock = $ (($ domElement).find 'div.resolution-class-block')[0]
         codeHeader = codeBlock.find 'div.resolution-class-header'
         codeHeader.mouseover()
-        codeHeader.mouseout()
         codeSuggestion = $ (codeBlock.find 'div.suggestion')[0]
         codeSuggestion.mouseover()
+        codeHeader.mouseout()
 
         (expect model.getResolutionChoice()).toBe null
         codeSuggestion.click()

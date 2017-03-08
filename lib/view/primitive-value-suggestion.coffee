@@ -1,4 +1,5 @@
 { SuggestionView } = require './suggestion-view'
+{ SuggestionBlockView } = require './suggestion-block-view'
 { Replacement } = require '../edit/replacement'
 
 
@@ -11,11 +12,21 @@ module.exports.PrimitiveValueSuggestionView = \
     @replacement = new Replacement \
       errorMarker.getBufferRange(), suggestion.getValueString()
 
-  onMouseOver: (event) ->
+  preview: ->
     @model.getEdits().push @replacement
 
-  onMouseOut: (event) ->
+  revert: ->
     @model.getEdits().splice (@model.getEdits().indexOf @replacement), 1
 
-  onClick: (event) ->
+  accept: ->
     @model.getEdits().push @replacement
+
+
+module.exports.PrimitiveValueSuggestionBlockView = \
+    class SymbolSuggestionBlockView extends SuggestionBlockView
+
+  constructor: (suggestions, model, errorMarker) ->
+    super "Set value", suggestions, model, errorMarker
+
+  createSuggestionView: (suggestion) ->
+    new PrimitiveValueSuggestionView suggestion, @model, @errorMarker

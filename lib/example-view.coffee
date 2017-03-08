@@ -3,8 +3,8 @@ $ = require 'jquery'
 { Range, RangeSet } = require './model/range-set'
 { MissingDefinitionError } = require './error/missing-definition'
 { SymbolSuggestion, PrimitiveValueSuggestion } = require './suggestor/suggestion'
-{ SymbolSuggestionView } = require "./view/symbol-suggestion"
-{ PrimitiveValueSuggestionView } = require "./view/primitive-value-suggestion"
+{ SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
+{ PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
 
 
 module.exports.ExampleView = class ExampleView
@@ -188,50 +188,23 @@ module.exports.ExampleView = class ExampleView
     decoration = $ "<div></div>"
     originalText = @textEditor.getTextInBufferRange marker.getBufferRange()
 
-    # Get names of all suggestion classes
+    # Group suggestions by class
     suggestionClasses = []
     suggestionsByClass = {}
     for suggestion in suggestions
-
-      # Start making a list of all types of suggestions
       class_ = suggestion.constructor.name
       suggestionClasses.push class_ if (class_ not in suggestionClasses)
-
-      # Group suggestions by class
       if class_ not of suggestionsByClass
         suggestionsByClass[class_] = []
       suggestionsByClass[class_].push suggestion
 
-    _textForClass = (className) =>
-      return "Set value" if className is "PrimitiveValueSuggestion"
-      return "Add code" if className is "SymbolSuggestion"
-
-    # Add a UI element for each class of suggestion
-    classHeaders = {}
     for class_ in suggestionClasses
-      classBlock = $ "<div></div>"
-        .addClass "resolution-class-block"
-        .mouseout (event) =>
-          block = ($ event.target)
-          # Propagate mouseout to suggestions and remove suggestions
-          (block.find 'div.suggestion').each ->
-            ($ @).mouseout()
-            ($ @).remove()
-      classHeader = $ "<div></div>"
-        .addClass "resolution-class-header"
-        .text _textForClass class_
-        .data "suggestions", suggestionsByClass[class_]
-        .data "block", classBlock
-        .data "class", class_
-      classBlock.append classHeader
-      decoration.append classBlock
-      classHeaders[class_] = classHeader
-
-    _textForSuggestion = (suggestion) =>
-      if suggestion instanceof SymbolSuggestion
-        return "L" + suggestion.getSymbol().getRange().start.row
-      else if suggestion instanceof PrimitiveValueSuggestion
-        return suggestion.getValueString()
+      suggestions = suggestionsByClass[class_]
+      if class_ is "SymbolSuggestion"
+        block = new SymbolSuggestionBlockView suggestions, @model, marker
+      else if class_ is "PrimitiveValueSuggestion"
+        block = new PrimitiveValueSuggestionBlockView suggestions, @model, marker
+      decoration.append block
 
     _makeSuggestionOption = (suggestion, model) =>
       if suggestion instanceof SymbolSuggestion
@@ -239,15 +212,6 @@ module.exports.ExampleView = class ExampleView
       else if suggestion instanceof PrimitiveValueSuggestion
         option = new PrimitiveValueSuggestionView suggestion, model, marker
       option
-
-    # For each suggestion, add another block when hovering over the header
-    for class_, header of classHeaders
-      header.mouseover (event) =>
-        target = ($ event.target)
-        block = target.data "block"
-        for suggestion in target.data "suggestions"
-          option = _makeSuggestionOption suggestion, @model
-          block.append option
 
     # Create a decoration from the element
     params =

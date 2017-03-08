@@ -1,4 +1,5 @@
 { SuggestionView } = require './suggestion-view'
+{ SuggestionBlockView } = require './suggestion-block-view'
 
 
 module.exports.SymbolSuggestionView = class SymbolSuggestionView extends SuggestionView
@@ -7,11 +8,21 @@ module.exports.SymbolSuggestionView = class SymbolSuggestionView extends Suggest
     super suggestion, model,
       "L" + suggestion.getSymbol().getRange().start.row
 
-  onMouseOver: (event) ->
+  preview: ->
     @rangeSet.addSuggestedRange @suggestion.getSymbol().getRange()
 
-  onMouseOut: (event) ->
+  revert: ->
     @rangeSet.removeSuggestedRange @suggestion.getSymbol().getRange()
 
-  onClick: (event) ->
+  accept: ->
     @model.setResolutionChoice @suggestion
+
+
+module.exports.SymbolSuggestionBlockView = \
+    class SymbolSuggestionBlockView extends SuggestionBlockView
+
+  constructor: (suggestions, model, errorMarker) ->
+    super "Add code", suggestions, model, errorMarker
+
+  createSuggestionView: (suggestion) ->
+    new SymbolSuggestionView suggestion, @model
