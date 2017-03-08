@@ -24,33 +24,6 @@ codeBuffer = editor.getBuffer()
 TEST_FILE = new File "fake/path", "FakeClass.java"
 
 
-describe "ExampleModel", ->
-
-  observer =
-    onPropertyChanged: (object, name, value) ->
-      @object = object
-      @propertyName = name
-      @propertyValue = value
-
-  parseTree = jasmine.createSpyObj "parseTree", [ "getRoot" ]
-
-  it "notifies observers when lines changed", ->
-    rangeSet = new RangeSet()
-    exampleModel = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), parseTree, new ValueMap()
-    exampleModel.addObserver observer
-    rangeSet.getActiveRanges().push new Range [0, 0], [0, 10]
-    (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_RANGES
-    (expect observer.propertyValue).toEqual [ new Range [0, 0], [0, 10] ]
-
-  it "notifies observers when the list of undefined symbols changes", ->
-    symbols = new SymbolSet()
-    exampleModel = new ExampleModel codeBuffer, new RangeSet(), symbols, parseTree, new ValueMap()
-    exampleModel.addObserver observer
-    symbols.addUndefinedUse { name: "sym", line: 1, start: 5, end: 6 }
-    (expect observer.propertyName).toBe ExampleModelProperty.UNDEFINED_USES
-    (expect observer.propertyValue).toEqual { name: "sym", line: 1, start: 5, end: 6 }
-
-
 describe "ExampleView", ->
 
   parseTree = jasmine.createSpyObj "parseTree", [ "getRoot" ]
