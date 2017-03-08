@@ -1,6 +1,7 @@
 { CompositeDisposable } = require 'atom'
 { CodeView } = require './code-view'
-{ ExampleModel, ExampleView } = require './example-view'
+{ ExampleView } = require './example-view'
+{ ExampleModel } = require './model/example-model'
 { ExampleController } = require './example-controller'
 { DefUseAnalysis } = require './def-use'
 { ValueAnalysis } = require './value-analysis'

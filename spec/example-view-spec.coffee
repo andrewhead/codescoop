@@ -1,5 +1,5 @@
 { ExampleView } = require '../lib/example-view'
-{ ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/example-view'
+{ ExampleModel, ExampleModelState, ExampleModelProperty } = require '../lib/model/example-model'
 { makeObservableArray } = require '../lib/example-view'
 { File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
 { Range, RangeSet } = require '../lib/model/range-set'

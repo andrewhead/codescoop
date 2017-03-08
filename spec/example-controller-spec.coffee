@@ -1,4 +1,4 @@
-{ ExampleModel, ExampleModelState } = require '../lib/example-view'
+{ ExampleModel, ExampleModelState } = require '../lib/model/example-model'
 { ExampleController } = require '../lib/example-controller'
 { DefUseAnalysis } = require '../lib/def-use'
 { Range, RangeSet } = require '../lib/model/range-set'

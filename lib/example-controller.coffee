@@ -1,4 +1,4 @@
-{ ExampleModelState, ExampleModelProperty } = require './example-view'
+{ ExampleModelState, ExampleModelProperty } = require './model/example-model'
 { RangeAddition } = require './edit/range-addition'
 
 
