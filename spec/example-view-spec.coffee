@@ -5,7 +5,7 @@
 { Range, RangeSet } = require '../lib/model/range-set'
 { ValueMap } = require '../lib/analysis/value-analysis'
 { MissingDefinitionError } = require '../lib/error/missing-definition'
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggestor/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
 { Replacement } = require '../lib/edit/replacement'
 $ = require 'jquery'
 _ = require 'lodash'
@@ -90,11 +90,13 @@ describe "ExampleView", ->
 
     editor = view.getTextEditor()
     markers = editor.getMarkers()
-    (expect markers.length).toBe 2
+    (expect markers.length).toBe 3
 
     # The marked range will be different from original symbol position, due to
-    # filtering to active lines and pretty-printing
-    markerBufferRange = markers[0].getBufferRange()
+    # filtering to active lines and pretty-printing.  (The first marker is
+    # to keep track of the active ranges; the second and third are markers
+    # on each of the error choices.)
+    markerBufferRange = markers[1].getBufferRange()
     (expect markerBufferRange).toEqual new Range [4, 12], [4, 13]
     (expect editor.getTextInBufferRange(markerBufferRange)).toBe "j"
 
@@ -120,8 +122,8 @@ describe "ExampleView", ->
       # Make sure that the decoration is associated with the marker created
       (expect buttonDecorations.length).toBe 1
       (expect highlightDecorations.length).toBe 1
-      (expect buttonDecorations[0].getMarker()).toBe markers[0]
-      (expect highlightDecorations[0].getMarker()).toBe markers[0]
+      (expect buttonDecorations[0].getMarker()).toBe markers[1]
+      (expect highlightDecorations[0].getMarker()).toBe markers[1]
 
     it "updates the target when the decoration is clicked", ->
       domElement = $ (buttonDecorations[0].getProperties()).item
@@ -146,9 +148,11 @@ describe "ExampleView", ->
 
     # Only show markers when we're picking from undefined uses
     model.setState ExampleModelState.ERROR_CHOICE
-    (expect view.getTextEditor().getMarkers().length).toBe 1
+    (expect view.getTextEditor().getDecorations(
+      { class: 'error-choice-highlight' }).length).toBe 1
     model.setState ExampleModelState.IDLE
-    (expect view.getTextEditor().getMarkers().length).toBe 0
+    (expect view.getTextEditor().getDecorations(
+      { class: 'error-choice-highlight' }).length).toBe 0
 
   describe "when the state is set to RESOLUTION", ->
 
@@ -179,8 +183,7 @@ describe "ExampleView", ->
     model.setState ExampleModelState.RESOLUTION
 
     it "adds a marker for resolving the error", ->
-      editor = view.getTextEditor()
-      markers = editor.getMarkers()
+      markers = view.getSymbolMarkers()
       (expect markers.length).toBe 1
       markerBufferRange = markers[0].getBufferRange()
       (expect markerBufferRange).toEqual new Range [4, 12], [4, 13]
@@ -190,7 +193,7 @@ describe "ExampleView", ->
       editor = view.getTextEditor()
       decorations = editor.getDecorations { class: 'resolution-widget' }
       decoration = decorations[0]
-      markers = editor.getMarkers()
+      markers = view.getSymbolMarkers()
 
       it "corresponds to the new marker", ->
         (expect decorations.length).toBe 1
@@ -274,5 +277,5 @@ describe "ExampleView", ->
         (expect edit.getText(), "1")
 
         valueSuggestion.mouseout()
-        (expect model.getEdits().length).toBe 0
+        (expect model.getEdits()[0].getText(), "i")
         valueBlock.mouseleave()

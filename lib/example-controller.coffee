@@ -1,6 +1,7 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
 { MissingDefinitionDetector } = require "./error/missing-definition"
-{ DefinitionSuggestor } = require "./suggestor/definition-suggestor"
+{ DefinitionSuggester } = require "./suggester/definition-suggester"
+{ PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { RangeAddition } = require "./edit/range-addition"
 { Fixer } = require "./fixer"
 
@@ -20,7 +21,10 @@ module.exports.ExampleController = class ExampleController
     if not @correctors?
       @correctors = [
           checker: new MissingDefinitionDetector()
-          suggesters: [ new DefinitionSuggestor() ]
+          suggesters: [
+            new DefinitionSuggester()
+            new PrimitiveValueSuggester()
+          ]
       ]
 
     # Before the state can update, the analyses must complete

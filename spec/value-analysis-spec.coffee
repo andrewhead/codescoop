@@ -39,5 +39,5 @@ describe "ValueAnalysis", ->
         (expect "j" of map["Example.java"][6]).toBe true
 
         # "includes printable values for variable by line"
-        (expect map["Example.java"][5]["i"]).toBe "1"
-        (expect map["Example.java"][8]["i"]).toBe "3"
+        (expect map["Example.java"][5]["i"]).toEqual ["1"]
+        (expect map["Example.java"][8]["i"]).toEqual ["3"]

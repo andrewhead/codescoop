@@ -3,9 +3,10 @@ $ = require 'jquery'
 { Range, RangeSet } = require './model/range-set'
 { Replacement } = require './edit/replacement'
 { MissingDefinitionError } = require './error/missing-definition'
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require './suggestor/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require './suggester/suggestion'
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
+{ Point } = require 'atom'
 
 
 module.exports.ExampleView = class ExampleView
@@ -31,8 +32,8 @@ module.exports.ExampleView = class ExampleView
     @model = model
     @model.addObserver @
     @textEditor = textEditor
-    @markers = []
-    @markerUses = {}
+    @symbolMarkerPairs = []
+    @activeRangeMarkerPairs = []
     @update()
 
   getTextEditor: () ->
@@ -42,6 +43,8 @@ module.exports.ExampleView = class ExampleView
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.ACTIVE_RANGES
+    ]
+    @_applyReplacements() if propertyName in [
       ExampleModelProperty.EDITS
     ]
 
@@ -50,18 +53,19 @@ module.exports.ExampleView = class ExampleView
     # We add in the code, then add the markers, then the boilerplate.
     # By adding the code first, we get to use the character offsets of
     # each symbol to mark them, before inserting other boilerplate code
-    activeRangeOffsets = @_addCodeLines()
-    @_applyReplacements activeRangeOffsets
+    @_addCodeLines()
+    @_applyReplacements()
     if @model.getState() is ExampleModelState.ERROR_CHOICE
-      @_markErrors @model.getErrors(), activeRangeOffsets
+      @_markErrors @model.getErrors()
     else if @model.getState() is ExampleModelState.RESOLUTION
-      @_addResolutionWidget @model.getSuggestions(), activeRangeOffsets
+      @_addResolutionWidget @model.getSuggestions()
     @_insertBoilerplate()
 
   _clearMarkers: ->
-    marker.destroy() for marker in @markers
-    @markers = []
-    @markerUses = {}
+    symbolMarkerPair[1].destroy() for symbolMarkerPair in @symbolMarkerPairs
+    rangeMarkerPair[1].destroy() for rangeMarkerPair in @activeRangeMarkerPairs
+    @symbolMarkerPairs = []
+    @activeRangeMarkerPairs = []
 
   _addCodeLines: ->
 
@@ -70,64 +74,82 @@ module.exports.ExampleView = class ExampleView
     ranges = @model.getRangeSet().getActiveRanges().copy()
     rangesSorted = ranges.sort (a, b) => a.compare b
 
-    rangeOffsets = []
-    text = ""
+    @textEditor.setText ""
+    nextInsertionPoint = new Point 0, 0
 
     for range in rangesSorted
+
       # We store the offset of each active range within the editor so that
       # in the next step we can locate where the symbols have been moved,
       # so we can add markers and decorations
-      rangeOffset = (text.split "\n").length - 1
-      rangeText = @model.getCodeBuffer().getTextInRange range
-      text += (rangeText + "\n")
-      rangeOffsets.push [range, rangeOffset]
+      endRange = new Range nextInsertionPoint, nextInsertionPoint
+      codeText = @model.getCodeBuffer().getTextInRange range
+      exampleRange = @textEditor.setTextInBufferRange endRange, codeText + "\n"
+      nextInsertionPoint = exampleRange.end
 
-    @textEditor.setText text
-    rangeOffsets
+      # Step back over the newline when getting the range in the example.
+      # This is oddly neceesary to make sure the marker doesn't keep moving
+      # this range's end further and futher out.
+      exampleRange = new Range exampleRange.start, [
+        exampleRange.end.row - 1,
+        @textEditor.getBuffer().lineLengthForRow exampleRange.end.row - 1
+      ]
 
-  _getAdjustedSymbolRange: (symbol, rangeOffsets) ->
+      # Save a reference to a movable buffer range for the active range's
+      # position within the example code.
+      marker = @textEditor.markBufferRange exampleRange
+      @activeRangeMarkerPairs.push [range, marker]
+
+
+  _getAdjustedSymbolRange: (symbol, rangeMarkers) ->
+
+    # Find the active range that contains the symbol
     symbolInActiveRange = false
-    for activeRange in @model.getRangeSet().getActiveRanges()
+    for rangeMarkerPair in @activeRangeMarkerPairs
+      activeRange = rangeMarkerPair[0]
       if activeRange.containsRange symbol.getRange()
         symbolInActiveRange = true
-        filteredRangeOffsets = rangeOffsets.filter (element) =>
-          activeRange.isEqual element[0]
-        rangeOffset = filteredRangeOffsets[0]
-        exampleRow = rangeOffset[1] +
-          (symbol.getRange().start.row - activeRange.start.row)
+        marker = rangeMarkerPair[1]
+        markerRange = marker.getBufferRange()
         break
+
     return null if not symbolInActiveRange  # if use not in active ranges, skip it
-    return new Range \
-      [exampleRow, symbol.getRange().start.column],
-      [exampleRow, symbol.getRange().end.column]
+
+    symbolRange = symbol.getRange()
+    columnOffset = symbolRange.start.column - activeRange.start.column
+    rowOffset = symbolRange.start.row - activeRange.start.row
+    width = symbolRange.end.column - symbolRange.start.column
+    height = symbolRange.end.row - symbolRange.start.row
+    adjustedRange = new Range [
+        markerRange.start.row + rowOffset
+        markerRange.start.column + columnOffset
+      ], [
+        markerRange.start.row + rowOffset + height
+        markerRange.start.column + columnOffset + width
+      ]
+    adjustedRange
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
-  _markSymbol: (symbol, rangeOffsets) ->
-
-    adjustedRange = @_getAdjustedSymbolRange symbol, rangeOffsets
+  _markSymbol: (symbol) ->
+    adjustedRange = @_getAdjustedSymbolRange symbol
     return if not adjustedRange?
     marker = @textEditor.markBufferRange adjustedRange, { invalidate: "overlap" }
-    @markers.push marker
-
-    # We need to hold onto the use that each marker refers to.  We use
-    # marker.id, using the recommendation of an error message that we
-    # encountered when trying to set custom properties
-    @markerUses[marker.id] = symbol
-
+    @symbolMarkerPairs.push [symbol, marker]
     marker
 
-  _markErrors: (errors, rangeOffsets) ->
+  _markErrors: (errors) ->
     for error in errors
       if error instanceof MissingDefinitionError
-        marker = @_markSymbol error.getSymbol(), rangeOffsets
+        marker = @_markSymbol error.getSymbol()
         marker.examplifyError = error
     @_addErrorDecorations()
 
   _addErrorDecorations: ->
 
-    for marker in @markers
+    for symbolMarkerPair in @symbolMarkerPairs
 
+      marker = symbolMarkerPair[1]
       error = marker.examplifyError
 
       # Add a button for highlighting the undefined use
@@ -151,11 +173,11 @@ module.exports.ExampleView = class ExampleView
         class: 'error-choice-highlight'
       @textEditor.decorateMarker marker, params
 
-  _addResolutionWidget: (suggestions, rangeOffsets) ->
+  _addResolutionWidget: (suggestions) ->
 
     # Make a marker for the target use
     errorChoice = @model.getErrorChoice()
-    marker = @_markSymbol errorChoice.getSymbol(), rangeOffsets
+    marker = @_markSymbol errorChoice.getSymbol()
 
     # Built up the interactive widget
     decoration = $ "<div></div>"
@@ -194,12 +216,26 @@ module.exports.ExampleView = class ExampleView
       position: "tail"
     @textEditor.decorateMarker marker, params
 
-  _applyReplacements: (rangeOffsets) ->
+  _applyReplacements: ->
+
     for edit in @model.getEdits()
-      if edit instanceof Replacement
-        symbol = edit.getSymbol()
-        adjustedRange = @_getAdjustedSymbolRange symbol, rangeOffsets
-        @textEditor.setTextInBufferRange adjustedRange, edit.getText()
+      continue if edit not instanceof Replacement
+      symbol = edit.getSymbol()
+
+      foundSymbol = false
+      for symbolMarkerPair in @symbolMarkerPairs
+        continue if not symbolMarkerPair[0].equals symbol
+        foundSymbol = true
+        marker = symbolMarkerPair[1]
+
+      # The first time we find the symbol (presumably before any
+      # replacements have been performed), mark it and save a reference
+      # to the marker, for later replacements.
+      if not foundSymbol
+        adjustedRange = @_getAdjustedSymbolRange symbol
+        marker = @_markSymbol symbol
+
+      @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
 
   _insertBoilerplate: ->
 
@@ -213,7 +249,8 @@ module.exports.ExampleView = class ExampleView
     # Note that by doing this before we insert text, we also solve the problem
     # where, if one of the symbols appears at the very top left of the editor,
     # its marker range grows to include the starter boilerplate.  Score!
-    for marker in @markers
+    for rangeMarkerPair in @activeRangeMarkerPairs
+      marker = rangeMarkerPair[1]
       markerRange = marker.getBufferRange()
       if markerRange.start.column is 0
         markerRange.start.column = @programTemplate.mainIndentLevel * @textEditor.getTabLength()
@@ -233,3 +270,6 @@ module.exports.ExampleView = class ExampleView
       range,
       @programTemplate.end
     )
+
+  getSymbolMarkers: ->
+    (symbolMarkerPair[1] for symbolMarkerPair in @symbolMarkerPairs)

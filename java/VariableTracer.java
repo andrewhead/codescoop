@@ -38,7 +38,7 @@ public class VariableTracer {
         }
         VariableTracer tracer = new VariableTracer();
 
-        Map<String, Map<Integer, Map<String, Value>>> values = null;
+        Map<String, Map<Integer, Map<String, List<Value>>>> values = null;
         try {
             values = tracer.run(className, classpath);
         } catch (ClassNotFoundException exception) {
@@ -48,13 +48,15 @@ public class VariableTracer {
 
         if (values != null) {
             for (String sourceFilename: values.keySet()) {
-                Map<Integer, Map<String, Value>> lineValues = values.get(sourceFilename);
+                Map<Integer, Map<String, List<Value>>> lineValues = values.get(sourceFilename);
                 for (int lineNumber: lineValues.keySet()) {
-                    Map<String, Value> variableValues = lineValues.get(lineNumber);
+                    Map<String, List<Value>> variableValues = lineValues.get(lineNumber);
                     for (String variableName: variableValues.keySet()) {
-                        Value value = variableValues.get(variableName);
-                        System.out.println(sourceFilename + "," + Integer.toString(lineNumber) +
-                                "," + variableName + "," + value);
+                        List<Value> valueList = variableValues.get(variableName);
+                        for (Value value: valueList) {
+                            System.out.println(sourceFilename + "," + Integer.toString(lineNumber) +
+                                    "," + variableName + "," + value);
+                        }
                     }
                 }
             }
@@ -62,7 +64,7 @@ public class VariableTracer {
 
     }
 
-    public Map<String, Map<Integer, Map<String, Value>>> run(
+    public Map<String, Map<Integer, Map<String, List<Value>>>> run(
             String className, String classpath) throws ClassNotFoundException {
 
         VirtualMachine vm = launchVirtualMachine(className, classpath);
@@ -79,11 +81,11 @@ public class VariableTracer {
 
     }
 
-    public Map<String, Map<Integer, Map<String, Value>>> runCode(VirtualMachine vm)
+    public Map<String, Map<Integer, Map<String, List<Value>>>> runCode(VirtualMachine vm)
             throws ClassNotFoundException {
 
-        Map<String, Map<Integer, Map<String, Value>>> values = (
-                new HashMap<String, Map<Integer, Map<String, Value>>>());
+        Map<String, Map<Integer, Map<String, List<Value>>>> values = (
+                new HashMap<String, Map<Integer, Map<String, List<Value>>>>());
 
         // This is the thread that will step through the code
         StepperThread stepperThread = new StepperThread(vm, values);

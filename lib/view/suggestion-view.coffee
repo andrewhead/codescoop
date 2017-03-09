@@ -19,7 +19,7 @@ module.exports.SuggestionView = class SuggestionView extends $
     element = $ "<div></div>"
       .text text
       .addClass "suggestion"
-      .click (event) => @accept()
+      .click (event) => @model.setResolutionChoice suggestion
       .mouseover (event) => @preview()
       .mouseout (event) => @revert()
 

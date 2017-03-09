@@ -23,7 +23,7 @@ module.exports.SuggestionBlockView = class SuggestionBlockView extends $
       .addClass "resolution-class-block"
       # This should be "mouseleave" and not "mouseout": with "mouseout",
       # the suggestions are cleared whenever the mouse leaves any descendant
-      .mouseleave (event) => console.log event; @onMouseLeave event
+      .mouseleave (event) => @onMouseLeave event
 
     header = $ "<div></div>"
       .addClass "resolution-class-header"
@@ -34,7 +34,6 @@ module.exports.SuggestionBlockView = class SuggestionBlockView extends $
             suggestionView = @createSuggestionView suggestion, @model, @errorMarker
             @append suggestionView
             @suggestionViews.push suggestionView
-            suggestionView.mouseleave => console.log "Leaving view"
           @state = SuggestionBlockViewState.SUGGESTIONS
     element.append header
 

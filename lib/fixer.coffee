@@ -1,4 +1,4 @@
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggestor/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
 
 
 module.exports.Fixer = class Fixer
@@ -14,3 +14,8 @@ module.exports.Fixer = class Fixer
       endRowRange = codeBuffer.rangeForRow symbolRange.end.row
       rangeUnion = startRowRange.union endRowRange
       model.getRangeSet().getActiveRanges().push rangeUnion
+
+    else if suggestion instanceof PrimitiveValueSuggestion
+      codeBuffer = model.getCodeBuffer()
+      editRange = suggestion.getSymbol().getRange()
+      codeBuffer.setTextInRange editRange, suggestion.getValueString()

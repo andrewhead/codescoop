@@ -8,17 +8,18 @@ module.exports.PrimitiveValueSuggestionView = \
 
   constructor: (suggestion, model, errorMarker) ->
     super suggestion, model, suggestion.getValueString()
-    # Pre-package the replacement so we can refer to the same one for all events
-    @replacement = new Replacement suggestion.getSymbol(), suggestion.getValueString()
+    @symbol = suggestion.getSymbol()
+    @valueString = suggestion.getValueString()
 
   preview: ->
-    @model.getEdits().push @replacement
+    @previewReplacement = new Replacement @symbol, @valueString
+    @model.getEdits().splice (@model.getEdits().indexOf @revertReplacement), 1
+    @model.getEdits().push @previewReplacement
 
   revert: ->
-    @model.getEdits().splice (@model.getEdits().indexOf @replacement), 1
-
-  accept: ->
-    @model.getEdits().push @replacement
+    @revertReplacement = new Replacement @symbol, @symbol.getName()
+    @model.getEdits().splice (@model.getEdits().indexOf @previewReplacement), 1
+    @model.getEdits().push @revertReplacement
 
 
 module.exports.PrimitiveValueSuggestionBlockView = \

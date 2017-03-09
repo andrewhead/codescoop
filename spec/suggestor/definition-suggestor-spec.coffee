@@ -1,12 +1,12 @@
 { MissingDefinitionError } = require "../../lib/error/missing-definition"
-{ DefinitionSuggestor } = require "../../lib/suggestor/definition-suggestor"
-{ SymbolSuggestion } = require "../../lib/suggestor/suggestion"
+{ DefinitionSuggester } = require "../../lib/suggester/definition-suggester"
+{ SymbolSuggestion } = require "../../lib/suggester/suggestion"
 { Symbol, SymbolSet } = require "../../lib/model/symbol-set"
 { Range, RangeSet } = require "../../lib/model/range-set"
 { parse } = require "../../lib/analysis/parse-tree"
 { ExampleModel } = require "../../lib/model/example-model"
 
-describe "DefinitionSuggestor", ->
+describe "DefinitionSuggester", ->
 
   parseTree = parse [
     "public class Example {"
@@ -28,7 +28,7 @@ describe "DefinitionSuggestor", ->
     "  }"
     "}"
   ].join "\n"
-  suggestor = new DefinitionSuggestor()
+  suggester = new DefinitionSuggester()
   symbols = new SymbolSet {
     uses: [
       (new Symbol "Example.java", "k", new Range [5, 8], [5, 9])
@@ -51,11 +51,11 @@ describe "DefinitionSuggestor", ->
   }
 
   # For testing purposes, it doesn't matter what value rangeSet has,
-  # as the definition suggestor only looks at existing defs, and does not
+  # as the definition suggester only looks at existing defs, and does not
   # care about what lines are in the active set.
   rangeSet = new RangeSet()
 
-  # Make a model that can be passed to the suggestor with all data
+  # Make a model that can be passed to the suggester with all data
   model = new ExampleModel undefined, rangeSet, symbols, parseTree, undefined
 
   _indexOf = (suggestion, suggestions) =>
@@ -70,7 +70,7 @@ describe "DefinitionSuggestor", ->
 
     error = new MissingDefinitionError \
       new Symbol "Example.java", "j", new Range [11, 12], [11, 13]
-    suggestions = suggestor.getSuggestions error, model
+    suggestions = suggester.getSuggestions error, model
 
     suggestion = suggestions[0]
     (expect suggestions.length).toBe 1
@@ -82,7 +82,7 @@ describe "DefinitionSuggestor", ->
 
     error = new MissingDefinitionError \
       new Symbol "Example.java", "i", new Range [14, 23], [14, 24]
-    suggestions = suggestor.getSuggestions error, model
+    suggestions = suggester.getSuggestions error, model
 
     ranges = (s.getSymbol().getRange() for s in suggestions)
     (expect suggestions.length).toBe 3
@@ -93,14 +93,14 @@ describe "DefinitionSuggestor", ->
   it "only suggests a def that is in scope of the use", ->
     error = new MissingDefinitionError \
       new Symbol "Example.java", "k", new Range [15, 23], [15, 24]
-    suggestions = suggestor.getSuggestions error, model
+    suggestions = suggester.getSuggestions error, model
     (expect suggestions.length).toBe 1
 
   it "suggests defs that below the use (and still sorts by proximity)", ->
 
     error = new MissingDefinitionError \
       new Symbol "Example.java", "i", new Range [10, 12], [10, 13]
-    suggestions = suggestor.getSuggestions error, model
+    suggestions = suggester.getSuggestions error, model
 
     (expect suggestions.length).toBe 3
     ranges = (s.getSymbol().getRange() for s in suggestions)

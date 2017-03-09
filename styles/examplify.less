@@ -1,21 +1,5 @@
-// The ui-variables file is provided by base themes provided by Atom.
-//
-// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
-// for a full listing of what's available.
-@import "ui-variables";
-
-.examplify {
-}
-
 @import "syntax-variables";
 @import "ui-variables";
-// @blue-color: @syntax-color-renamed;
-
-/*
-div.line.unchosen {
-  opacity: .5;
-}
-*/
 
 
 atom-text-editor .highlight.error-choice-highlight .region {
@@ -51,31 +35,41 @@ atom-overlay.error-choice-button {
   font-family: @font-family;
 }
 
-atom-overlay.resolution-widget {
-  // background-color: @tool-panel-background-color;
-  background-color: @background-color-info;
-  border-color: @tool-panel-border-color;
-  color: @text-color-highlight;
-  padding: @component-padding;
-  font-family: @font-family;
-}
+atom-overlay {
 
-atom-overlay div.resolution-choice-button {
-
-  &.disabled {
-    color: @text-color-subtle;
-    text-decoration: line-through;
+  &.resolution-widget {
+    // background-color: @tool-panel-background-color;
+    font-family: @font-family;
   }
 
-  &:not(:last-of-type) {
-    padding-right: .5em;
-    border-right: 1px white dashed;
-  }
+  div.resolution-class-block {
 
-  &:not(:first-of-type) {
-    padding-left: .5em;
-  }
+    &:not(:last-of-type) {
+      padding-right: .5em;
+      border-right: 1px white dashed;
+    }
 
-  float: left;
+    &:not(:first-of-type) {
+      padding-left: .5em;
+    }
+
+    padding: @component-padding;
+    background-color: @background-color-info;
+    border-color: @tool-panel-border-color;
+    color: @text-color-highlight;
+
+    float: left;
+
+    div.resolution-class-header {
+      font-weight: bold;
+    }
+
+    div.suggestion {
+      margin-top: @component-padding;
+      border: 1px white dotted;
+      text-align: center;
+    }
+
+  }
 
 }

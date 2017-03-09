@@ -2,7 +2,7 @@
 { ScopeFinder } = require '../analysis/scope'
 
 
-module.exports.DefinitionSuggestor = class DefinitionSuggestor
+module.exports.DefinitionSuggester = class DefinitionSuggester
 
   getSuggestions: (error, model) ->
 

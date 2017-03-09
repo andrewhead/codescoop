@@ -27,17 +27,18 @@ module.exports.ValueAnalysis = class ValueAnalysis
     # into a JavaScript object.
     for sourceFileName in javaMap.keySetSync().toArraySync()
       valueMap[sourceFileName] = {}
-      sourceFileLines = javaMap.getSync sourceFileName
-      for lineNumber in sourceFileLines.keySetSync().toArraySync()
+      sourceFileLinesJ = javaMap.getSync sourceFileName
+      for lineNumber in sourceFileLinesJ.keySetSync().toArraySync()
         # Remember: in the data structure we return, we want to
         # let values be accessed by zero-indexed row number.
         correctedLineNumber = lineNumber - 1
         valueMap[sourceFileName][correctedLineNumber] = {}
-        variables = sourceFileLines.getSync lineNumber
-        for variableName in variables.keySetSync().toArraySync()
-          variableValue = variables.getSync variableName
-          valueMap[sourceFileName][correctedLineNumber][variableName] =\
-            @_getPrintableValue variableValue
+        variablesJ = sourceFileLinesJ.getSync lineNumber
+        for variableName in variablesJ.keySetSync().toArraySync()
+          variableValuesJ = variablesJ.getSync variableName
+          values = (@_getPrintableValue value \
+              for value in variableValuesJ.toArraySync())
+          valueMap[sourceFileName][correctedLineNumber][variableName] = values
 
     valueMap
 

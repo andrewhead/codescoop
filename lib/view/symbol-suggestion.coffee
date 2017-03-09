@@ -14,9 +14,6 @@ module.exports.SymbolSuggestionView = class SymbolSuggestionView extends Suggest
   revert: ->
     @rangeSet.removeSuggestedRange @suggestion.getSymbol().getRange()
 
-  accept: ->
-    @model.setResolutionChoice @suggestion
-
 
 module.exports.SymbolSuggestionBlockView = \
     class SymbolSuggestionBlockView extends SuggestionBlockView

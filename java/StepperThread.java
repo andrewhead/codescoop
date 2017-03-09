@@ -14,13 +14,13 @@ public class StepperThread extends Thread {
     private String[] STANDARD_PACKAGES = {"java/", "javax/", "sun/", "com/sun/"};
     private final VirtualMachine vm;
     private boolean connected = true;  // Connected to VM
-    private Map<String, Map<Integer, Map<String, Value>>> values;
+    private Map<String, Map<Integer, Map<String, List<Value>>>> values;
 
     /**
      * @param values data structure into which assignments to variables will be stored.
      *      You can look up a value by indexing on class name, line number, and variable name.
      */
-    public StepperThread(VirtualMachine vm, Map<String, Map<Integer, Map<String, Value>>> values) {
+    public StepperThread(VirtualMachine vm, Map<String, Map<Integer, Map<String, List<Value>>>> values) {
 
         super("Stepper");
         this.vm = vm;
@@ -144,19 +144,24 @@ public class StepperThread extends Thread {
         }
         int lineNumber = event.location().lineNumber();
 
-        Map<Integer, Map<String, Value>> lineToVariableMap = values.get(sourceFileName);
+        Map<Integer, Map<String, List<Value>>> lineToVariableMap = values.get(sourceFileName);
         if (lineToVariableMap == null) {
-            lineToVariableMap = new HashMap<Integer, Map<String, Value>>();
+            lineToVariableMap = new HashMap<Integer, Map<String, List<Value>>>();
             values.put(sourceFileName, lineToVariableMap);
         }
 
-        Map<String, Value> variableToValueMap = lineToVariableMap.get(lineNumber);
-        if (variableToValueMap == null) {
-            variableToValueMap = new HashMap<String, Value>();
-            lineToVariableMap.put(lineNumber, variableToValueMap);
+        Map<String, List<Value>> variableToValuesMap = lineToVariableMap.get(lineNumber);
+        if (variableToValuesMap == null) {
+            variableToValuesMap = new HashMap<String, List<Value>>();
+            lineToVariableMap.put(lineNumber, variableToValuesMap);
         }
 
-        variableToValueMap.put(variableName, value);
+        List<Value> values = variableToValuesMap.get(variableName);
+        if (values == null) {
+            values = new ArrayList<Value>();
+            variableToValuesMap.put(variableName, values);
+        }
+        values.add(value);
 
     }
 

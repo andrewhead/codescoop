@@ -178,7 +178,7 @@ describe "ExampleController", ->
     it "updates the state to RESOLUTION when an error is chosen", ->
       (expect model.getState()).toBe ExampleModelState.RESOLUTION
 
-    it "populates the resolution options for the error from all suggestors", ->
+    it "populates the resolution options for the error from all suggesters", ->
       (expect model.getSuggestions()).toEqual [1, 2, 3, 5]
 
 
