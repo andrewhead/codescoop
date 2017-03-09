@@ -1,14 +1,19 @@
+import soot.Type;
+
+
 public class SymbolAppearance {
 
     private final String mSymbolName;
+    private final Type mType;
     private final int mStartLine;
     private final int mStartColumn;
     private final int mEndLine;
     private final int mEndColumn;
 
-    public SymbolAppearance(String pSymbolName, int pStartLine, int pStartColumn, 
+    public SymbolAppearance(String pSymbolName, Type pType, int pStartLine, int pStartColumn, 
             int pEndLine, int pEndColumn) {
         this.mSymbolName = pSymbolName;
+        this.mType = pType;
         this.mStartLine = pStartLine;
         this.mStartColumn = pStartColumn;
         this.mEndLine = pEndLine;
@@ -17,6 +22,10 @@ public class SymbolAppearance {
 
     public String getSymbolName() {
         return this.mSymbolName;
+    }
+
+    public Type getType() {
+        return this.mType;
     }
 
     public int getStartLine() {
@@ -36,7 +45,7 @@ public class SymbolAppearance {
     }
 
     public String toString() {
-        return ("(" + this.getSymbolName() + ": " +
+        return ("(" + this.getSymbolName() + " (" + this.getType() + "): " +
                 "[L" + this.getStartLine() + "C" + this.getStartColumn() + ", " +
                 "L" + this.getEndLine() + "C" + this.getEndColumn() + "])");
     }
@@ -48,6 +57,10 @@ public class SymbolAppearance {
         SymbolAppearance otherAppearance = (SymbolAppearance) other;
         return (
             otherAppearance.getSymbolName() == this.getSymbolName() &&
+            // Symbols might be compared to other symbols that weren't created
+            // in the same Soot runtime.  In that case, they won't share the same
+            // singleton object, but they will share the same hash code.
+            otherAppearance.getType().hashCode() == this.getType().hashCode() &&
             otherAppearance.getStartLine() == this.getStartLine() &&
             otherAppearance.getStartColumn() == this.getStartColumn() &&
             otherAppearance.getEndLine() == this.getEndLine() &&
@@ -58,6 +71,7 @@ public class SymbolAppearance {
     public int hashCode() {
         return (
             this.mSymbolName.hashCode() *
+            this.mType.hashCode() *
             this.mStartLine *
             this.mStartColumn *
             this.mEndLine *

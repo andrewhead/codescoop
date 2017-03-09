@@ -25,19 +25,47 @@ module.exports.File = class File
       (other.getName() is @fileName)
 
 
+# This is a 'lite' version of Symbol, where all that is known is the
+# range in a buffer where it appeared, and its name.  This can be useful,
+# for instance, when we don't have the type, but still want to compare
+# it to other symbols.
+module.exports.SymbolText = class SymbolText
+
+  constructor: (name, range) ->
+    @name = name
+    @range = range
+
+  getName: ->
+    @name
+
+  getRange: ->
+    @range
+
+  equals: (other) ->
+    (other instanceof SymbolText) and
+      (@name is other.getName()) and
+      (@range.isEqual other.getRange())
+
+
 module.exports.Symbol = class Symbol
 
   # The range includes encompasses the start and end positions of the symbol
   # in the GitHub Atom text editor.  Lines and columns are zero-indexed.
-  constructor: (file, name, range) ->
+  constructor: (file, name, range, type) ->
     @file = file
     @name = name
     @range = range
+    @type = type
 
   equals: (other) ->
-    (@file.equals other.file) and
-      (@name is other.name) and
-      (@range.isEqual other.range)
+    (@file.equals other.getFile()) and
+      (@name is other.getName()) and
+      (@range.isEqual other.getRange()) and
+      (@type is other.getType())
+
+  matchesText: (symbolText) ->
+    (@name is symbolText.getName()) and
+      (@range is symbolText.getRange())
 
   getFile: ->
     @file
@@ -47,6 +75,9 @@ module.exports.Symbol = class Symbol
 
   getName: ->
     @name
+
+  getType: ->
+    @type
 
 
 module.exports.SymbolSet = class SymbolSet

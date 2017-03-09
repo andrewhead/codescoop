@@ -1,13 +1,13 @@
 { JavaParser } = require '../grammar/Java/JavaParser'
 { JavaListener } = require '../grammar/Java/JavaListener'
-{ Symbol, File } = require '../model/symbol-set'
+{ SymbolText, File } = require '../model/symbol-set'
 { Range } = require '../model/range-set'
 { ParseTree } = require './parse-tree'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 
-_symbolFromIdNode = (file, idNode) ->
-  new Symbol file, idNode.text, (new Range \
+_symbolTextFromIdNode = (idNode) ->
+  new SymbolText idNode.text, (new Range \
     [idNode.line - 1, idNode.column],
     [idNode.line - 1, idNode.column + (idNode.stop - idNode.start) + 1])
 
@@ -18,7 +18,7 @@ class DeclarationVisitor extends JavaListener
     @file = file
     @symbolsDeclared = []
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
     @symbolsDeclared
 
 
@@ -47,13 +47,13 @@ class BlockDeclarationVisitor extends DeclarationVisitor
   enterVariableDeclarator: (ctx) ->
     return if @skip
     idNode = ctx.children[0].children[0].symbol
-    symbol = _symbolFromIdNode @file, idNode
+    symbol = _symbolTextFromIdNode idNode
     @symbolsDeclared.push symbol
 
   enterMethodDeclaration: (ctx) ->
     return if @skip
     idNode = ctx.children[1].symbol
-    symbol = _symbolFromIdNode @file, idNode
+    symbol = _symbolTextFromIdNode idNode
     @symbolsDeclared.push symbol
 
 
@@ -64,7 +64,7 @@ class ParameterVisitor extends DeclarationVisitor
 
   enterFormalParameter: (ctx) ->
     idNode = ctx.children[ctx.children.length - 1].children[0].symbol
-    symbol = _symbolFromIdNode @file, idNode
+    symbol = _symbolTextFromIdNode idNode
     @symbolsDeclared.push symbol
 
 
@@ -74,7 +74,7 @@ class EnhancedForVisitor extends DeclarationVisitor
 
   enterVariableDeclaratorId: (ctx) ->
     idNode = ctx.children[0].symbol
-    symbol = _symbolFromIdNode @file, idNode
+    symbol = _symbolTextFromIdNode idNode
     @symbolsDeclared.push symbol
 
 
@@ -107,9 +107,9 @@ module.exports.Scope = class Scope
   getType: ->
     @type
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
 
-    declaredSymbols = []
+    declarations = []
 
     # Find all nested scopes.  We want to ignore any
     # declarations from within these scopes.
@@ -121,7 +121,7 @@ module.exports.Scope = class Scope
 
     blockVisitor = new BlockDeclarationVisitor @file, nestedScopes
     ParseTreeWalker.walk blockVisitor, @ctx
-    declaredSymbols = blockVisitor.getDeclaredSymbols()
+    declarations = blockVisitor.getDeclarations()
 
   equals: (other) ->
     (@ctx is other.ctx) and (@type is other.type)
@@ -129,15 +129,15 @@ module.exports.Scope = class Scope
 
 module.exports.BlockScope = class BlockScope extends Scope
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
     super()
 
 
 module.exports.ForLoopScope = class ForLoopScope extends Scope
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
 
-    declaredSymbols = super()
+    declarations = super()
 
     forControlCtx = @ctx.parentCtx.parentCtx.children[2]
     forControlChildCtx = forControlCtx.children[0]
@@ -146,43 +146,43 @@ module.exports.ForLoopScope = class ForLoopScope extends Scope
     if forControlChildCtx.ruleIndex is JavaParser.RULE_forInit
       forInitVisitor = new BlockDeclarationVisitor @file, []
       ParseTreeWalker.walk forInitVisitor, forControlChildCtx
-      declaredSymbols = declaredSymbols.concat forInitVisitor.getDeclaredSymbols()
+      declarations = declarations.concat forInitVisitor.getDeclarations()
 
     # If this is an 'enhanced' for loop, use a custom visitor to find declarations.
     else if forControlChildCtx.ruleIndex is JavaParser.RULE_enhancedForControl
       enhancedForVisitor = new EnhancedForVisitor @file
       ParseTreeWalker.walk enhancedForVisitor, forControlChildCtx
-      declaredSymbols = declaredSymbols.concat enhancedForVisitor.getDeclaredSymbols()
+      declarations = declarations.concat enhancedForVisitor.getDeclarations()
 
-    declaredSymbols
+    declarations
 
 
 module.exports.ClassScope = class ClassScope extends Scope
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
 
-    declaredSymbols = super()
+    declarations = super()
 
     # If this is a class, then we declared the class name right above
-    symbol = _symbolFromIdNode @file, @ctx.parentCtx.children[1].symbol
-    declaredSymbols.push symbol
+    symbol = _symbolTextFromIdNode @ctx.parentCtx.children[1].symbol
+    declarations.push symbol
 
-    declaredSymbols
+    declarations
 
 
 module.exports.MethodScope = class MethodScope extends Scope
 
-  getDeclaredSymbols: ->
+  getDeclarations: ->
 
-    declaredSymbols = super()
+    declarations = super()
 
     # If this is a method, we also have to check the parameters
     methodDeclarationCtx = @ctx.parentCtx.parentCtx
     parameterVisitor = new ParameterVisitor @file
     ParseTreeWalker.walk parameterVisitor, methodDeclarationCtx
-    declaredSymbols = declaredSymbols.concat parameterVisitor.getDeclaredSymbols()
+    declarations = declarations.concat parameterVisitor.getDeclarations()
 
-    declaredSymbols
+    declarations
 
 
 module.exports.ScopeFinder = class ScopeFinder

@@ -35,10 +35,10 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
       # Look for a declaration in all scopes that the symbol appears in.  Only
       # report a declaration as "found" if it is in one of the active ranges.
       for scope in symbolScopes
-        for declaredSymbol in scope.getDeclaredSymbols()
+        for declaredSymbolText in scope.getDeclarations()
           for activeRange in rangeSet.getActiveRanges()
-            if (activeRange.containsRange declaredSymbol.getRange()) and
-               (declaredSymbol.getName() is symbol.getName())
+            if (activeRange.containsRange declaredSymbolText.getRange()) and
+               (declaredSymbolText.getName() is symbol.getName())
               foundDeclaration = true
 
       if not foundDeclaration

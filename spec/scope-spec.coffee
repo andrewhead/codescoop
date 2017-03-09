@@ -4,7 +4,7 @@
 { ScopeFinder } = require '../lib/analysis/scope'
 { BlockScope, ForLoopScope, MethodScope, ClassScope } = require '../lib/analysis/scope'
 { parse, partialParse } = require '../lib/analysis/parse-tree'
-{ Symbol, File } = require '../lib/model/symbol-set'
+{ Symbol, SymbolText, File } = require '../lib/model/symbol-set'
 { Range } = require '../lib/model/range-set'
 
 
@@ -103,32 +103,32 @@ describe "ScopeFinder", ->
 
     it "can find a symbol in a statement block scope", ->
       # Initialize the scope finder.  This is the object under test.
-      symbol = new Symbol fakeFile, "i", (new Range [6, 15], [6, 16])
+      symbol = new SymbolText "i", (new Range [6, 15], [6, 16])
       scopes = scopeFinder.findSymbolScopes symbol
       count = _countSymbolScopes scopes, _isScopeForStatementBlock
       (expect count).toBe 1
 
     it "can find a symbol in a method scope", ->
-      symbol = new Symbol fakeFile, "i", (new Range [3, 8], [3, 9])
+      symbol = new SymbolText "i", (new Range [3, 8], [3, 9])
       scopes = scopeFinder.findSymbolScopes symbol
       count = _countSymbolScopes scopes, _isScopeForMethod
       (expect count).toBe 1
 
     it "can find a symbol within class declarations", ->
-      symbol = new Symbol fakeFile, "k", (new Range [1, 20], [1, 21])
+      symbol = new SymbolText "k", (new Range [1, 20], [1, 21])
       scopes = scopeFinder.findSymbolScopes symbol
       count = _countSymbolScopes scopes, (scope) => scope instanceof ClassScope
       (expect count).toBe 1
 
     it "can find methods (not just variables!)", ->
-      symbol = new Symbol fakeFile, "method1", (new Range [9, 14], [9, 21])
+      symbol = new SymbolText "method1", (new Range [9, 14], [9, 21])
       scopes = scopeFinder.findSymbolScopes symbol
       (expect (scopes.length >= 1)).toBe true
 
     it "finds multiple encapsulating scopes", ->
       # This symbol is actually inside three scopes: one is a block of
       # statements, another is a method body, and another is a class body.
-      symbol = new Symbol fakeFile, "i", (new Range [6, 15], [6, 16])
+      symbol = new SymbolText "i", (new Range [6, 15], [6, 16])
       scopes = scopeFinder.findSymbolScopes symbol
       (expect scopes.length).toBe 3
 
@@ -153,9 +153,9 @@ describe "Scope", ->
   parseTree = parse MULTISCOPE_CODE
   scopeFinder = new ScopeFinder fakeFile, parseTree
 
-  _isSymbolInList = (symbol, list) =>
-    for listSymbol in list
-      if symbol.equals listSymbol
+  _isSymbolTextInList = (symbolText, list) =>
+    for listSymbolText in list
+      if symbolText.equals listSymbolText
         return true
     false
 
@@ -172,13 +172,14 @@ describe "Scope", ->
     scope = new BlockScope fakeFile, ctx
 
     it "produces a list of variables declared", ->
-      symbols = scope.getDeclaredSymbols()
+      symbols = scope.getDeclarations()
       (expect symbols.length).toBe 2
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "j", (new Range [1, 12], [1, 13])),
+      console.log symbols
+      (expect _isSymbolTextInList \
+        (new SymbolText "j", (new Range [1, 12], [1, 13])),
         symbols).toBe true
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "k", (new Range [2, 12], [2, 13])),
+      (expect _isSymbolTextInList \
+        (new SymbolText "k", (new Range [2, 12], [2, 13])),
         symbols).toBe true
 
   describe "for a for loop", ->
@@ -194,10 +195,10 @@ describe "Scope", ->
       blockCtx = ctx.children[4].children[0]
       scope = new ForLoopScope fakeFile, blockCtx
 
-      symbols = scope.getDeclaredSymbols()
+      symbols = scope.getDeclarations()
       (expect symbols.length).toBe 1
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "i", (new Range [0, 15], [0, 16])),
+      (expect _isSymbolTextInList \
+        (new SymbolText "i", (new Range [0, 15], [0, 16])),
         symbols).toBe true
 
     it "also includes declarations from enhanced for loop control", ->
@@ -211,10 +212,10 @@ describe "Scope", ->
       blockCtx = ctx.children[4].children[0]
       scope = new ForLoopScope fakeFile, blockCtx
 
-      symbols = scope.getDeclaredSymbols()
+      symbols = scope.getDeclarations()
       (expect symbols.length).toBe 1
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "s", (new Range [0, 18], [0, 19])),
+      (expect _isSymbolTextInList \
+        (new SymbolText "s", (new Range [0, 18], [0, 19])),
         symbols).toBe true
 
   describe "for a method", ->
@@ -230,19 +231,19 @@ describe "Scope", ->
     ].join "\n"
     ctx = partialParse METHOD_CODE, "methodDeclaration"
     scope = new MethodScope fakeFile, ctx.children[3].children[0]
-    symbols = scope.getDeclaredSymbols()
+    symbols = scope.getDeclarations()
 
     # This should hold true for all scopes, but we're only testing it
     # for methods right now for brevity.
     it "ignores declarations of blocks nested within it", ->
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "i", (new Range [1, 8], [1, 9])),
+      (expect _isSymbolTextInList \
+        (new SymbolText "i", (new Range [1, 8], [1, 9])),
         symbols).toBe true
 
     it "includes declarations from parameters", ->
       (expect symbols.length).toBe 2
-      (expect _isSymbolInList \
-        (new Symbol fakeFile, "args", (new Range [0, 21], [0, 25])),
+      (expect _isSymbolTextInList \
+        (new SymbolText "args", (new Range [0, 21], [0, 25])),
         symbols).toBe true
 
   describe "for a class", ->
@@ -259,20 +260,21 @@ describe "Scope", ->
 
     ctx = partialParse CLASS_CODE, "classDeclaration"
     scope = new ClassScope fakeFile, ctx.children[2]
-    symbols = scope.getDeclaredSymbols()
+    symbols = scope.getDeclarations()
 
     it "produces a list of variables declared", ->
-      (expect _isSymbolInList \
-      (new Symbol fakeFile, "i", (new Range [1, 14], [1, 15])),
+      (expect _isSymbolTextInList \
+      (new SymbolText "i", (new Range [1, 14], [1, 15])),
         symbols).toBe true
 
     it "produces a list of methods declared", ->
-      (expect _isSymbolInList \
-      (new Symbol fakeFile, "method1", (new Range [2, 21], [2, 28])),
+      (expect _isSymbolTextInList \
+      (new SymbolText "method1", (new Range [2, 21], [2, 28])),
         symbols).toBe true
 
     it "includes the name of the class in the declarations", ->
       (expect symbols.length).toBe 3
-      (expect _isSymbolInList \
-      (new Symbol fakeFile, "Example", (new Range [0, 6], [0, 13])),
+      console.log symbols
+      (expect _isSymbolTextInList \
+      (new SymbolText "Example", (new Range [0, 6], [0, 13])),
         symbols).toBe true

@@ -55,7 +55,7 @@ describe "ExampleController", ->
 
         # Check that the analyses have updated the model with valid symbols
         (expect _in \
-          (new Symbol testFile, "j", new Range [5, 8], [5, 9]),
+          (new Symbol testFile, "j", (new Range [5, 8], [5, 9]), "int"),
           defs).toBe true
 
   _makeMockDefUseAnalysis = =>

@@ -16,12 +16,13 @@ module.exports.DefUseAnalysis = class DefUseAnalysis
 
   _javaSymbolAppearanceToSymbol: (symbolAppearance) ->
     name = symbolAppearance.getSymbolNameSync()
+    type = symbolAppearance.getTypeSync().toStringSync()
     startRow = symbolAppearance.getStartLineSync() - 1
     endRow = symbolAppearance.getEndLineSync() - 1
     startColumn = symbolAppearance.getStartColumnSync()
     endColumn = symbolAppearance.getEndColumnSync()
     new Symbol @file, name,
-      new Range [startRow, startColumn], [endRow, endColumn]
+      (new Range [startRow, startColumn], [endRow, endColumn]), type
 
   getDefs: ->
     defsJ = @analysis.getDefinitionsSync()

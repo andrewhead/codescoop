@@ -307,6 +307,7 @@ public class DataflowAnalysis {
                                 if (positionTag != null) {
                                 SymbolAppearance definition = new SymbolAppearance(
                                     local.getName(),
+                                    local.getType(),
                                     positionTag.startLn(),
                                     positionTag.startPos(),
                                     positionTag.endLn(),
@@ -343,6 +344,7 @@ public class DataflowAnalysis {
                     if (positionTag != null) {
                         SymbolAppearance use = new SymbolAppearance(
                             localValueBox.getValue().toString(),
+                            localValueBox.getValue().getType(),
                             positionTag.startLn(),
                             positionTag.startPos(),
                             positionTag.endLn(),
