@@ -6,7 +6,9 @@ module.exports.SymbolSuggestionView = class SymbolSuggestionView extends Suggest
 
   constructor: (suggestion, model) ->
     super suggestion, model,
-      "L" + suggestion.getSymbol().getRange().start.row
+      # Recall that line numbers in our models are one less than
+      # the line numbers as they're displayed in the editor
+      "Line " + (suggestion.getSymbol().getRange().start.row + 1)
 
   preview: ->
     @rangeSet.addSuggestedRange @suggestion.getSymbol().getRange()

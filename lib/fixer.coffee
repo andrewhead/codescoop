@@ -1,4 +1,5 @@
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion } = require './suggester/suggestion'
+{ Replacement } = require "./edit/replacement"
 
 
 module.exports.Fixer = class Fixer
@@ -16,6 +17,17 @@ module.exports.Fixer = class Fixer
       model.getRangeSet().getActiveRanges().push rangeUnion
 
     else if suggestion instanceof PrimitiveValueSuggestion
-      codeBuffer = model.getCodeBuffer()
-      editRange = suggestion.getSymbol().getRange()
-      codeBuffer.setTextInRange editRange, suggestion.getValueString()
+
+      # First, update the example by making a replacement
+      edit = new Replacement suggestion.getSymbol(), suggestion.getValueString()
+      model.getEdits().push edit
+
+      # Next, make sure that the symbol is no longer marked
+      # as a "use" in the model (avert future definition errors)
+      uses = model.getSymbols().getUses()
+      useIndex = 0
+      for use in uses
+        if use.equals suggestion.getSymbol()
+          uses.splice useIndex, 1
+          break
+        useIndex += 1
