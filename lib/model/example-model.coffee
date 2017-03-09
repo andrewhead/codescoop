@@ -59,7 +59,6 @@ module.exports.ExampleModel = class ExampleModel
     @observers.push observer
 
   notifyObservers: (object, propertyName, propertyValue) ->
-    console.log "Notifying", propertyName, propertyValue
     # For now, it's sufficient to bubble up the event
     if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
       propertyName = ExampleModelProperty.ACTIVE_RANGES

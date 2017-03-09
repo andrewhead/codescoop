@@ -102,7 +102,7 @@ module.exports.ExampleController = class ExampleController
 
         if propertyValue instanceof RangeAddition
           @model.getRangeSet().getActiveRanges().push propertyValue.getRange()
-        else #propertyValue instanceof SymbolSuggestion
+        else
           fixer = new Fixer()
           fixer.apply @model, propertyValue
 

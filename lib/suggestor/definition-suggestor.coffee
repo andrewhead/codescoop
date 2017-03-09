@@ -28,6 +28,7 @@ module.exports.DefinitionSuggestor = class DefinitionSuggestor
 
       # Look for a def in each of the use's scopes
       defScope = (scopeFinder.findSymbolScopes def)[0]
+      return false if not defScope?
       for useScope in useScopes
         if useScope.equals defScope
           return true
