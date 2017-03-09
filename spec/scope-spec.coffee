@@ -174,7 +174,6 @@ describe "Scope", ->
     it "produces a list of variables declared", ->
       symbols = scope.getDeclarations()
       (expect symbols.length).toBe 2
-      console.log symbols
       (expect _isSymbolTextInList \
         (new SymbolText "j", (new Range [1, 12], [1, 13])),
         symbols).toBe true
@@ -274,7 +273,6 @@ describe "Scope", ->
 
     it "includes the name of the class in the declarations", ->
       (expect symbols.length).toBe 3
-      console.log symbols
       (expect _isSymbolTextInList \
       (new SymbolText "Example", (new Range [0, 6], [0, 13])),
         symbols).toBe true

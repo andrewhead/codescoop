@@ -86,7 +86,6 @@ module.exports.SymbolSet = class SymbolSet
     symbolArrays or= {}
     @uses = makeObservableArray (symbolArrays.uses or [])
     @defs = makeObservableArray (symbolArrays.defs or [])
-    @allSymbols = makeObservableArray (symbolArrays.all or [])
     @observers = []
 
   addObserver: (observer) ->
@@ -97,7 +96,8 @@ module.exports.SymbolSet = class SymbolSet
       observer.onPropertyChanged this, propertyName, propertyValue
 
   getAllSymbols: ->
-    @allSymbols
+    # Exhaustively accrue all symbols from the various subsets
+    @uses.copy().concat @defs.copy()
 
   setUses: (uses) ->
     @uses.reset uses

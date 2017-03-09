@@ -9,8 +9,10 @@ module.exports.MissingDefinitionError = class MissingDefinitionError
 
 module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
 
-  detectErrors: (parseTree, rangeSet, symbolSet) ->
+  detectErrors: (model) ->
 
+    rangeSet = model.getRangeSet()
+    symbolSet = model.getSymbols()
     activeUses = rangeSet.getActiveSymbols symbolSet.getUses()
     activeDefs = rangeSet.getActiveSymbols symbolSet.getDefs()
     missingDefinitionErrors = []
@@ -18,6 +20,9 @@ module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
     # For each use in the active set, check to see if it was defined before
     # it was used.  If not, mark it as undefined
     for use in activeUses
+
+      # We don't need to define any temporary symbols
+      continue if use.getName().startsWith "$"
 
       useDefined = false
       for def in activeDefs

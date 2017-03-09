@@ -21,3 +21,20 @@ module.exports.PrimitiveValueSuggestion = class PrimitiveValueSuggestion
 
   getValueString: ->
     @valueString
+
+
+module.exports.DeclarationSuggestion = class DeclarationSuggestion
+
+  constructor: (name, type, symbol) ->
+    @name = name
+    @type = type
+    @symbol = symbol
+
+  getName: ->
+    @name
+
+  getType: ->
+    @type
+
+  getSymbol: ->
+    @symbol

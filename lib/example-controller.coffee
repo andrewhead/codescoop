@@ -1,6 +1,8 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
 { MissingDefinitionDetector } = require "./error/missing-definition"
+{ MissingDeclarationDetector } = require "./error/missing-declaration"
 { DefinitionSuggester } = require "./suggester/definition-suggester"
+{ DeclarationSuggester } = require "./suggester/declaration-suggester"
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { RangeAddition } = require "./edit/range-addition"
 { Fixer } = require "./fixer"
@@ -20,6 +22,9 @@ module.exports.ExampleController = class ExampleController
     # Load default correctors if none were passed in
     if not @correctors?
       @correctors = [
+          checker: new MissingDeclarationDetector()
+          suggesters: [ new DeclarationSuggester() ]
+        ,
           checker: new MissingDefinitionDetector()
           suggesters: [
             new DefinitionSuggester()
@@ -65,8 +70,7 @@ module.exports.ExampleController = class ExampleController
 
   applyCorrectors: ->
     for corrector in @correctors
-      errors = corrector.checker.detectErrors \
-        @model.getParseTree(), @model.getRangeSet(), @model.getSymbols()
+      errors = corrector.checker.detectErrors @model
       if errors.length > 0
         # It's important that the state gets set last, as it's the
         # state change that the view will be refreshing on
@@ -82,6 +86,7 @@ module.exports.ExampleController = class ExampleController
     for suggester in activeCorrector.suggesters
       suggesterSuggestions = suggester.getSuggestions error, @model
       suggestions = suggestions.concat suggesterSuggestions
+    console.log suggestions
     suggestions
 
   onPropertyChanged: (object, propertyName, propertyValue) ->

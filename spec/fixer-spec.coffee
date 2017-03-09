@@ -4,6 +4,8 @@
 { SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
 { Fixer } = require "../lib/fixer"
 { Replacement } = require "../lib/edit/replacement"
+{ DeclarationSuggestion } = require "../lib/suggester/suggestion"
+{ Declaration } = require "../lib/edit/declaration"
 
 
 describe "Fixer", ->
@@ -58,3 +60,18 @@ describe "Fixer", ->
       uses = model.getSymbols().getUses()
       (expect uses.length).toBe 1
       (expect uses[0].getRange()).toEqual new Range [1, 12], [1, 13]
+
+  describe "when applying a DeclarationSuggestion", ->
+
+    it "adds an extra declaration to the model", ->
+      model = _makeModel()
+      (expect model.getAuxiliaryDeclarations().length).toBe 0
+      suggestion = new DeclarationSuggestion \
+        "i", "int", new Symbol TEST_FILE, "i", (new Range [0, 4], [0, 5]), "int"
+      fixer.apply model, suggestion
+      declarations = model.getAuxiliaryDeclarations()
+      (expect declarations.length).toBe 1
+      declaration = declarations[0]
+      (expect declaration instanceof Declaration).toBe true
+      (expect declaration.getName()).toEqual "i"
+      (expect declaration.getType()).toEqual "int"

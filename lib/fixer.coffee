@@ -1,5 +1,6 @@
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require './suggester/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion, DeclarationSuggestion } = require './suggester/suggestion'
 { Replacement } = require "./edit/replacement"
+{ Declaration } = require "./edit/declaration"
 
 
 module.exports.Fixer = class Fixer
@@ -31,3 +32,8 @@ module.exports.Fixer = class Fixer
           uses.splice useIndex, 1
           break
         useIndex += 1
+
+    else if suggestion instanceof DeclarationSuggestion
+      symbol = suggestion.getSymbol()
+      declaration = new Declaration symbol.getName(), symbol.getType()
+      model.getAuxiliaryDeclarations().push declaration

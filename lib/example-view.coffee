@@ -3,9 +3,11 @@ $ = require 'jquery'
 { Range, RangeSet } = require './model/range-set'
 { Replacement } = require './edit/replacement'
 { MissingDefinitionError } = require './error/missing-definition'
+{ MissingDeclarationError } = require "./error/missing-declaration"
 { SymbolSuggestion, PrimitiveValueSuggestion } = require './suggester/suggestion'
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
+{ DeclarationSuggestionBlockView } = require "./view/declaration-suggestion"
 { Point } = require 'atom'
 
 
@@ -17,10 +19,8 @@ module.exports.ExampleView = class ExampleView
       ""
       "    public static void main(String[] args) {"
       ""
-      ""
     ].join '\n'
     end: [
-      ""
       ""
       "    }"
       ""
@@ -43,6 +43,7 @@ module.exports.ExampleView = class ExampleView
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.ACTIVE_RANGES
+      ExampleModelProperty.AUXILIARY_DECLARATIONS
     ]
     @_applyReplacements() if propertyName in [
       ExampleModelProperty.EDITS
@@ -54,6 +55,7 @@ module.exports.ExampleView = class ExampleView
     # By adding the code first, we get to use the character offsets of
     # each symbol to mark them, before inserting other boilerplate code
     @_addCodeLines()
+    @_addAuxiliaryDeclarations()
     @_applyReplacements()
     if @model.getState() is ExampleModelState.ERROR_CHOICE
       @_markErrors @model.getErrors()
@@ -74,8 +76,8 @@ module.exports.ExampleView = class ExampleView
     ranges = @model.getRangeSet().getActiveRanges().copy()
     rangesSorted = ranges.sort (a, b) => a.compare b
 
-    @textEditor.setText ""
-    nextInsertionPoint = new Point 0, 0
+    @textEditor.setText "\n"
+    nextInsertionPoint = new Point 1, 0
 
     for range in rangesSorted
 
@@ -100,6 +102,15 @@ module.exports.ExampleView = class ExampleView
       marker = @textEditor.markBufferRange exampleRange
       @activeRangeMarkerPairs.push [range, marker]
 
+  _addAuxiliaryDeclarations: ->
+    declarations = @model.getAuxiliaryDeclarations()
+    return if declarations.length is 0
+    declarationText = "\n"
+    for declaration in declarations
+      declarationText +=
+        (declaration.getType() + " " + declaration.getName() + ";\n")
+    @textEditor.setTextInBufferRange \
+      (new Range [0, 0], [0, 0]), declarationText
 
   _getAdjustedSymbolRange: (symbol, rangeMarkers) ->
 
@@ -140,9 +151,8 @@ module.exports.ExampleView = class ExampleView
 
   _markErrors: (errors) ->
     for error in errors
-      if error instanceof MissingDefinitionError
-        marker = @_markSymbol error.getSymbol()
-        marker.examplifyError = error
+      marker = @_markSymbol error.getSymbol()
+      marker.examplifyError = error
     @_addErrorDecorations()
 
   _addErrorDecorations: ->
@@ -152,13 +162,18 @@ module.exports.ExampleView = class ExampleView
       marker = symbolMarkerPair[1]
       error = marker.examplifyError
 
+      label = "ResolveError"
+      label = "Click to define" if error instanceof MissingDefinitionError
+      label = "Click to declare" if error instanceof MissingDeclarationError
+
       # Add a button for highlighting the undefined use
       # I find it necessary to bind the use as data: when I don't do this,
       # use takes on the last value that it had in this loop
-      decoration = $ "<div>Click to define</div>"
+      decoration = $ "<div></div>"
+        .text label
         .data 'error', error
         .click (event) =>
-          use = ($ (event.target)).data 'error'
+          error = ($ (event.target)).data 'error'
           @model.setErrorChoice error
       params =
         type: 'overlay'
@@ -199,14 +214,9 @@ module.exports.ExampleView = class ExampleView
         block = new SymbolSuggestionBlockView suggestions, @model, marker
       else if class_ is "PrimitiveValueSuggestion"
         block = new PrimitiveValueSuggestionBlockView suggestions, @model, marker
+      else if class_ is "DeclarationSuggestion"
+        block = new DeclarationSuggestionBlockView suggestions, @model, marker
       decoration.append block
-
-    _makeSuggestionOption = (suggestion, model) =>
-      if suggestion instanceof SymbolSuggestion
-        option = new SymbolSuggestionView suggestion, model
-      else if suggestion instanceof PrimitiveValueSuggestion
-        option = new PrimitiveValueSuggestionView suggestion, model, marker
-      option
 
     # Create a decoration from the element
     params =

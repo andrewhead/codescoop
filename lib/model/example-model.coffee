@@ -13,6 +13,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   SUGGESTIONS: { value: 7, name: "suggestions" }
   EDITS: { value: 8, name: "edits" }
   ACTIVE_CORRECTOR: { value: 9, name: "active-corrector" }
+  AUXILIARY_DECLARATIONS: { value: 10, name: "auxiliary-declarations" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -43,6 +44,9 @@ module.exports.ExampleModel = class ExampleModel
     @edits = makeObservableArray []
     @edits.addObserver @
 
+    @auxiliaryDeclarations = makeObservableArray []
+    @auxiliaryDeclarations.addObserver @
+
     @codeBuffer = codeBuffer
     @parseTree = parseTree
     @valueMap = valueMap
@@ -62,10 +66,10 @@ module.exports.ExampleModel = class ExampleModel
     # For now, it's sufficient to bubble up the event
     if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
       propertyName = ExampleModelProperty.ACTIVE_RANGES
-    else if object is @symbols
-      propertyName = ExampleModelProperty.UNDEFINED_USES
     else if object is @edits
       propertyName = ExampleModelProperty.EDITS
+    else if object is @auxiliaryDeclarations
+      propertyName = ExampleModelProperty.AUXILIARY_DECLARATIONS
     else if object is @
       proprtyName = propertyName
     else
@@ -132,6 +136,9 @@ module.exports.ExampleModel = class ExampleModel
 
   getSuggestions: ->
     @suggestions
+
+  getAuxiliaryDeclarations: ->
+    @auxiliaryDeclarations
 
   getEdits: ->
     @edits

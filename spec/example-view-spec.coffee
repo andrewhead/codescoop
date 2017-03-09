@@ -7,6 +7,7 @@
 { MissingDefinitionError } = require '../lib/error/missing-definition'
 { SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
 { Replacement } = require '../lib/edit/replacement'
+{ Declaration } = require "../lib/edit/declaration"
 $ = require 'jquery'
 _ = require 'lodash'
 
@@ -56,6 +57,16 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "int j = i;").not.toBe -1
     expect(exampleText.indexOf "i = j + 1;").not.toBe -1
     expect(exampleText.indexOf "j = j + 1;").toBe -1
+
+  it "updates text when declarations added", ->
+    model = new ExampleModel codeBuffer,
+      (new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]),
+      new SymbolSet(), parseTree, new ValueMap()
+    view = new ExampleView model, makeEditor(), codeBuffer
+    model.getAuxiliaryDeclarations().push new Declaration "k", "int"
+    exampleText = view.getTextEditor().getText()
+    (expect exampleText.indexOf "int k;").not.toBe -1
+    (expect (exampleText.indexOf "int k;") < (exampleText.indexOf "int i = 0;")).toBe true
 
   it "applies replacement edits by changing the text immediately", ->
 
