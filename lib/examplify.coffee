@@ -7,6 +7,7 @@
 { ValueAnalysis } = require './analysis/value-analysis'
 { RangeSet } = require './model/range-set'
 { File, SymbolSet } = require './model/symbol-set'
+{ parse } = require './analysis/parse-tree'
 $ = require 'jquery'
 
 
@@ -49,17 +50,22 @@ module.exports.MainController = class MainController
     # Prepare models (data)
     @rangeSet = new RangeSet activeRanges
     @symbols = new SymbolSet()
-    @exampleModel = new ExampleModel codeEditor.getBuffer(), @rangeSet, @symbols
+    @parseTree = parse codeEditor.getText()
+    @exampleModel = new ExampleModel codeEditor.getBuffer(), @rangeSet,\
+      @symbols, @parseTree
 
     # Prepare views
     @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
 
-    # Prepare controllers
+    # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
-    @defUseAnalysis = new DefUseAnalysis codeEditorFile
-    @valueAnalysis = new ValueAnalysis codeEditorFile
-    @exampleController = new ExampleController @exampleModel, @defUseAnalysis, @valueAnalysis
+    @analyses =
+      defUseAnalysis: new DefUseAnalysis codeEditorFile
+      valueAnalysis: new ValueAnalysis codeEditorFile
+
+    # Prepare controllers
+    @exampleController = new ExampleController @exampleModel, @analyses
 
   # These accessors are here to let us test the controller
   getRangeSet: ->

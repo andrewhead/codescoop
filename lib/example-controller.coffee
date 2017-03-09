@@ -64,9 +64,11 @@ module.exports.ExampleController = class ExampleController
       errors = corrector.checker.detectErrors \
         @model.getParseTree(), @model.getRangeSet(), @model.getSymbols()
       if errors.length > 0
-        @model.setState ExampleModelState.ERROR_CHOICE
+        # It's important that the state gets set last, as it's the
+        # state change that the view will be refreshing on
         @model.setErrors errors
         @model.setActiveCorrector corrector
+        @model.setState ExampleModelState.ERROR_CHOICE
         break
 
   getSuggestions: ->
