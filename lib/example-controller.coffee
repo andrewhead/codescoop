@@ -2,7 +2,7 @@
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { DefinitionSuggestor } = require "./suggestor/definition-suggestor"
 { RangeAddition } = require "./edit/range-addition"
-
+{ Fixer } = require "./fixer"
 
 module.exports.ExampleController = class ExampleController
 
@@ -102,6 +102,9 @@ module.exports.ExampleController = class ExampleController
 
         if propertyValue instanceof RangeAddition
           @model.getRangeSet().getActiveRanges().push propertyValue.getRange()
+        else #propertyValue instanceof SymbolSuggestion
+          fixer = new Fixer()
+          fixer.apply @model, propertyValue
 
         @model.setActiveCorrector null
         @model.setState ExampleModelState.IDLE
