@@ -1,4 +1,4 @@
-{ SymbolSuggestion, PrimitiveValueSuggestion, DeclarationSuggestion } = require './suggester/suggestion'
+{ SymbolSuggestion, PrimitiveValueSuggestion, DeclarationSuggestion, ControlLogicSuggestion } = require './suggester/suggestion'
 { Replacement } = require "./edit/replacement"
 { Declaration } = require "./edit/declaration"
 
@@ -37,3 +37,6 @@ module.exports.Fixer = class Fixer
       symbol = suggestion.getSymbol()
       declaration = new Declaration symbol.getName(), symbol.getType()
       model.getAuxiliaryDeclarations().push declaration
+
+    else if suggestion instanceof ControlLogicSuggestion
+      model.getRangeSet().getActiveRanges().push suggestion.getRange()
