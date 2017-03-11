@@ -30,6 +30,11 @@ module.exports.ExampleController = class ExampleController
             new DefinitionSuggester()
             new PrimitiveValueSuggester()
           ]
+        ,
+          checker: new MissingControlLogicDetector()
+          suggesters: [
+            new AddLogicSuggester()
+          ]
       ]
 
     # Before the state can update, the analyses must complete
