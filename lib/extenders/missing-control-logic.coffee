@@ -17,4 +17,9 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
     parseTree = model.getParseTree()
     rangeSet = model.getRangeSet()
 
-    missingDeclarations
+    missingControlLogicContexts = []
+
+    for activeRange in rangeSet.getActiveRanges()
+      console.log activeRange
+
+    missingControlLogicContexts

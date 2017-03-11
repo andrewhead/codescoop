@@ -38,3 +38,15 @@ module.exports.DeclarationSuggestion = class DeclarationSuggestion
 
   getSymbol: ->
     @symbol
+
+module.exports.ControlLogicSuggestion = class ControlLogicSuggestion
+
+  constructor: (context, range) ->
+    @context = context
+    @range = range
+
+  getContext: ->
+    @context
+
+  getRange: ->
+    @range

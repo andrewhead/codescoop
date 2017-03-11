@@ -1,8 +1,10 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
+{ MissingControlLogicDetector } = require "./error/missing-control-logic"
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
+{ AddControlLogicSuggester } = require "./suggester/control-logic-suggester"
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { RangeAddition } = require "./edit/range-addition"
 { Fixer } = require "./fixer"
@@ -33,7 +35,7 @@ module.exports.ExampleController = class ExampleController
         ,
           checker: new MissingControlLogicDetector()
           suggesters: [
-            new AddLogicSuggester()
+            new AddControlLogicSuggester()
           ]
       ]
 
