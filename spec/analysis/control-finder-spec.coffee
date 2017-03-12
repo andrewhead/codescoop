@@ -17,9 +17,3 @@ fdescribe 'control-finder', ->
   it 'walks upward from node to control node', ->
     parseTree = parse JAVA_CODE
     console.log parseTree
-    symbol = new Symbol (new File 'fakePath', 'fakeFileName'), 'i', (new Range [3,10], [3,11]), 'int'
-    symbolNode = parseTree.getNodeForSymbol symbol
-    while symbolNode.parentCtx?
-      if symbolNode.ruleIndex is JavaParser.RULE_statement
-        console.log symbolNode
-      symbolNode = symbolNode.parentCtx
