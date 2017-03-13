@@ -35,6 +35,28 @@ class SymbolSearcher extends JavaListener
         "this code, or the symbol you passed in."
     if @matchingContexts.length > 0 then @matchingContexts[0] else null
 
+class IFStatementSearcher extends JavaListener
+
+  constructor: ->
+    @matchingContexts = []
+
+  enterStatement: (ctx) ->
+    #console.log 'statement ctx', ctx
+    #console.log 'statement ctx children', ctx.children
+    #console.log 'statement ctx first children', ctx.children[0]
+    #console.log 'statement ctx first children symbol text', ctx.children[0].symbol.text
+    try
+      if ctx.children[0].symbol.text == 'if'
+        console.log 'its an if!'
+        console.log ctx
+        console.log ctx.start.line, ctx.start.column
+        console.log ctx.stop.line, ctx.stop.column
+        @matchingContexts.push ctx
+    catch
+      console.log 'nothing to check'
+
+  getMatchingCtx: ->
+    @matchingContexts
 
 # During testing, we don't always want the parse for the full program.  This
 # method let's us do a parse starting starting at a specific rule
@@ -54,7 +76,6 @@ module.exports.partialParse = partialParse = (codeText, ruleName) ->
 module.exports.parse = (codeText) ->
   ctx = partialParse codeText, "compilationUnit"
   new ParseTree ctx
-
 
 ###
 ANTLR lines are one-indexed, and columns are zero-indexed.  For the API of the
@@ -76,3 +97,8 @@ module.exports.ParseTree = class ParseTree
     symbolSearcher = new SymbolSearcher symbol
     ParseTreeWalker.walk symbolSearcher, @root
     symbolSearcher.getMatchingCtx()
+
+  getIfStatements: ->
+    ifStatementSearcher = new IFStatementSearcher
+    ParseTreeWalker.walk ifStatementSearcher, @root
+    ifStatementSearcher.getMatchingCtx()
