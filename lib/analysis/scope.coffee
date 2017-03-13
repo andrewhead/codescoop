@@ -21,7 +21,6 @@ class DeclarationVisitor extends JavaListener
   getDeclarations: ->
     @symbolsDeclared
 
-
 # XXX: The algorithm we use ignores other scopes when the walker enters them,
 # and then starts paying attention when it leaves those scopes.  Here we take
 # advantage of the fact that it looks like the tree walk pre-order.  If the
