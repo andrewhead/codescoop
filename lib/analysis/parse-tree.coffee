@@ -5,6 +5,17 @@
 { Range } = require '../../lib/model/range-set'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
+isAnIfStatement = (ctx) ->
+  try
+    if ctx.children[0].symbol.text == 'if'
+      # console.log 'its an if!'
+      # console.log ctx
+      # console.log ctx.start.line, ctx.start.column
+      # console.log ctx.stop.line, ctx.stop.column
+      return true
+  catch
+    #console.log 'nothing to check'
+    return false
 
 class SymbolSearcher extends JavaListener
 
@@ -42,19 +53,8 @@ class IFStatementSearcher extends JavaListener
     @matchingContexts = []
 
   enterStatement: (ctx) ->
-    #console.log 'statement ctx', ctx
-    #console.log 'statement ctx children', ctx.children
-    #console.log 'statement ctx first children', ctx.children[0]
-    #console.log 'statement ctx first children symbol text', ctx.children[0].symbol.text
-    try
-      if ctx.children[0].symbol.text == 'if'
-        console.log 'its an if!'
-        console.log ctx
-        console.log ctx.start.line, ctx.start.column
-        console.log ctx.stop.line, ctx.stop.column
-        @matchingContexts.push ctx
-    catch
-      console.log 'nothing to check'
+    if isAnIfStatement(ctx)
+      @matchingContexts.push ctx
 
   getMatchingCtx: ->
     @matchingContexts
@@ -69,6 +69,26 @@ class CtxSearcher extends JavaListener
 
   getMatchingCtx: ->
     @matchingContexts
+
+class ContainingControlLogicCtxSearcher extends JavaListener
+
+  constructor: (activeRange) ->
+    @activeRange = activeRange
+    @containingContext
+
+  exitStatement: (ctx) ->
+    # is it a control logic context?
+    # does it contain or intersect with the active range?
+    # is it not contained by the active range?
+    ctxRange = ctx.getRange()
+    if ctxRange.containsRange(@activeRange) or ctxRange.intersectsWith(@activeRange)
+      if not ctxRange.containsRange(@activeRange)
+        if isAnIfStatement(ctx)
+          if not @containingContext?
+            @containingContext = ctx
+
+  getContainingCtx: ->
+    @containingContext
 
 # During testing, we don't always want the parse for the full program.  This
 # method let's us do a parse starting starting at a specific rule
