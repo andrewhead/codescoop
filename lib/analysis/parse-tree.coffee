@@ -2,6 +2,7 @@
 { JavaParser } = require '../grammar/Java/JavaParser'
 { JavaListener } = require '../grammar/Java/JavaListener'
 { InputStream, CommonTokenStream } = require 'antlr4'
+{ Range } = require '../../lib/model/range-set'
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 
