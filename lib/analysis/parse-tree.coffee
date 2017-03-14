@@ -58,6 +58,17 @@ class IFStatementSearcher extends JavaListener
   getMatchingCtx: ->
     @matchingContexts
 
+class CtxSearcher extends JavaListener
+
+  constructor: ->
+    @matchingContexts = []
+
+  enterStatement: (ctx) ->
+    @matchingContexts.push ctx
+
+  getMatchingCtx: ->
+    @matchingContexts
+
 # During testing, we don't always want the parse for the full program.  This
 # method let's us do a parse starting starting at a specific rule
 module.exports.partialParse = partialParse = (codeText, ruleName) ->
@@ -102,3 +113,16 @@ module.exports.ParseTree = class ParseTree
     ifStatementSearcher = new IFStatementSearcher
     ParseTreeWalker.walk ifStatementSearcher, @root
     ifStatementSearcher.getMatchingCtx()
+
+  getCtxs: ->
+    ctxSearcher = new CtxSearcher
+    ParseTreeWalker.walk ctxSearcher, @root
+    ctxSearcher.getMatchingCtx()
+
+  getCtxRanges: ->
+    ctxSearcher = new CtxSearcher
+    ParseTreeWalker.walk ctxSearcher, @root
+    ctxRanges = []
+    for ctx in ctxSearcher.getMatchingCtx()
+      ctxRanges.push new Range [ctx.start.line,ctx.start.column], [ctx.stop.line,ctx.stop.column]
+    ctxRanges
