@@ -1,4 +1,3 @@
-
 module.exports.MissingControlLogicError = class MissingControlLogicError
 
   constructor: (controlCtx) ->
@@ -19,9 +18,7 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
 
     missingControlLogicContexts = []
 
-    console.log parseTree
-    console.log rangeSet
-
+    #console.log 'parseTree', parseTree
     #symbol = new Symbol (new File 'fakePath', 'fakeFileName'), 'i', (new Range [3,10], [3,11]), 'int'
     #symbolNode = parseTree.getNodeForSymbol symbol
     # while context.parentCtx?
@@ -30,7 +27,7 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
     #   symbolNode = context.parentCtx
 
     for activeRange in activeRangeSet
-      console.log activeRange
+      console.log 'active', activeRange
 
     #missingControlLogicContexts.push new MissingControlLogicError
 

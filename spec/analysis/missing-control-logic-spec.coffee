@@ -66,9 +66,9 @@ describe 'control-finder', ->
     console.log parseTree
     ctxRanges = parseTree.getCtxRanges()
     for ctxRange in ctxRanges
-      console.log ctxRange
+      #console.log ctxRange
       console.log ctxRange.toString()
-      console.log ctxRange.getRows()
+      #console.log ctxRange.getRows()
       #console.log range.start(), range.end()
 
   it 'can find the enclosed context', ->
