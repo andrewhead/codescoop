@@ -1,5 +1,5 @@
 { MissingControlLogicDetector } = require '../../lib/concern/missing-control-logic'
-{ parse } = require '../../lib/analysis/parse-tree'
+{ parse, getContextRange } = require '../../lib/analysis/parse-tree'
 { Range, RangeSet } = require '../../lib/model/range-set'
 { File, Symbol, SymbolSet } = require '../../lib/model/symbol-set'
 { ExampleModel } = require "../../lib/model/example-model"
@@ -60,7 +60,7 @@ describe 'control-finder', ->
     (expect ifstatements[1].stop.line).toEqual 6
     (expect ifstatements[1].stop.column).toEqual 8
 
-  fit 'can find the ranges of all statements', ->
+  it 'can find the ranges of all statements', ->
 
     parseTree = parse JAVA_CODE_2
     console.log parseTree
@@ -71,18 +71,24 @@ describe 'control-finder', ->
       #console.log ctxRange.getRows()
       #console.log range.start(), range.end()
 
-  it 'can find the enclosed context', ->
+  fit 'can find the enclosed control logic context', ->
 
     parseTree = parse JAVA_CODE_2
     console.log parseTree
+    activeRange = new Range [4,8],[6,8]
+    containingControlLogic = parseTree.getContainingControlLogicCtx(activeRange)
+    console.log 'containingControlLogic', containingControlLogic
+    resultingIFcontextRange = getContextRange(containingControlLogic)
 
-    codeBuffer = undefined
-    activeRanges = [new Range [4,8],[6,8]]
-    console.log 'activeRanges', activeRanges
-    rangeSet = new RangeSet activeRanges
-    console.log 'rangeSet', rangeSet
-    symbolSet = new SymbolSet()
-    model = new ExampleModel codeBuffer, rangeSet, symbolSet, parseTree
-    detector = new MissingControlLogicDetector()
+    (expect resultingIFcontextRange).toEqual new Range [3, 4], [7, 4]
 
-    errors = detector.detectErrors model
+    # codeBuffer = undefined
+    # activeRanges = [new Range [4,8],[6,8]]
+    # console.log 'activeRanges', activeRanges
+    # rangeSet = new RangeSet activeRanges
+    # console.log 'rangeSet', rangeSet
+    # symbolSet = new SymbolSet()
+    # model = new ExampleModel codeBuffer, rangeSet, symbolSet, parseTree
+    # detector = new MissingControlLogicDetector()
+    #
+    # errors = detector.detectErrors model
