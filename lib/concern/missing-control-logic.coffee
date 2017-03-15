@@ -18,17 +18,11 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
 
     missingControlLogicContexts = []
 
-    #console.log 'parseTree', parseTree
-    #symbol = new Symbol (new File 'fakePath', 'fakeFileName'), 'i', (new Range [3,10], [3,11]), 'int'
-    #symbolNode = parseTree.getNodeForSymbol symbol
-    # while context.parentCtx?
-    #   if context.ruleIndex is JavaParser.RULE_statement
-    #     console.log context
-    #   symbolNode = context.parentCtx
-
     for activeRange in activeRangeSet
-      console.log 'active', activeRange
-
-    #missingControlLogicContexts.push new MissingControlLogicError
+      console.log 'activeRange', activeRange.toString()
+      containingControlLogicCtx = parseTree.getContainingControlLogicCtx(activeRange)
+      console.log 'containingControlLogic', containingControlLogicCtx
+      #resultingIFcontextRange = getContextRange(containingControlLogic)
+      missingControlLogicContexts.push new MissingControlLogicError containingControlLogicCtx
 
     missingControlLogicContexts

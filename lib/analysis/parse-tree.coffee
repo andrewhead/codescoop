@@ -7,7 +7,7 @@ ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 isAnIfStatement = (ctx) ->
   try
-    console.log 'is ctx an if?', ctx
+    #console.log 'is ctx an if?', ctx
     if ctx.children[0].symbol.text == 'if'
       # console.log 'its an if!'
       # console.log ctx
@@ -84,15 +84,15 @@ class ContainingControlLogicCtxSearcher extends JavaListener
     # is it a control logic context?
     # does it contain or intersect with the active range?
     # is it not contained by the active range?
-    console.log 'exiting ctx', ctx
+    #console.log 'exiting ctx', ctx
     if isAnIfStatement(ctx)
       ctxRange = getContextRange(ctx)
-      console.log 'ctxRange', ctxRange.toString()
-      console.log 'activeRange', @activeRange.toString()
+      # console.log 'ctxRange', ctxRange.toString()
+      # console.log 'activeRange', @activeRange.toString()
       if ctxRange.containsRange(@activeRange) or ctxRange.intersectsWith(@activeRange)
-        console.log 'contained or intersects with'
+        # console.log 'contained or intersects with'
         if not @activeRange.containsRange(ctxRange)
-          console.log 'not contained in'
+          # console.log 'not contained in'
           if not @containingContext?
             @containingContext = ctx
 

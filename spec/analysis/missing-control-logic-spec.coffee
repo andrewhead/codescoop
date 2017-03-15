@@ -71,7 +71,7 @@ describe 'control-finder', ->
       #console.log ctxRange.getRows()
       #console.log range.start(), range.end()
 
-  fit 'can find the enclosed control logic context', ->
+  it 'can find the enclosed control logic context', ->
 
     parseTree = parse JAVA_CODE_2
     console.log parseTree
@@ -82,13 +82,23 @@ describe 'control-finder', ->
 
     (expect resultingIFcontextRange).toEqual new Range [3, 4], [7, 4]
 
-    # codeBuffer = undefined
-    # activeRanges = [new Range [4,8],[6,8]]
-    # console.log 'activeRanges', activeRanges
-    # rangeSet = new RangeSet activeRanges
-    # console.log 'rangeSet', rangeSet
-    # symbolSet = new SymbolSet()
-    # model = new ExampleModel codeBuffer, rangeSet, symbolSet, parseTree
-    # detector = new MissingControlLogicDetector()
-    #
-    # errors = detector.detectErrors model
+  fit 'can detect enclosing control logic that is not part of the active range', ->
+    codeBuffer = undefined
+    activeRanges = [new Range [4,8],[6,8]]
+    console.log 'activeRanges', activeRanges
+    rangeSet = new RangeSet activeRanges
+    console.log 'rangeSet', rangeSet
+    symbolSet = new SymbolSet()
+    console.log 'symbolSet', symbolSet
+    parseTree = parse JAVA_CODE_2
+    console.log 'parseTree', parseTree
+    model = new ExampleModel codeBuffer, rangeSet, symbolSet, parseTree
+    console.log 'model', model
+    detector = new MissingControlLogicDetector()
+    console.log 'detector', detector
+    errors = detector.detectErrors model
+    console.log 'errors', errors
+    console.log getContextRange(errors[0].controlCtx).toString()
+
+    (expect errors.length).toBe 1
+    (expect getContextRange(errors[0].controlCtx).toString()).toBe '[(3, 4) - (7, 4)]'
