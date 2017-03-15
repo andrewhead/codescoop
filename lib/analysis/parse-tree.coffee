@@ -7,6 +7,7 @@ ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 isAnIfStatement = (ctx) ->
   try
+    console.log 'is ctx an if?', ctx
     if ctx.children[0].symbol.text == 'if'
       # console.log 'its an if!'
       # console.log ctx
@@ -16,6 +17,9 @@ isAnIfStatement = (ctx) ->
   catch
     #console.log 'nothing to check'
     return false
+
+getContextRange = (ctx) ->
+  new Range [ctx.start.line,ctx.start.column], [ctx.stop.line,ctx.stop.column]
 
 class SymbolSearcher extends JavaListener
 
@@ -80,15 +84,21 @@ class ContainingControlLogicCtxSearcher extends JavaListener
     # is it a control logic context?
     # does it contain or intersect with the active range?
     # is it not contained by the active range?
-    ctxRange = ctx.getRange()
-    if ctxRange.containsRange(@activeRange) or ctxRange.intersectsWith(@activeRange)
-      if not ctxRange.containsRange(@activeRange)
-        if isAnIfStatement(ctx)
+    console.log 'exiting ctx', ctx
+    if isAnIfStatement(ctx)
+      ctxRange = getContextRange(ctx)
+      console.log 'ctxRange', ctxRange.toString()
+      console.log 'activeRange', @activeRange.toString()
+      if ctxRange.containsRange(@activeRange) or ctxRange.intersectsWith(@activeRange)
+        console.log 'contained or intersects with'
+        if not @activeRange.containsRange(ctxRange)
+          console.log 'not contained in'
           if not @containingContext?
             @containingContext = ctx
 
   getContainingCtx: ->
     @containingContext
+
 
 # During testing, we don't always want the parse for the full program.  This
 # method let's us do a parse starting starting at a specific rule
@@ -108,6 +118,8 @@ module.exports.partialParse = partialParse = (codeText, ruleName) ->
 module.exports.parse = (codeText) ->
   ctx = partialParse codeText, "compilationUnit"
   new ParseTree ctx
+
+module.exports.getContextRange = getContextRange
 
 ###
 ANTLR lines are one-indexed, and columns are zero-indexed.  For the API of the
@@ -147,3 +159,8 @@ module.exports.ParseTree = class ParseTree
     for ctx in ctxSearcher.getMatchingCtx()
       ctxRanges.push new Range [ctx.start.line,ctx.start.column], [ctx.stop.line,ctx.stop.column]
     ctxRanges
+
+  getContainingControlLogicCtx: (activeRange) ->
+    containingControlLogicCtxSearcher = new ContainingControlLogicCtxSearcher activeRange
+    ParseTreeWalker.walk containingControlLogicCtxSearcher, @root
+    containingControlLogicCtxSearcher.getContainingCtx()
