@@ -1,6 +1,5 @@
 { DeclarationSuggestion } = require "./suggestion"
 
-
 module.exports.DeclarationSuggester = class DeclarationSuggester
 
   getSuggestions: (error, model) ->
