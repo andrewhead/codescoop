@@ -1,4 +1,4 @@
-module.exports.MissingControlLogicError = class MissingControlLogicError
+module.exports.MissingControlLogicConcern = class MissingControlLogicConcern
 
   constructor: (controlCtx) ->
     @controlCtx = controlCtx
@@ -23,6 +23,6 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
       containingControlLogicCtx = parseTree.getContainingControlLogicCtx(activeRange)
       console.log 'containingControlLogic', containingControlLogicCtx
       #resultingIFcontextRange = getContextRange(containingControlLogic)
-      missingControlLogicContexts.push new MissingControlLogicError containingControlLogicCtx
+      missingControlLogicContexts.push new MissingControlLogicConcern containingControlLogicCtx
 
     missingControlLogicContexts
