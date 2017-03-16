@@ -6,7 +6,8 @@ import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
 
-import soot.RefLikeType;
+import soot.Type;
+import soot.RefType;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -31,7 +32,8 @@ public class MemberAccessAnalysis {
         // Only try to track symbols that correspond to "refs" or objects.
         List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
         for (SymbolAppearance def: dataflowAnalysis.getDefinitions()) {
-            if (def.getType() instanceof RefLikeType) {
+            Type defType = def.getType();
+            if (defType instanceof RefType && !defType.toString().equals("java.lang.String")) {
                 ObjectDefinition objectDefinition = new ObjectDefinition(
                         def.getSymbolName(), pClassName, def.getStartLine());
                 objectDefinitions.add(objectDefinition);
