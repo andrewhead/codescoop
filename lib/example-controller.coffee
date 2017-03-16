@@ -86,7 +86,6 @@ module.exports.ExampleController = class ExampleController
     for suggester in activeCorrector.suggesters
       suggesterSuggestions = suggester.getSuggestions error, @model
       suggestions = suggestions.concat suggesterSuggestions
-    console.log suggestions
     suggestions
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
