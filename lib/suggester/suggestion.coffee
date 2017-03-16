@@ -41,12 +41,12 @@ module.exports.DeclarationSuggestion = class DeclarationSuggestion
 
 module.exports.ControlLogicSuggestion = class ControlLogicSuggestion
 
-  constructor: (context, range) ->
-    @context = context
-    @range = range
+  constructor: (type, ranges) ->
+    @type = type
+    @ranges = ranges
 
-  getContext: ->
-    @context
+  getRanges: ->
+    @ranges
 
-  getRange: ->
-    @range
+  getType: ->
+    @type
