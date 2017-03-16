@@ -15,11 +15,12 @@ import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
 import soot.Unit;
+import soot.Value;
 import soot.ValueBox;
 
 import soot.options.Options;
 
-import soot.tagkit.SourceLnNamePosTag;
+import soot.tagkit.SourceLnPosTag;
 import soot.tagkit.Tag;
 
 import soot.toolkits.graph.UnitGraph;
@@ -62,6 +63,10 @@ public class DataflowAnalysis {
         this.mDefinitions = new HashSet<SymbolAppearance>();
         this.mUses = new HashSet<SymbolAppearance>();
 
+    }
+
+    public DataflowAnalysis() {
+        this(null);
     }
 
     public String getClasspath() {
@@ -217,11 +222,11 @@ public class DataflowAnalysis {
 
     }
 
-    private SourceLnNamePosTag getSourceLnNamePosTag(List<Tag> tags) {
-        SourceLnNamePosTag positionTag = null;
+    private SourceLnPosTag getSourceLnPosTag(List<Tag> tags) {
+        SourceLnPosTag positionTag = null;
         for (Tag tag: tags) {
-            if (tag instanceof SourceLnNamePosTag) {
-                positionTag = (SourceLnNamePosTag) tag;
+            if (tag instanceof SourceLnPosTag) {
+                positionTag = (SourceLnPosTag) tag;
                 break;
             }
         }
@@ -290,21 +295,26 @@ public class DataflowAnalysis {
             // Make a control flow graph through the program
             UnitGraph graph = new CompleteUnitGraph(body);
 
-            // Save all local definition.  Visit every unit looking for
-            // a definition of eachl local.  If one was found, and that symbol
-            // corresponds to something in the original source, save a record
-            // of the definition of that symbol.
+            // Visit every unit looking for a definition of each local.  
+            // If one was found, and that symbol corresponds to something
+            // in the original source, save a record of the definition of that symbol.
             LocalDefs defs = new SimpleLocalDefs(graph);
 
             for (Local local: body.getLocals()) {
 
                 for (Unit unit: body.getUnits()) {
-                    try {
-                        List<Unit> defUnits = defs.getDefsOfAt(local, unit);
-                        for (Unit defUnit: defUnits) {
-                                SourceLnNamePosTag positionTag = (
-                                    getSourceLnNamePosTag(defUnit.getTags()));
-                                if (positionTag != null) {
+
+                    for (ValueBox defBox: unit.getDefBoxes()) {
+
+                        // Get the local corresponding to the def
+                        Value defValue = defBox.getValue();
+                        if (!(defValue instanceof Local)) continue;
+                        Local defLocal = (Local) defValue;
+                        
+                        if (local == defLocal) {
+                            SourceLnPosTag positionTag = (
+                                    getSourceLnPosTag(defBox.getTags()));
+                            if (positionTag != null) {
                                 SymbolAppearance definition = new SymbolAppearance(
                                     local.getName(),
                                     local.getType(),
@@ -315,11 +325,7 @@ public class DataflowAnalysis {
                                 );
                                 definitions.add(definition);
                             }
-
                         }
-                    } catch (RuntimeException runtimeException) {
-                        // A RuntimeException is thrown when no definition found in a unit.
-                        // This is expected to happen many times.  Just ignore it.
                     }
                 }
             }
@@ -339,8 +345,8 @@ public class DataflowAnalysis {
                     Unit localUnit = unitValueBoxPair.getUnit();
                     ValueBox localValueBox = unitValueBoxPair.getValueBox();
 
-                    SourceLnNamePosTag positionTag = (
-                        getSourceLnNamePosTag(localValueBox.getTags()));
+                    SourceLnPosTag positionTag = (
+                        getSourceLnPosTag(localValueBox.getTags()));
                     if (positionTag != null) {
                         SymbolAppearance use = new SymbolAppearance(
                             localValueBox.getValue().toString(),

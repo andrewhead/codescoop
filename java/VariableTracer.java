@@ -18,7 +18,6 @@ import java.util.Scanner;
  * REUSE: This code is based on the Trace.java example code for JDI.  Though all efforts have been
  * made to reduce the original code, there are a few dozen lines of boilerplate that were reused
  * because, honestly, there's presumably no other way to do the initializtion.
- * 
  */
 public class VariableTracer {
 

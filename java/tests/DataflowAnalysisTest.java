@@ -33,12 +33,9 @@ public class DataflowAnalysisTest {
         Set<SymbolAppearance> defs = dataflowAnalysis.getDefinitions();
 
         // Check for all of the expected definitions of i and j
-        // Note that the way that definitions are reported are:
-        // * on the first line that definitions occur, the symbol span
-        // * on the next lines that definitions occur, the full line
         SymbolAppearance iDef1 = new SymbolAppearance("i", IntType.v(), 5, 8, 5, 9);
         SymbolAppearance jDef1 = new SymbolAppearance("j", IntType.v(), 6, 8, 6, 9);
-        SymbolAppearance iDef2 = new SymbolAppearance("i", IntType.v(), 7, 4, 7, 13);
+        SymbolAppearance iDef2 = new SymbolAppearance("i", IntType.v(), 7, 4, 7, 5);
         assertTrue(defs.contains(iDef1));
         assertTrue(defs.contains(jDef1));
         assertTrue(defs.contains(iDef2));
@@ -118,7 +115,7 @@ public class DataflowAnalysisTest {
         Set<SymbolAppearance> iDefs = namesToDefs.get("i");
         assertEquals(2, iDefs.size());
         assertTrue(iDefs.contains(new SymbolAppearance("i", IntType.v(), 5, 8, 5, 9)));
-        assertTrue(iDefs.contains(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 13)));
+        assertTrue(iDefs.contains(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 5)));
 
         Set<SymbolAppearance> jDefs = namesToDefs.get("j");
         assertEquals(1, jDefs.size());
@@ -142,7 +139,7 @@ public class DataflowAnalysisTest {
 
         Set<SymbolAppearance> line7Defs = linesToDefs.get(7);
         assertEquals(1, excludeTempAppearances(line7Defs).size());
-        assertTrue(line7Defs.contains(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 13)));
+        assertTrue(line7Defs.contains(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 5)));
 
         assertNull(linesToDefs.get(8));  // Nothing on line 8
 
@@ -219,7 +216,7 @@ public class DataflowAnalysisTest {
         // If there are multiple definitions, just get the one right above it (the case with i)
         definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
             new SymbolAppearance("i", IntType.v(), 9, 27, 9, 28));
-        assertEquals(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 13), definition);
+        assertEquals(new SymbolAppearance("i", IntType.v(), 7, 4, 7, 5), definition);
 
         // Pathological case: there is no line above where the symbol is defined
         definition = dataflowAnalysis.getLatestDefinitionBeforeUse(
