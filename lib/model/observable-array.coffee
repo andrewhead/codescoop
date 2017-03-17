@@ -1,6 +1,3 @@
-{ RangeSetProperty } = require '../model/range-set'
-
-
 module.exports.ObservableArrayProperty = ObservableArrayProperty =
   UNKNOWN: { value: -1, name: "unknown" }
   ARRAY_CHANGE: { value: 0, name: "array-change" }
