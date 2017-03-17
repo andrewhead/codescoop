@@ -21,6 +21,15 @@ import java.util.Scanner;
 
 public class MemberAccessAnalysis {
 
+    public static void main(String [] args) {
+        MemberAccessAnalysis analysis = new MemberAccessAnalysis();
+        try {
+            analysis.run(args[0], args[1]);
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("Could not find class " + args[1]);
+        }
+    }
+
     public Map<ObjectDefinition, List<AccessHistory>> run(String pClassName, String pClasspath)
             throws ClassNotFoundException {
 

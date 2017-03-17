@@ -46,8 +46,8 @@ public class MemberAccessTrackerThread extends Thread {
     private boolean connected = true;  // Connected to VM
 
     private Map<ObjectDefinition, List<AccessHistory>> mAccessHistories;
-    private Map<Long, AccessHistory> mAccessHistoriesByInstanceId = (
-            new HashMap<Long, AccessHistory>());
+    private Map<Long, List<AccessHistory>> mAccessHistoriesByInstanceId = (
+            new HashMap<Long, List<AccessHistory>>());
     private List<ObjectDefinition> mObjectDefinitions;
     private Set<ObjectDefinition> mObjectDefinitionsWithBreakpoints = new HashSet<ObjectDefinition>();
 
@@ -182,7 +182,9 @@ public class MemberAccessTrackerThread extends Thread {
                 // Tell the debugger to start watching all of the times that fields and methods
                 // are getting accessed on this instance.
                 AccessHistory instanceAccessHistory = watchInstance(currentInstance);
-                instanceAccessHistories.add(instanceAccessHistory);
+                if (instanceAccessHistory != null) {
+                    instanceAccessHistories.add(instanceAccessHistory);
+                }
 
             }
 
@@ -242,12 +244,15 @@ public class MemberAccessTrackerThread extends Thread {
         if (instance == null) return;
 
         Access access = makeAccessFromValue(returnValue);
-        AccessHistory accesses = this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
+        List<AccessHistory> accessHistories = 
+                this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
 
         // Save the result of this method call (skipping calls to the constructor)
         MethodIdentifier methodId = new MethodIdentifier(method.name(), method.argumentTypeNames());
         if (!(method.name().equals("<init>"))) {
-            accesses.addMethodCall(methodId, access);
+            for (AccessHistory accessHistory: accessHistories) {
+                accessHistory.addMethodCall(methodId, access);
+            }
         }
 
     }
@@ -259,20 +264,25 @@ public class MemberAccessTrackerThread extends Thread {
         ObjectReference instance = event.object();
         Field field = event.field();
         Value value = event.valueCurrent();
+    
+        // If this is a null instance, we might be dealing with a static variable
+        // For right now, we ignore it, but we might need this at some time in the future.
+        if (instance == null) return;
 
         Access access = makeAccessFromValue(value);
-        AccessHistory accessHistory = this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
-        accessHistory.addFieldAccess(field.name(), access);
+        List<AccessHistory> accessHistories =
+                this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
+        for (AccessHistory accessHistory: accessHistories) {
+            accessHistory.addFieldAccess(field.name(), access);
+        }
 
     }
 
     private AccessHistory watchInstance(ObjectReference instance) {
 
-        // Only watch an instance once.  If an access history has already been created
-        // for this instance, return it so it can be updated by the caller.
-        if (this.mAccessHistoriesByInstanceId.containsKey(instance.uniqueID())) {
-            return this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
-        }
+        // Don't watch strings: we assume they're available anywhere and don't
+        // have to be stubbed, as long as we have the value of the string.
+        if (instance instanceof StringReference) return null;
 
         // If the access history for this instance doesn't exist, create a new one.
         AccessHistory accessHistory = createAccessHistory(instance);
@@ -306,33 +316,67 @@ public class MemberAccessTrackerThread extends Thread {
             methodExitRequest.enable();
         }
 
+        // We're going to continually access the access history for the instance
+        // by the instance ID (it's the one thing we'll continually have access to
+        // as we step through the program.
+        // Whenever an instance is watched more than once, create a new access history for
+        // it.  We can't share the access histories for the same instance, as this might cause 
+        // cycles in the access graph, which makes stubs with infinite nested accesses.
+        // We need to update all of these access histories when the instance is accessed,
+        // as we can't recall where in the access graph the instance was retrieved.  Currently,
+        // this will create spurious accesses in some places of the access graph: we need a
+        // more sophisticated way of disambiguating between references to an instance
+        // in order to remove those spurious accesses.  For future work.
+        List<AccessHistory> accessHistoriesForInstance =
+                this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
+        if (accessHistoriesForInstance == null) {
+            accessHistoriesForInstance = new ArrayList<AccessHistory>();
+            this.mAccessHistoriesByInstanceId.put(instance.uniqueID(), accessHistoriesForInstance);
+        }
+        accessHistoriesForInstance.add(accessHistory);
+
         return accessHistory;
 
     }
 
+    private String getNameForType(Type type) {
+        if (type.name().equals("java.lang.String"))
+            return "String";
+        else
+            return type.name();
+    }
+
     private AccessHistory createAccessHistory(ObjectReference instance) {
 
-        // Compile all the field names and method identifiers for the instance
+        // Collect all the field names and method identifiers for the instance
         // We need these to initialize an empty access history
         List<Field> fields = instance.referenceType().allFields();
         List<String> fieldNames = new ArrayList<String>();
+        List<String> fieldTypes = new ArrayList<String>();
         List<Method> methods = instance.referenceType().allMethods();
         List<MethodIdentifier> methodIds = new ArrayList<MethodIdentifier>();
+        List<String> methodReturnTypes = new ArrayList<String>();
         for (Field field: fields) {
             fieldNames.add(field.name());
+            String typeName = "unknown";
+            try {
+                typeName = getNameForType(field.type());
+            } catch (ClassNotLoadedException exception) {}
+            fieldTypes.add(typeName);
         }
         for (Method method: methods) {
             MethodIdentifier methodId = new MethodIdentifier(method.name(), method.argumentTypeNames());
             methodIds.add(methodId);
+            String typeName = "unknown";
+            try {
+                typeName = getNameForType(method.returnType());
+            } catch (ClassNotLoadedException exception) {}
+            methodReturnTypes.add(typeName);
         }
 
         // Create an access history for the instance
-        AccessHistory accessHistory = new AccessHistory(fieldNames, methodIds);
-
-        // We're going to continually access the access history for the instance
-        // by the instance ID (it's the one thing we'll continually have access to
-        // as we step through the program.  So we save a link between the two.
-        this.mAccessHistoriesByInstanceId.put(instance.uniqueID(), accessHistory);
+        AccessHistory accessHistory = new AccessHistory(
+                fieldNames, fieldTypes, methodIds, methodReturnTypes);
 
         return accessHistory;
 

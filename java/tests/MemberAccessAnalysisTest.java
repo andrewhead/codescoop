@@ -124,6 +124,24 @@ public class MemberAccessAnalysisTest {
     }
 
     @Test
+    public void testSavesFieldAndReturnTypes() throws ClassNotFoundException {
+
+        List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
+        ObjectDefinition instance = new ObjectDefinition("w", "FieldAccessAndMethodReturn", 11);
+        objectDefinitions.add(instance);
+
+        Map<ObjectDefinition, List<AccessHistory>> accesses = analysis.run(
+                "FieldAccessAndMethodReturn", "tests/analysis_examples", objectDefinitions);
+
+        List<AccessHistory> oInstances = accesses.get(instance);
+        AccessHistory accessHistory = oInstances.get(0);
+        assertEquals("int", accessHistory.getFieldType("i"));
+        assertEquals("String", accessHistory.getMethodReturnType(
+                new MethodIdentifier("getString", new ArrayList<String>())));
+
+    }
+
+    @Test
     public void testAddsObjectFieldAccess() throws ClassNotFoundException {
 
         List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
@@ -335,6 +353,33 @@ public class MemberAccessAnalysisTest {
                 new ObjectDefinition("o", "DiscoverableDefinitions", 9)).get(0);
         PrimitiveAccess fieldAccess = (PrimitiveAccess) oAccesses.getFieldAccesses("i").get(0);
         assertEquals(42, fieldAccess.getValue());
+
+    }
+
+    // In an earlier version of this code, we only made one shared access history for each
+    // instance.  If the instance was returned by multiple accesses, or was assigned to
+    // multiple values, then all versions of the instance in the access history tree would
+    // whare the same access history object.  This can cause cycles (e.g., if a parent's child
+    // is accessed), which can cause iterators over the access history tree to never terminate.
+    @Test
+    public void testNoCyclesInAcesssHistoryGraph() throws ClassNotFoundException {
+
+        List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
+        ObjectDefinition parentDefinition = new ObjectDefinition("parent", "CyclicAccess", 13);
+        ObjectDefinition childDefinition = new ObjectDefinition("child", "CyclicAccess", 14);
+        objectDefinitions.add(parentDefinition);
+        objectDefinitions.add(childDefinition);
+
+        Map<ObjectDefinition, List<AccessHistory>> accesses = analysis.run(
+                "CyclicAccess", "tests/analysis_examples", objectDefinitions);
+
+        // For this example, the access history should show a link from a parent to a child
+        // and back to a parent.  But this is where the links should stop: there should not
+        // be another link from the parent back to the child (a loop in the access history tree).
+        AccessHistory parentAccesses = accesses.get(parentDefinition).get(0);
+        AccessHistory childAccesses = (AccessHistory) parentAccesses.getFieldAccesses("child").get(0);
+        parentAccesses = (AccessHistory) childAccesses.getFieldAccesses("parent").get(0);
+        assertEquals(0, parentAccesses.getFieldAccesses("child").size());
 
     }
 

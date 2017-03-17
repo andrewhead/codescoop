@@ -12,8 +12,8 @@ TESTS_DIR=tests
 TEST_CLASSES=`(cd $TESTS_DIR && ls *Test.java) | sed -e 's/\.java$//'`
 
 # Compile all classes, and all tests
-javac -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. *.java
-javac -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. tests/*.java
+javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. *.java
+javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:. tests/*.java
 
 # Compile classes for all of the files we're going to run test analysis on
 # Use `-g` so we get symbol information, for extracting variable names during analysis.
