@@ -1,5 +1,6 @@
-{ makeObservableArray } = require './observable-array'
-{ RangeSetProperty } = require './range-set'
+{ makeObservableArray } = require "./observable-array"
+{ RangeSet, RangeSetProperty } = require "./range-set"
+{ SymbolSet } = require "./symbol-set"
 
 
 module.exports.ExampleModelProperty = ExampleModelProperty =
@@ -14,6 +15,8 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   EDITS: { value: 8, name: "edits" }
   ACTIVE_CORRECTOR: { value: 9, name: "active-corrector" }
   AUXILIARY_DECLARATIONS: { value: 10, name: "auxiliary-declarations" }
+  STUB_OPTION: { value: 11, name: "stub-option" }
+  STUB_SPEC_TABLE: {value: 12, name: "stub-spec-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -29,10 +32,10 @@ module.exports.ExampleModel = class ExampleModel
 
     @observers = []
 
-    @rangeSet = rangeSet
+    @rangeSet = rangeSet or new RangeSet()
     @rangeSet.addObserver @
 
-    @symbols = symbols
+    @symbols = symbols or new SymbolSet()
     @symbols.addObserver @
 
     @errors = makeObservableArray []
@@ -53,6 +56,8 @@ module.exports.ExampleModel = class ExampleModel
     @errorChoice = null
     @resolutionChoice = null
     @activeCorrector = null
+    @stubOption = null
+    @stubSpecTable = null
 
     @state = ExampleModelState.ANALYSIS
 
@@ -139,6 +144,23 @@ module.exports.ExampleModel = class ExampleModel
 
   getAuxiliaryDeclarations: ->
     @auxiliaryDeclarations
+
+  setStubOption: (stubOption) ->
+    @stubOption = stubOption
+    @notifyObservers @, ExampleModelProperty.STUB_OPTION, @stubOption
+
+  getStubOption: ->
+    @stubOption
+
+  getStubSpecTable: ->
+    @stubSpecTable
+
+  setStubSpecTable: (stubSpecTable) ->
+    @stubSpecTable = stubSpecTable
+    @notifyObservers @, ExampleModelProperty.STUB_SPEC_TABLE, @stubSpecTable
+
+  getStubOption: ->
+    @stubOption
 
   getEdits: ->
     @edits

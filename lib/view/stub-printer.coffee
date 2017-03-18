@@ -1,6 +1,8 @@
 { StubSpec } = require "../model/stub-spec"
 
 
+# Currently, a new stub printer needs to be created for every stub that
+# gets printed, due to the printer's internal state.
 module.exports.StubPrinter = class StubPrinter
 
   TAB_LENGTH: 4

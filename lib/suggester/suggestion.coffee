@@ -23,6 +23,19 @@ module.exports.PrimitiveValueSuggestion = class PrimitiveValueSuggestion
     @valueString
 
 
+module.exports.InstanceStubSuggestion = class InstanceStubSuggestion
+
+  constructor: (symbol, stubSpec) ->
+    @symbol = symbol
+    @stubSpec = stubSpec
+
+  getSymbol: ->
+    @symbol
+
+  getStubSpec: ->
+    @stubSpec
+
+
 module.exports.DeclarationSuggestion = class DeclarationSuggestion
 
   constructor: (name, type, symbol) ->

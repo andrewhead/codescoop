@@ -8,6 +8,7 @@ $ = require 'jquery'
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
 { DeclarationSuggestionBlockView } = require "./view/declaration-suggestion"
+{ InstanceStubSuggestionBlockView } = require "./view/instance-stub-suggestion"
 { Point } = require 'atom'
 
 
@@ -216,6 +217,8 @@ module.exports.ExampleView = class ExampleView
         block = new PrimitiveValueSuggestionBlockView suggestions, @model, marker
       else if class_ is "DeclarationSuggestion"
         block = new DeclarationSuggestionBlockView suggestions, @model, marker
+      else if class_ is "InstanceStubSuggestion"
+        block = new InstanceStubSuggestionBlockView suggestions, @model, marker
       decoration.append block
 
     # Create a decoration from the element

@@ -1,11 +1,8 @@
 { JAVA_CLASSPATH, java } = require "../config/paths"
-{ StubSpec } = require "../model/stub-spec"
+{ StubSpec, StubSpecTable } = require "../model/stub-spec"
 MemberAccessAnalysis = java.import "MemberAccessAnalysis"
 
 
-# While this currently relies on a Map loaded from Java using the node-java
-# connector, it's reasonable to expect that this could also read in a
-# pre-written local file instead.
 module.exports.StubAnalysis = class StubAnalysis
 
   constructor: (file) ->
@@ -42,10 +39,15 @@ module.exports.StubAnalysis = class StubAnalysis
       returnValues = []
       for accessJ in returnValuesJ.toArraySync()
         returnValues.push @_createValueForAccess accessJ
+      returnType = undefined
+      if returnValues.length > 0 and java.instanceOf accessJ, "AccessHistory"
+        returnType = "instance"
+      else
+        returnType = accessHistoryJ.getMethodReturnTypeSync methodIdJ
       methodCalls.push
         signature:
           name: methodIdJ.getNameSync()
-          returnType: accessHistoryJ.getMethodReturnTypeSync methodIdJ
+          returnType: returnType
           argumentTypes: (type for type in methodIdJ.getTypeNamesSync().toArraySync())
         returnValues: returnValues
 
@@ -54,18 +56,22 @@ module.exports.StubAnalysis = class StubAnalysis
 
   _constructStubSpecs: (accessHistoriesJ) ->
 
-    stubSpecs = []
+    stubSpecTable = new StubSpecTable()
     for objectDefinition in accessHistoriesJ.keySetSync().toArraySync()
 
+      # We correct the line number from the 1-indexed line number created
+      # by JDI to the 0-indexed one used in ranges in this program
+      lineNumber = objectDefinition.getLineNumberSync() - 1
+      className = objectDefinition.getClassNameSync()
       objectName = objectDefinition.getNameSync()
-      className = (objectName.charAt 0).toUpperCase() + (objectName.slice 1)
+      newClassName = (objectName.charAt 0).toUpperCase() + (objectName.slice 1)
 
       instanceAccessHistoriesJ = accessHistoriesJ.getSync objectDefinition
       for accessHistoryJ in instanceAccessHistoriesJ.toArraySync()
-        stubSpec = @_createStubSpecForAccessHistory className, accessHistoryJ
-        stubSpecs.push stubSpec
+        stubSpec = @_createStubSpecForAccessHistory newClassName, accessHistoryJ
+        stubSpecTable.putStubSpec className, objectName, lineNumber, stubSpec
 
-    stubSpecs
+    stubSpecTable
 
   run: (callback, err) ->
     className = @file.getName().replace /\.java$/, ''
@@ -73,5 +79,5 @@ module.exports.StubAnalysis = class StubAnalysis
     sootClasspath = (java.classpath.join ':') + ":" + pathToFile
     memberAccessAnalysis = new MemberAccessAnalysis()
     memberAccessAnalysis.run className, sootClasspath, (error, result) =>
-      err error if error
-      callback (@_constructStubSpecs result)
+      err error if error?
+      callback (@_constructStubSpecs result) if not error?

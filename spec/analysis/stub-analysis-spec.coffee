@@ -12,14 +12,14 @@ describe "StubAnalysis", ->
       "AccessSampler.java"
     analysis = new StubAnalysis file
 
-    stubSpecs = undefined
+    stubSpecTable = undefined
     runs =>
       analysis.run ((result) =>
-        stubSpecs = result
+        stubSpecTable = result
       ), console.error
 
     waitsFor =>
-      stubSpecs?
+      stubSpecTable?
 
     # XXX: While it's sloppy to run all of the tests in a single "runs" block,
     # stub analysis is pretty expensive (it will take a couple of seconds),
@@ -27,8 +27,8 @@ describe "StubAnalysis", ->
     runs =>
 
       # A spec should have been created for obj and obj2
-      (expect stubSpecs.length).toBe 2
-      stubSpec = stubSpecs[0]
+      (expect stubSpecTable.getSize()).toBe 2
+      stubSpec = (stubSpecTable.getStubSpecs "AccessSampler", "obj", 26)[0]
 
       # First, the class name should be the object name, capitalized
       # TODO: At some point, we have to make sure we don't reuse the same

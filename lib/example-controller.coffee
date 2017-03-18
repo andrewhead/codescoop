@@ -4,6 +4,7 @@
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
+{ InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
 { RangeAddition } = require "./edit/range-addition"
 { Fixer } = require "./fixer"
 
@@ -17,25 +18,27 @@ module.exports.ExampleController = class ExampleController
 
     defUseAnalysis = analyses.defUseAnalysis
     valueAnalysis = analyses.valueAnalysis
+    stubAnalysis = analyses.stubAnalysis
 
     @correctors = correctors
     # Load default correctors if none were passed in
     if not @correctors?
       @correctors = [
-          checker: new MissingDeclarationDetector()
-          suggesters: [ new DeclarationSuggester() ]
-        ,
           checker: new MissingDefinitionDetector()
           suggesters: [
             new DefinitionSuggester()
             new PrimitiveValueSuggester()
+            new InstanceStubSuggester()
           ]
+        ,
+          checker: new MissingDeclarationDetector()
+          suggesters: [ new DeclarationSuggester() ]
       ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses defUseAnalysis, valueAnalysis
+    @_startAnalyses defUseAnalysis, valueAnalysis, stubAnalysis
 
-  _startAnalyses: (defUseAnalysis, valueAnalysis) ->
+  _startAnalyses: (defUseAnalysis, valueAnalysis, stubAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -50,23 +53,32 @@ module.exports.ExampleController = class ExampleController
         callback: (valueMap) =>
           @model.setValueMap valueMap
         error: console.error
+      stub:
+        runner: stubAnalysis or= null
+        callback: (stubSpecTable) =>
+          console.log "Callback:", stubSpecTable
+          @model.setStubSpecTable stubSpecTable
+        error: console.error
 
-    # Kick off each of the analyses, changing state when all are done
-    controller = @
-    for name, analysis of @analyses
-      continue if not analysis.runner
-      analysis.runner.run (((result) ->
-          @finished = true
-          @callback result
-          if controller._areAnalysesDone()
-            controller.model.setState ExampleModelState.IDLE
-        ).bind analysis), analysis.error
-
-  _areAnalysesDone: ->
-    for analysis in @analyses
-      if analysis.runner? and (not analysis.finished)
-        return false
-    true
+    # Run analyses sequentially.  Soot can't handle when more than one
+    # analysis is running at a time.  Pattern reference for chaining promises:
+    # http://stackoverflow.com/questions/24586110/resolve-promises-one-after-another-i-e-in-sequence
+    analysisDone = Promise.resolve()
+    for _, analysis of @analyses
+      analysisDone = analysisDone.then (() ->
+        new Promise (resolve, reject) =>
+          resolve() if not @runner?
+          @runner.run ((outcome) =>
+            @callback outcome
+            resolve()
+          ), () =>
+            # Even on error, claim that we have "resolved" the promise,
+            # just so we can keep moving onto the next analysis.
+            @error()
+            resolve()
+        ).bind analysis
+    analysisDone.then =>
+      @model.setState ExampleModelState.IDLE
 
   applyCorrectors: ->
     for corrector in @correctors

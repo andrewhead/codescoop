@@ -1,11 +1,12 @@
-{ ExampleModel, ExampleModelState } = require '../lib/model/example-model'
-{ ExampleController } = require '../lib/example-controller'
-{ DefUseAnalysis } = require '../lib/analysis/def-use'
-{ Range, RangeSet } = require '../lib/model/range-set'
-{ File, Symbol, SymbolSet } = require '../lib/model/symbol-set'
-{ ValueAnalysis, ValueMap } = require '../lib/analysis/value-analysis'
-{ RangeAddition } = require '../lib/edit/range-addition'
-{ PACKAGE_PATH } = require '../lib/config/paths'
+{ ExampleModel, ExampleModelState } = require "../lib/model/example-model"
+{ ExampleController } = require "../lib/example-controller"
+{ DefUseAnalysis } = require "../lib/analysis/def-use"
+{ Range, RangeSet } = require "../lib/model/range-set"
+{ File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
+{ ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
+{ StubAnalysis } = require "../lib/analysis/stubs"
+{ RangeAddition } = require "../lib/edit/range-addition"
+{ PACKAGE_PATH } = require "../lib/config/paths"
 
 
 describe "ExampleController", ->
@@ -25,6 +26,7 @@ describe "ExampleController", ->
 
     defUseAnalysis = new DefUseAnalysis testFile
     valueAnalysis = new ValueAnalysis testFile
+    stubAnalysis = new StubAnalysis testFile
     model = new ExampleModel _makeCodeBuffer(),
       (new RangeSet [ new Range [5, 0], [5, 10] ]), new SymbolSet(),
       (jasmine.createSpyObj 'parseTree', ['getRoot']), new ValueMap()
@@ -33,20 +35,26 @@ describe "ExampleController", ->
     controller = undefined
     defs = undefined
     valueMap = undefined
+    stubSpecTable = undefined
 
     it "enters the IDLE state when initial analyses finish", ->
 
       runs ->
-        controller = new ExampleController model, { defUseAnalysis, valueAnalysis }, []
+        controller = new ExampleController model,
+          { defUseAnalysis, valueAnalysis, stubAnalysis }, []
 
       # After creating the controller, we wait for analyses to finish
       waitsFor =>
         defs = model.getSymbols().getDefs()
         valueMap = model.getValueMap()
-        ((defs.length > 0) and ("Example.java" of valueMap))
+        stubSpecTable = model.getStubSpecTable()
+        ((defs.length > 0) and valueMap? and stubSpecTable? and
+          ("Example.java" of valueMap))
+
+      waitsFor =>
+        model.getState() is ExampleModelState.IDLE
 
       runs ->
-        (expect model.getState()).toEqual ExampleModelState.IDLE
 
         _in = (symbol, symbols) =>
           for otherSymbol in symbols
@@ -70,26 +78,30 @@ describe "ExampleController", ->
 
   describe "when in the IDLE state", ->
 
-    correctors = [
-        checker:
-          detectErrors: (parseTree, rangeSet, symbolSet) => []
-        # Checkers will also have suggesters, but that isn't important here.
-    ]
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    analyses = { defUseAnalysis }
+    model = undefined
+    controller = undefined
+    defUseAnalysis = undefined
+    correctors = undefined
+
+    beforeEach =>
+      correctors = [
+          checker:
+            detectErrors: (parseTree, rangeSet, symbolSet) => []
+      ]
+      model = _makeDefaultModel()
+      defUseAnalysis = _makeMockDefUseAnalysis()
+      controller = new ExampleController model, { defUseAnalysis }, correctors
+      waitsFor (=>
+          model.getState() is ExampleModelState.IDLE
+        ), "Waiting for state"
 
     it "leaves the state at IDLE if no errors found", ->
-      model = _makeDefaultModel()
-      controller = new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.IDLE
 
     it "applies correctors when new lines are added", ->
 
       # Spy on the first corrector to make sure that it was used to detect errors
-      model = _makeDefaultModel()
-      new ExampleController model, analyses, correctors
-
       # Update the corrector to return errors, as if they were caused by
       # the addition of new ranges.  XXX: this will cause this corrector
       # to return errors in the upcoming tests too.
@@ -109,6 +121,9 @@ describe "ExampleController", ->
       # (even a set of string).  Because it returns some errors, the second
       # corrector (initialized below) should never be invoked.
       firstCorrector = correctors[0]
+      firstCorrector.checker.detectErrors = (parseTree, rangeSet, symbolSet) =>
+        [ "error1", "error2"]
+
       secondCorrector =
         name: "mock-corrector-2"
         checker: { detectErrors: (parseTree, rangeSet, symbolSet) => [] }
@@ -119,43 +134,34 @@ describe "ExampleController", ->
       (spyOn firstCorrector.checker, "detectErrors").andCallThrough()
       (spyOn secondCorrector.checker, "detectErrors").andCallThrough()
 
-      model = _makeDefaultModel()
-      new ExampleController model, analyses, correctors
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
 
       (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
       (expect secondCorrector.checker.detectErrors).not.toHaveBeenCalled()
 
     it "updates to ERROR_CHOICE when lines are chosen and errors found", ->
-      model = _makeDefaultModel()
-      controller = new ExampleController model, analyses, correctors
+      correctors[0].checker.detectErrors = () => [ "error1" ]
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
 
     it "updates model errors when lines are chosen and errors are found", ->
-      model = _makeDefaultModel()
-      controller = new ExampleController model, analyses, correctors
+      correctors[0].checker.detectErrors = () => [ "error1", "error2" ]
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getErrors()).toEqual [ "error1", "error2" ]
 
     it "transitions to ERROR_CHOICE if it enters IDLE with errors", ->
-      model = _makeDefaultModel()
-      controller = new ExampleController model, analyses, correctors
+      correctors[0].checker.detectErrors = () => [ "error1" ]
       model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
 
     it "saves a reference to the corrector that found the error", ->
-      correctors = [ { checker: { detectErrors: -> ["error"] } } ]
-      model = _makeDefaultModel()
       (expect model.getActiveCorrector()).toBe null
-      controller = new ExampleController model, analyses, correctors
+      correctors[0].checker.detectErrors = () => [ "error1" ]
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
       (expect model.getActiveCorrector()).toBe correctors[0]
 
 
   describe "when in the ERROR_CHOICE state", ->
-
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    analyses = { defUseAnalysis }
 
     # A mock corrector that does nothing but detect an error
     # and give primitive fix suggestions
@@ -167,13 +173,22 @@ describe "ExampleController", ->
         { getSuggestions: (error) -> [5] }
       ]
     }]
+    model = undefined
+    controller = undefined
 
-    # These lines get us into the ERROR_CHOICE state
-    model = _makeDefaultModel()
-    controller = new ExampleController model, analyses, correctors
+    beforeEach =>
 
-    # Here, we simulate the choice of an error
-    model.setErrorChoice "error"
+      runs =>
+        model = _makeDefaultModel()
+        defUseAnalysis = _makeMockDefUseAnalysis()
+        controller = new ExampleController model, { defUseAnalysis }, correctors
+
+      waitsFor =>
+        model.getState() is ExampleModelState.ERROR_CHOICE
+
+      runs =>
+        # Here, we simulate the choice of an error
+        model.setErrorChoice "error"
 
     it "updates the state to RESOLUTION when an error is chosen", ->
       (expect model.getState()).toBe ExampleModelState.RESOLUTION
@@ -184,22 +199,21 @@ describe "ExampleController", ->
 
   describe "when in the RESOLUTION state", ->
 
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    analyses = { defUseAnalysis }
-
     # These lines get the controller into the RESOLUTION state
     correctors = [{
       checker: { detectErrors: -> [ "error" ] }
       suggesters: [ { getSuggestions: -> [1] } ]
     }]
+
     model = _makeDefaultModel()
-    controller = new ExampleController model, analyses, correctors
-    model.getRangeSet().getActiveRanges().push new Range [1, 0], [1, 10]
-    model.setErrorChoice "error"
+    defUseAnalysis = _makeMockDefUseAnalysis()
+    controller = new ExampleController model, { defUseAnalysis }, correctors
+    model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+    model.setState ExampleModelState.RESOLUTION
+    model.setActiveCorrector correctors[0]
 
     # Before faking the resolution, pretend the errors have gone away
     correctors[0].checker.detectErrors = => []
-
     model.setResolutionChoice new RangeAddition new Range [0, 0], [0, 10]
 
     it "updates the state to IDLE when a resolution was chosen", ->
