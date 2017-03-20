@@ -9,7 +9,7 @@ import java.util.*;
  * This thread walks step by step through a class and queries the values of all
  * variables on the stack at each step.
  */
-public class StepperThread extends Thread {
+public class PrimitiveValueTrackerThread extends Thread {
 
     private String[] STANDARD_PACKAGES = {"java/", "javax/", "sun/", "com/sun/"};
     private final VirtualMachine vm;
@@ -20,7 +20,8 @@ public class StepperThread extends Thread {
      * @param values data structure into which assignments to variables will be stored.
      *      You can look up a value by indexing on class name, line number, and variable name.
      */
-    public StepperThread(VirtualMachine vm, Map<String, Map<Integer, Map<String, List<Value>>>> values) {
+    public PrimitiveValueTrackerThread(VirtualMachine vm, Map<String,
+            Map<Integer, Map<String, List<Value>>>> values) {
 
         super("Stepper");
         this.vm = vm;
@@ -86,56 +87,8 @@ public class StepperThread extends Thread {
 
     }
 
-    private String valueToString(Value value) {
-
-        // Boilerplate, using the suggestions of Wayne Adams:
-        // https://wayne-adams.blogspot.com/2011/12/examining-variables-in-jdi.html?showComment=1487723907415
-        if (value instanceof BooleanValue) {
-            BooleanValue booleanValue = (BooleanValue) value;
-            return booleanValue.toString();
-        } else if (value instanceof IntegerValue) {
-            IntegerValue integerValue = (IntegerValue) value;
-            return integerValue.toString();
-        } else if (value instanceof ByteValue) {
-            ByteValue byteValue = (ByteValue) value;
-            return byteValue.toString();
-        } else if (value instanceof CharValue) {
-            CharValue charValue = (CharValue) value;
-            return charValue.toString();
-        } else if (value instanceof DoubleValue) {
-            DoubleValue doubleValue = (DoubleValue) value;
-            return doubleValue.toString();
-        } else if (value instanceof FloatValue) {
-            FloatValue floatValue = (FloatValue) value;
-            return floatValue.toString();
-        } else if (value instanceof LongValue) {
-            LongValue longValue = (LongValue) value;
-            return longValue.toString();
-        } else if (value instanceof ShortValue) {
-            ShortValue shortValue = (ShortValue) value;
-            return shortValue.toString();
-        } else if (value instanceof VoidValue) {
-            VoidValue voidValue = (VoidValue) value;
-            return voidValue.toString();
-        // As mentioned in Wayne Adams' blog, make sure that StringReference
-        // is checked before ObjectReference because a StringReference is
-        // an ObjectReference, but it can be easily printed with its actual
-        // string, instead of a hash value.
-        } else if (value instanceof StringReference) {
-            StringReference stringReference = (StringReference) value;
-            return stringReference.toString();
-        } else if (value instanceof ObjectReference) {
-            ObjectReference objectReference = (ObjectReference) value;
-            return objectReference.toString();
-        } else {
-            return null;
-        }
-
-    }
-
     private void saveVariableValue(StepEvent event, String variableName, Value value) {
 
-        String printableValue = valueToString(value);
         String sourceFileName;
         try {
             sourceFileName = event.location().sourceName();
@@ -193,6 +146,19 @@ public class StepperThread extends Thread {
                     // The most important part: for each variable, we print out
                     // a readable representation of its data at that line.
                     Value variableValue = variableValues.get(variable);
+
+                    // XXX: string references get deleted from the VM's memory when the execution
+                    // stops.  This hack of calling the `toString` method apparently keeps the
+                    // StringReference in memory long enough to be referenced after the VM stops.
+                    // This deserves a more stable solution soon.
+                    if (variableValue instanceof StringReference) {
+                        StringReference stringVariable = (StringReference) variableValue;
+                        String whatever = stringVariable.toString();
+                    // Only save primitive values and Strings.  If we find objects on the stack,
+                    // skip them: We need more complex analysis for useful object representations.
+                    } else if (variableValue instanceof ObjectReference)
+                        continue;
+
                     saveVariableValue(event, variable.name(), variableValue);
 
                 }

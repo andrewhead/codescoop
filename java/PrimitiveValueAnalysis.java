@@ -19,7 +19,7 @@ import java.util.Scanner;
  * made to reduce the original code, there are a few dozen lines of boilerplate that were reused
  * because, honestly, there's presumably no other way to do the initializtion.
  */
-public class VariableTracer {
+public class PrimitiveValueAnalysis {
 
     /**
      * @param args args[0] is a class name of the class you want to run.
@@ -35,7 +35,7 @@ public class VariableTracer {
         if (args.length > 1) {
             classpath = args[1];
         }
-        VariableTracer tracer = new VariableTracer();
+        PrimitiveValueAnalysis tracer = new PrimitiveValueAnalysis();
 
         Map<String, Map<Integer, Map<String, List<Value>>>> values = null;
         try {
@@ -87,12 +87,12 @@ public class VariableTracer {
                 new HashMap<String, Map<Integer, Map<String, List<Value>>>>());
 
         // This is the thread that will step through the code
-        StepperThread stepperThread = new StepperThread(vm, values);
-        stepperThread.start();
+        PrimitiveValueTrackerThread trackerThread = new PrimitiveValueTrackerThread(vm, values);
+        trackerThread.start();
 
         // Shutdown begins when event thread terminates
         try {
-            stepperThread.join();
+            trackerThread.join();
         } catch (InterruptedException interruptedException) {
             // XXX: I honestly don't know when this would come up.
         }
