@@ -25,20 +25,22 @@ module.exports.StubPreview = class StubPreview
         @textEditor.destroy()
         @textEditor = null
 
-      # If the text editor has been initialized, just update the text
-      else if @textEditor?
-        @_updateStubText propertyValue
+      else if propertyValue?
 
-      # If an editor doesn't exist for the preview, we have to create one
-      # befoe we can show the stub text.
-      else
-        # XXX: right now, the stub preview is specific to Java.  In the future,
-        # the language for the stub should be detected to open up with the
-        # right extension for each language, to enable syntax highlighting
-        (atom.workspace.open "StubPreview.java", {
-            split: "left"
-            activatePane: false
-            activateItem: true
-          }).then (editor) =>
-            @textEditor = editor
-            @_updateStubText propertyValue
+        # If the text editor has been initialized, just update the text
+        if @textEditor?
+          @_updateStubText propertyValue
+
+        # If an editor doesn't exist for the preview, we have to create one
+        # befoe we can show the stub text.
+        else
+          # XXX: right now, the stub preview is specific to Java.  In the future,
+          # the language for the stub should be detected to open up with the
+          # right extension for each language, to enable syntax highlighting
+          (atom.workspace.open "StubPreview.java", {
+              split: "left"
+              activatePane: false
+              activateItem: true
+            }).then (editor) =>
+              @textEditor = editor
+              @_updateStubText propertyValue

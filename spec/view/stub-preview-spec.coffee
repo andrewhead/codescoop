@@ -1,5 +1,5 @@
 { StubPreview } = require "../../lib/view/stub-preview"
-{ StubSpec } = require "../../lib/model/stub-spec"
+{ StubSpec } = require "../../lib/model/stub"
 { ExampleModel } = require "../../lib/model/example-model"
 
 describe "StubPreview", ->

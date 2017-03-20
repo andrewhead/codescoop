@@ -1,4 +1,4 @@
-{ StubSpec } = require "../model/stub-spec"
+{ StubSpec } = require "../model/stub"
 
 
 # Currently, a new stub printer needs to be created for every stub that
@@ -11,6 +11,7 @@ module.exports.StubPrinter = class StubPrinter
     @string = ""
     @anonymousClassCounter = 0
     @indentLevel = 0
+    @previousLineEmpty = false
 
   _addLine: (string) ->
 
@@ -20,6 +21,13 @@ module.exports.StubPrinter = class StubPrinter
     # Print the string
     @string += (string + "\n")
 
+    # Whenever we print a line, indicate that we are not longer on an empty line
+    @previousLineEmpty = (string is "")
+
+  _addPaddingLine: ->
+    if not @previousLineEmpty
+      @_addLine ""
+
   _nextAnonymousClassName: ->
     className = "AnonymousClass" + (@anonymousClassCounter + 1)
     @anonymousClassCounter += 1
@@ -28,6 +36,11 @@ module.exports.StubPrinter = class StubPrinter
   _printFields: (fieldAccesses) ->
 
     anonymousSpecs = []
+
+    hasAtLeastOneFieldAccess = false
+    for _, fieldSpec of fieldAccesses
+      hasAtLeastOneFieldAccess = true if fieldSpec.values.length > 0
+    @_addPaddingLine() if hasAtLeastOneFieldAccess
 
     # Add an instance variable for the first access of each field
     for fieldName, fieldSpec of fieldAccesses
@@ -44,10 +57,15 @@ module.exports.StubPrinter = class StubPrinter
           anonymousSpec.setClassName typeString
           anonymousSpecs.push anonymousSpec
         else
-          typeString = fieldSpec.type
+          if firstValue is null
+            typeString = "Object"
+          else
+            typeString = fieldSpec.type
           valueString = "#{firstValue}"
 
         @_addLine "public #{typeString} #{fieldName} = #{valueString};"
+
+    @_addPaddingLine() if hasAtLeastOneFieldAccess
 
     anonymousSpecs
 
@@ -58,6 +76,10 @@ module.exports.StubPrinter = class StubPrinter
   _printMethodBodies: (methodCalls, callCountNames) ->
 
     anonymousSpecs = []
+
+    hasAtLeastOneMethodCall = false
+    for methodCall in methodCalls
+      hasAtLeastOneMethodCall = true if methodCall.returnValues.length > 0
 
     # Create methods that return all observed method return values
     for methodCall in methodCalls
@@ -71,6 +93,8 @@ module.exports.StubPrinter = class StubPrinter
 
       continue if returnValues.length is 0
 
+      @_addPaddingLine()
+
       # If this returns another stub, create a new return type and alter the
       # return values so they all return stub objects.
       returnsAnonymousClass = (returnType is "instance")
@@ -82,24 +106,36 @@ module.exports.StubPrinter = class StubPrinter
         anonymousClassName = @_nextAnonymousClassName()
         returnTypeString = anonymousClassName
 
-        # If there is more than one return value for an anonymous class,
+        nonNullReturns = returnValues.filter (value) => value?
+        nonNullReturnValueCount = nonNullReturns.length
+
+        # If there is more than one non-null return value for an anonymous class,
         # each returned stub needs to be a subclass of the anonymous class.
-        if returnValues.length > 1
+        if nonNullReturnValueCount > 1
           returnAnonymousSpec = new StubSpec anonymousClassName
           anonymousSpecs.push returnAnonymousSpec
-          for returnValue, i in returnValues
-            returnObjectClassName = anonymousClassName + "_" + (i + 1)
-            anonymousSpec = returnValue.copy()
-            anonymousSpec.setClassName returnObjectClassName
-            anonymousSpec.setSuperclassName anonymousClassName
-            anonymousSpecs.push anonymousSpec
-            returnValuesStrings.push "new #{returnObjectClassName}()"
-        # Otherwise, we can return just one class
+          nonNullIndex = 0
+          for returnValue in returnValues
+            if returnValue is null
+              returnValuesStrings.push "null"
+            else
+              returnObjectClassName = anonymousClassName + "_" + (nonNullIndex + 1)
+              anonymousSpec = returnValue.copy()
+              anonymousSpec.setClassName returnObjectClassName
+              anonymousSpec.setSuperclassName anonymousClassName
+              anonymousSpecs.push anonymousSpec
+              returnValuesStrings.push "new #{returnObjectClassName}()"
+              nonNullIndex += 1
+        # Otherwise, we can return just one class, and a bunch of nulls
         else
-          returnValuesStrings = ["new #{anonymousClassName}()"]
-          anonymousSpec = returnValues[0].copy()
-          anonymousSpec.setClassName anonymousClassName
-          anonymousSpecs.push anonymousSpec
+          for returnValue in returnValues
+            if returnValue is null
+              returnValuesStrings.push "null"
+            else
+              returnValuesStrings.push "new #{anonymousClassName}()"
+              anonymousSpec = returnValues[0].copy()
+              anonymousSpec.setClassName anonymousClassName
+              anonymousSpecs.push anonymousSpec
 
       else
         returnTypeString = returnType
@@ -133,6 +169,9 @@ module.exports.StubPrinter = class StubPrinter
       @indentLevel -= 1
 
       @_addLine "}"
+      @_addPaddingLine()
+
+    # @_addPaddingLine() if hasAtLeastOneMethodCall
 
     anonymousSpecs
 
@@ -164,6 +203,8 @@ module.exports.StubPrinter = class StubPrinter
     # Then, assign distinct call count variables based on the signature
     callCountNames = {}
     anotherMethodNameCounter = {}
+    printedCallCount = false
+
     for methodCall in stubSpec.getMethodCalls()
 
       # Build an initial call count name
@@ -179,12 +220,17 @@ module.exports.StubPrinter = class StubPrinter
 
       # Finally, add a line declaring the call count for this method
       if methodCall.returnValues.length > 1
+        if not printedCallCount
+          @_addLine ""
+          printedCallCount = true
         @_addLine "private int #{callCountName} = 0;"
 
       # Save the call count variable name so we can give it to the method printer
       key = @_getObjectKeyForMethodCall methodCall
       callCountNames[key] = callCountName
       anotherMethodNameCounter[methodName] += 1
+
+    @_addPaddingLine() if printedCallCount
 
     methodAnonymousSpecs = @_printMethodBodies \
       stubSpec.getMethodCalls(), callCountNames

@@ -56,7 +56,6 @@ module.exports.ExampleController = class ExampleController
       stub:
         runner: stubAnalysis or= null
         callback: (stubSpecTable) =>
-          console.log "Callback:", stubSpecTable
           @model.setStubSpecTable stubSpecTable
         error: console.error
 

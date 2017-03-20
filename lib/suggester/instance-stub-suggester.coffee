@@ -13,7 +13,9 @@ module.exports.InstanceStubSuggester = class InstanceStubSuggester
     # to the symbol's use.  XXX: This might yield invalid recommendations.
     defs = model.getSymbols().getDefs().copy()
     defs = defs.filter (def) =>
-      (def.getRange().compare symbol.getRange()) < 1
+      (def.getFile().equals symbol.getFile()) and
+      (def.getName() is symbol.getName()) and
+      ((def.getRange().compare symbol.getRange()) < 1)
     defs.sort (def1, def2) =>
       def2.getRange().compare def1.getRange()
     closestDef = defs[0]

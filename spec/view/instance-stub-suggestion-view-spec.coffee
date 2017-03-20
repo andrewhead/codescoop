@@ -3,7 +3,7 @@
 { ExampleModel } = require "../../lib/model/example-model"
 { Range } = require "../../lib/model/range-set"
 { File, Symbol } = require "../../lib/model/symbol-set"
-{ StubSpec } = require "../../lib/model/stub-spec"
+{ StubSpec } = require "../../lib/model/stub"
 
 
 describe "InstanceStubSuggestionView", ->

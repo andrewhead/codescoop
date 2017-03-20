@@ -8,6 +8,7 @@ public class AccessSampler {
 
         int primitiveField = 1;
         List objectField = new ArrayList();
+        Object nullField = null;
 
         public int doPrimitiveWork(int arg) {
             return 42;
@@ -21,6 +22,10 @@ public class AccessSampler {
             primitiveField = newValue;
         }
 
+        public Object getNull() {
+            return null;
+        }
+
     }
 
     public static void main(String[] args) {
@@ -32,6 +37,8 @@ public class AccessSampler {
         System.out.println(obj.doPrimitiveWork(1));
         System.out.println(obj.doPrimitiveWork(2));
         System.out.println(obj.doObjectWork().size());
+        System.out.println(obj.nullField);
+        System.out.println(obj.getNull());
         Watchable obj2 = new Watchable();
     }
 

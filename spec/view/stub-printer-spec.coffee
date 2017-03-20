@@ -1,8 +1,8 @@
 { StubPrinter } = require "../../lib/view/stub-printer"
-{ StubSpec } = require "../../lib/model/stub-spec"
+{ StubSpec } = require "../../lib/model/stub"
 
 
-describe "StubWriter", ->
+describe "StubPrinter", ->
 
   stubPrinter = undefined
   beforeEach =>
@@ -26,7 +26,9 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    public int i = 42;"
+      "    "
       "}"
       ""
     ].join "\n"
@@ -43,9 +45,11 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    public int method(int arg1, String arg2) {"
       "        return 42;"
       "    }"
+      "    "
       "}"
       ""
     ].join "\n"
@@ -62,7 +66,9 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    private int methodCallCount = 0;"
+      "    "
       "    public int method() {"
       "        if (methodCallCount == 0) {"
       "            return 42;"
@@ -73,6 +79,7 @@ describe "StubWriter", ->
       "        }"
       "        methodCallCount += 1;"
       "    }"
+      "    "
       "}"
       ""
     ].join "\n"
@@ -125,18 +132,41 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    public AnonymousClass1 object = new AnonymousClass1();"
+      "    "
       "    public AnonymousClass2 method() {"
       "        return new AnonymousClass2();"
       "    }"
+      "    "
       "}"
       ""
       "private class AnonymousClass1 {"
+      "    "
       "    public int i = 42;"
+      "    "
       "}"
       ""
       "private class AnonymousClass2 {"
+      "    "
       "    public int i = 43;"
+      "    "
+      "}"
+      ""
+    ].join "\n"
+
+  it "can print an object field with a null value", ->
+    stubSpec = new StubSpec "Stub",
+      fieldAccesses:
+        object:
+          type: "instance"
+          values: [null]
+    string = stubPrinter.printToString stubSpec
+    (expect string).toEqual [
+      "private class Stub {"
+      "    "
+      "    public Object object = null;"
+      "    "
       "}"
       ""
     ].join "\n"
@@ -164,7 +194,9 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    private int methodCallCount = 0;"
+      "    "
       "    public AnonymousClass1 method() {"
       "        if (methodCallCount == 0) {"
       "            return new AnonymousClass1_1();"
@@ -173,17 +205,63 @@ describe "StubWriter", ->
       "        }"
       "        methodCallCount += 1;"
       "    }"
+      "    "
       "}"
       ""
       "private class AnonymousClass1 {"
       "}"
       ""
       "private class AnonymousClass1_1 extends AnonymousClass1 {"
+      "    "
       "    public int i = 42;"
+      "    "
       "}"
       ""
       "private class AnonymousClass1_2 extends AnonymousClass1 {"
+      "    "
       "    public int i = 43;"
+      "    "
+      "}"
+      ""
+    ].join "\n"
+
+  it "doesn't create more stubs for null return values", ->
+    stubSpec = new StubSpec "Stub",
+      methodCalls: [
+          signature:
+            name: "method"
+            returnType: "instance"
+            argumentTypes: []
+          returnValues: [
+            new StubSpec undefined,
+              fieldAccesses:
+                i:
+                  type: "int"
+                  values: [42]
+            null
+          ]
+      ]
+    string = stubPrinter.printToString stubSpec
+    (expect string).toEqual [
+      "private class Stub {"
+      "    "
+      "    private int methodCallCount = 0;"
+      "    "
+      "    public AnonymousClass1 method() {"
+      "        if (methodCallCount == 0) {"
+      "            return new AnonymousClass1();"
+      "        } else {"
+      "            return null;"
+      "        }"
+      "        methodCallCount += 1;"
+      "    }"
+      "    "
+      "}"
+      ""
+      "private class AnonymousClass1 {"
+      "    "
+      "    public int i = 42;"
+      "    "
       "}"
       ""
     ].join "\n"
@@ -206,10 +284,13 @@ describe "StubWriter", ->
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
       "private class Stub {"
+      "    "
       "    private int method2CallCount = 0;"
+      "    "
       "    public int method() {"
       "        return 1;"
       "    }"
+      "    "
       "    public int method(int arg1) {"
       "        if (method2CallCount == 0) {"
       "            return 1;"
@@ -218,6 +299,7 @@ describe "StubWriter", ->
       "        }"
       "        method2CallCount += 1;"
       "    }"
+      "    "
       "}"
       ""
     ].join "\n"

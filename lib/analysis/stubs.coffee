@@ -1,6 +1,14 @@
 { JAVA_CLASSPATH, java } = require "../config/paths"
-{ StubSpec, StubSpecTable } = require "../model/stub-spec"
+{ StubSpec, StubSpecTable } = require "../model/stub"
 MemberAccessAnalysis = java.import "MemberAccessAnalysis"
+
+
+# We only create stubs for objects that are non-printable types.
+# Those that can be easily substituted by a literal string ("printable types")
+# include all primitives and strings.
+module.exports.PRINTABLE_TYPE = PRINTABLE_TYPES =
+  [ "byte", "short", "int", "long", "float", "double", "boolean",
+    "char", "java.lang.String" ]
 
 
 module.exports.StubAnalysis = class StubAnalysis
@@ -9,8 +17,10 @@ module.exports.StubAnalysis = class StubAnalysis
     @file = file
 
   _createValueForAccess: (accessJ) ->
-    value = null
-    if java.instanceOf accessJ, "PrimitiveAccess"
+    value = undefined
+    if not accessJ?
+      value = null
+    else if java.instanceOf accessJ, "PrimitiveAccess"
       value = accessJ.getValueSync()
     else if java.instanceOf accessJ, "AccessHistory"
       value = @_createStubSpecForAccessHistory undefined, accessJ
@@ -37,13 +47,11 @@ module.exports.StubAnalysis = class StubAnalysis
     for methodIdJ in instanceMethodCallsJ.keySetSync().toArraySync()
       returnValuesJ = accessHistoryJ.getReturnValuesSync methodIdJ
       returnValues = []
+      returnType = accessHistoryJ.getMethodReturnTypeSync methodIdJ
+      if returnType not in PRINTABLE_TYPES
+        returnType = "instance"
       for accessJ in returnValuesJ.toArraySync()
         returnValues.push @_createValueForAccess accessJ
-      returnType = undefined
-      if returnValues.length > 0 and java.instanceOf accessJ, "AccessHistory"
-        returnType = "instance"
-      else
-        returnType = accessHistoryJ.getMethodReturnTypeSync methodIdJ
       methodCalls.push
         signature:
           name: methodIdJ.getNameSync()

@@ -35,8 +35,9 @@ module.exports.StubSpec = class StubSpec
 
 module.exports.StubSpecTable = class StubSpecTable
 
-  table: {}
-  size: 0
+  constructor: ->
+    @table = {}
+    @size = 0
 
   putStubSpec: (className, symbolName, lineNumber, stubSpec) ->
     if className not of @table
@@ -54,7 +55,7 @@ module.exports.StubSpecTable = class StubSpecTable
         (lineNumber of @table[className][symbolName])
       return @table[className][symbolName][lineNumber]
     else
-      return null
+      return []
 
   getSize: ->
     @size

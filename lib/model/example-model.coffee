@@ -16,7 +16,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   ACTIVE_CORRECTOR: { value: 9, name: "active-corrector" }
   AUXILIARY_DECLARATIONS: { value: 10, name: "auxiliary-declarations" }
   STUB_OPTION: { value: 11, name: "stub-option" }
-  STUB_SPEC_TABLE: {value: 12, name: "stub-spec-table" }
+  STUB_SPEC_TABLE: {value: 12, name: "stub-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
