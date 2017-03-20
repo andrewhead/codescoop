@@ -243,9 +243,15 @@ public class MemberAccessTrackerThread extends Thread {
         ObjectReference instance = stackFrame.thisObject();
         if (instance == null) return;
 
-        Access access = makeAccessFromValue(returnValue);
+        // We currently can't control whether this listener is activated for unwatched instances
+        // that share a class with the watched instance.  We need to do a check to see if
+        // an access history has been created for the instance: if not, it's probably not one
+        // of the watched instances, and we don't need to update its record.
         List<AccessHistory> accessHistories = 
                 this.mAccessHistoriesByInstanceId.get(instance.uniqueID());
+        if (accessHistories == null) return;
+
+        Access access = makeAccessFromValue(returnValue);
 
         // Save the result of this method call (skipping calls to the constructor)
         MethodIdentifier methodId = new MethodIdentifier(method.name(), method.argumentTypeNames());
