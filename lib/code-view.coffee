@@ -15,18 +15,22 @@ module.exports.CodeView = class CodeView
     @rangeSet = rangeSet
     @rangeSet.addObserver @
     @listenForRefocus()
-    @update()
+    @updateHighlights()
 
   getEditor: ->
     @editor
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
-    @update() if (
+    @updateHighlights() if (
       propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED or
       propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED
     )
+    @scrollToSuggestedRange() if (
+      (propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED) and
+      (propertyValue.length > 0)
+    )
 
-  update: ->
+  updateHighlights: ->
 
     editorView = atom.views.getView @textEditor
     lines = $ ( editorView.querySelectorAll 'div.line' )
@@ -59,6 +63,14 @@ module.exports.CodeView = class CodeView
         )
       line.addClass 'suggested' if screenRowNumber in suggestedRows
 
+  scrollToSuggestedRange: ->
+    # I couldn't find any members of the Atom API that would let me query
+    # for the current scroll position of the text editor.  So for now, we
+    # somewhat lazily just scroll to the first available suggested range.
+    suggestedRange = @rangeSet.getSuggestedRanges()[0]
+    @textEditor.scrollToBufferPosition \
+      [suggestedRange.start.row, suggestedRange.start.column]
+
   listenForRefocus: ->
 
     # Whenever the DOM is changed, we need to make sure that lines are
@@ -68,5 +80,5 @@ module.exports.CodeView = class CodeView
     # the DOM contents change, and when the active editor changes, and
     # update the highlighting and dimming.
     editorView = atom.views.getView @textEditor
-    scrollObserver = new MutationObserver ((m, o) => @update())
+    scrollObserver = new MutationObserver ((m, o) => @updateHighlights())
     scrollObserver.observe editorView, { childList: true, subtree: true }

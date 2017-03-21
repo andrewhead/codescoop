@@ -37,7 +37,7 @@ describe "CodeView", () ->
 
     # Once we update highlighting, the second line should be marked as
     # "chosen" and the other lines as "unchosen"
-    codeView.update()
+    codeView.updateHighlights()
     chosen = $ (editorView.querySelectorAll "div.lines .active")
     expect(chosen.length).toBe 1
     expect(chosen.data "screenRow").toBe 1
@@ -54,7 +54,7 @@ describe "CodeView", () ->
     # Initially, the number of active lines in the DOM should be zero.
     # Though once we add an extra line to the set of active lines in the model
     # the view should update the DOM automatically
-    codeView.update()
+    codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .active")).length).toBe 0
     rangeSet.getActiveRanges().push new Range [1, 0], [1, 5]
     expect(($ (editorView.querySelectorAll "div.lines .active")).length).toBe 1
@@ -70,7 +70,7 @@ describe "CodeView", () ->
     # Initially, the number of active lines in the DOM should be zero.
     # Though once we add an extra line to the set of active lines in the model
     # the view should update the DOM automatically
-    codeView.update()
+    codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 1
     expect(($ (editorView.querySelectorAll "div.lines div.line:not(.suggested)")).length).toBe 3
 
@@ -85,7 +85,7 @@ describe "CodeView", () ->
     # Initially, the number of active lines in the DOM should be zero.
     # Though once we add an extra line to the set of active lines in the model
     # the view should update the DOM automatically
-    codeView.update()
+    codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 0
     rangeSet.getSuggestedRanges().push new Range [0, 0], [0, 5]
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 1
@@ -98,7 +98,17 @@ describe "CodeView", () ->
     editorView = atom.views.getView(editor)
     _addLines(editorView)
 
-    codeView.update()
+    codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 1
     rangeSet.removeSuggestedRange new Range [1, 0], [1, 5]
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 0
+
+  it "scrolls to a suggested range when a suggested range added", ->
+
+    rangeSet = new RangeSet [], []
+    editor = _makeEditor()
+    (spyOn editor, "scrollToBufferPosition").andCallThrough()
+    codeView = new CodeView editor, rangeSet
+
+    rangeSet.getSuggestedRanges().push new Range [1, 0], [1, 5]
+    (expect editor.scrollToBufferPosition).toHaveBeenCalledWith [1, 0]
