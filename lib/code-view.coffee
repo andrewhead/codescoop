@@ -14,14 +14,11 @@ module.exports.CodeView = class CodeView
     @textEditor = textEditor
     @rangeSet = rangeSet
     @rangeSet.addObserver @
+    @listenForRefocus()
     @update()
 
   getEditor: ->
     @editor
-
-  _screenRowToLineNumber: (screenRow) ->
-    # We assume that the code is completely unfolded.
-    screenRow
 
   onPropertyChanged: (object, propertyName, propertyValue) ->
     @update() if (
@@ -48,9 +45,28 @@ module.exports.CodeView = class CodeView
     # By default, no lines are chosen or unchosen
     ((lines.removeClass 'inactive').removeClass 'active').removeClass 'suggested'
     for line in ($ _ for _ in lines)
-      screenRowNumber = @_screenRowToLineNumber (line.data 'screenRow')
+
+      # We access "screenRow" through dataset and not the jQuery data() function
+      # because it looks like Atom recycles lines, and when it does, it updates
+      # the screenRow property, but jQuery.data('screenRow') somehow maintains
+      # the value of the recycled line before reuse.
+      # Note: the code must be completely unfolded for highlighting based on
+      # the 'screen-row' data property to work
+      screenRowNumber = Number(line[0].dataset.screenRow)
       line.addClass (
         if (screenRowNumber in activeRows)\
         then 'active' else 'inactive'
         )
       line.addClass 'suggested' if screenRowNumber in suggestedRows
+
+  listenForRefocus: ->
+
+    # Whenever the DOM is changed, we need to make sure that lines are
+    # highlighted and dimmed.  However, with Atom, line `div`s change whenever
+    # they scroll on or off-screen, or when their content changes.  This ruins
+    # the highlighting effect we're working with.  So, we listen to when
+    # the DOM contents change, and when the active editor changes, and
+    # update the highlighting and dimming.
+    editorView = atom.views.getView @textEditor
+    scrollObserver = new MutationObserver ((m, o) => @update())
+    scrollObserver.observe editorView, { childList: true, subtree: true }
