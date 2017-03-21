@@ -1,4 +1,5 @@
 { StubSpec } = require "../model/stub"
+_ = require "lodash"
 
 
 # Currently, a new stub printer needs to be created for every stub that
@@ -12,6 +13,7 @@ module.exports.StubPrinter = class StubPrinter
     @anonymousClassCounter = 0
     @indentLevel = 0
     @previousLineEmpty = false
+    @static = false
 
   _addLine: (string) ->
 
@@ -33,12 +35,18 @@ module.exports.StubPrinter = class StubPrinter
     @anonymousClassCounter += 1
     className
 
+  _getLiteralForValue: (value, typeName) ->
+    if typeName is "String"
+      return "\"" + value + "\""
+    else
+      return "#{value}"
+
   _printFields: (fieldAccesses) ->
 
     anonymousSpecs = []
 
     hasAtLeastOneFieldAccess = false
-    for _, fieldSpec of fieldAccesses
+    for fieldName, fieldSpec of fieldAccesses
       hasAtLeastOneFieldAccess = true if fieldSpec.values.length > 0
     @_addPaddingLine() if hasAtLeastOneFieldAccess
 
@@ -61,7 +69,7 @@ module.exports.StubPrinter = class StubPrinter
             typeString = "Object"
           else
             typeString = fieldSpec.type
-          valueString = "#{firstValue}"
+          valueString = @_getLiteralForValue firstValue, fieldSpec.type
 
         @_addLine "public #{typeString} #{fieldName} = #{valueString};"
 
@@ -139,10 +147,12 @@ module.exports.StubPrinter = class StubPrinter
 
       else
         returnTypeString = returnType
-        returnValuesStrings = ("#{returnValue}" for returnValue in returnValues)
+        for returnValue in returnValues
+          valueString = @_getLiteralForValue returnValue, returnType
+          returnValuesStrings.push valueString
 
       argumentStrings = []
-      for _, i in argumentTypes
+      for argumentType, i in argumentTypes
         argumentStrings.push "#{argumentTypes[i]} arg#{i + 1}"
       argumentsString = argumentStrings.join ", "
 
@@ -175,14 +185,23 @@ module.exports.StubPrinter = class StubPrinter
 
     anonymousSpecs
 
-  printToString: (stubSpec) ->
+  printToString: (stubSpec, options) ->
+
+    # Load options from arguments
+    defaultOptions =
+      static: false
+    options = _.merge {}, defaultOptions, options
+    printClassesAsStatic = options.static
 
     # While we iterate through the spec, we might find nested specs
     # that we also have to print.  This list will keep track of them.
     anonymousSpecs = []
 
     # Print the start of the class declaration
-    classDeclaration = "private class " + stubSpec.getClassName()
+    classDeclaration = "private "
+    if printClassesAsStatic
+      classDeclaration += "static "
+    classDeclaration += "class " + stubSpec.getClassName()
     if stubSpec.getSuperclassName()?
       classDeclaration += (" extends " + stubSpec.getSuperclassName())
     classDeclaration += " {"
@@ -242,6 +261,6 @@ module.exports.StubPrinter = class StubPrinter
 
     for spec in anonymousSpecs
       @_addLine ""
-      @printToString spec
+      @printToString spec, { static: printClassesAsStatic }
 
     @string

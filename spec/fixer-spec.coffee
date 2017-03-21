@@ -1,10 +1,13 @@
 { ExampleModel } = require "../lib/model/example-model"
 { Symbol, SymbolSet, File } = require "../lib/model/symbol-set"
 { Range, RangeSet } = require "../lib/model/range-set"
-{ SymbolSuggestion, PrimitiveValueSuggestion } = require '../lib/suggester/suggestion'
+{ StubSpec } = require "../lib/model/stub"
+{ SymbolSuggestion } = require "../lib/suggester/definition-suggester"
+{ PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
+{ InstanceStubSuggestion } = require '../lib/suggester/instance-stub-suggester'
+{ DeclarationSuggestion } = require "../lib/suggester/declaration-suggester"
 { Fixer } = require "../lib/fixer"
 { Replacement } = require "../lib/edit/replacement"
-{ DeclarationSuggestion } = require "../lib/suggester/suggestion"
 { Declaration } = require "../lib/edit/declaration"
 
 
@@ -75,3 +78,32 @@ describe "Fixer", ->
       (expect declaration instanceof Declaration).toBe true
       (expect declaration.getName()).toEqual "i"
       (expect declaration.getType()).toEqual "int"
+
+  describe "when applying an InstanceStubSuggestion", ->
+
+    model = _makeModel()
+    model.getSymbols().setUses [
+      new Symbol TEST_FILE, "book", (new Range [4, 11], [4, 15]), "Book"
+    ]
+    (expect model.getStubSpecs().length).toBe 0
+    suggestion = new InstanceStubSuggestion \
+      (new Symbol TEST_FILE, "book", (new Range [4, 11], [4, 15]), "Book"),
+      (new StubSpec "Book")
+    fixer.apply model, suggestion
+
+    it "adds the stub spec to the model", ->
+      stubSpecs = model.getStubSpecs()
+      (expect stubSpecs.length).toBe 1
+      (expect stubSpecs[0].className).toBe "Book"
+
+    it "adds a command to replace the symbol with an instantiation", ->
+      edits = model.getEdits()
+      (expect edits.length).toBe 1
+      edit = edits[0]
+      (expect edit instanceof Replacement).toBe true
+      (expect edit.getSymbol().getRange()).toEqual new Range [4, 11], [4, 15]
+      (expect edit.getText()).toEqual "(new Book())"
+
+    it "updates the model to reflect the symbol is no longer being used", ->
+      uses = model.getSymbols().getUses()
+      (expect uses.length).toBe 0

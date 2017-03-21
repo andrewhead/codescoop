@@ -45,15 +45,13 @@ atom-overlay {
   div.resolution-class-block {
 
     &:not(:last-of-type) {
-      padding-right: .5em;
       border-right: 1px white dashed;
     }
 
     &:not(:first-of-type) {
-      padding-left: .5em;
     }
 
-    padding: @component-padding;
+    // padding: @component-padding;
     background-color: @background-color-info;
     border-color: @tool-panel-border-color;
     color: @text-color-highlight;
@@ -62,12 +60,13 @@ atom-overlay {
 
     div.resolution-class-header {
       font-weight: bold;
+      padding: @component-padding;
     }
 
     div.suggestion {
-      margin-top: @component-padding;
-      border: 1px white dotted;
+      border-top: 1px white dotted;
       text-align: center;
+      padding: @component-padding;
     }
 
   }

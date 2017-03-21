@@ -1,5 +1,5 @@
 { InstanceStubSuggestionView } = require "../../lib/view/instance-stub-suggestion"
-{ InstanceStubSuggestion } = require "../../lib/suggester/suggestion"
+{ InstanceStubSuggestion } = require "../../lib/suggester/instance-stub-suggester"
 { ExampleModel } = require "../../lib/model/example-model"
 { Range } = require "../../lib/model/range-set"
 { File, Symbol } = require "../../lib/model/symbol-set"
@@ -24,7 +24,7 @@ describe "InstanceStubSuggestionView", ->
       edits = model.getEdits()
       (expect edits.length).toBe 1
       (expect edits[0].symbol).toBe symbol
-      (expect edits[0].text).toBe "new Book()"
+      (expect edits[0].text).toBe "(new Book())"
 
     it "updates the stub option in the model", ->
       (expect model.getStubOption()).not.toBe null

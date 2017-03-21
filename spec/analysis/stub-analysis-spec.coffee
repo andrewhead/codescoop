@@ -1,4 +1,4 @@
-{ StubAnalysis } = require "../../lib/analysis/stubs"
+{ StubAnalysis } = require "../../lib/analysis/stub-analysis"
 { StubSpec } = require "../../lib/model/stub"
 { File } = require "../../lib/model/symbol-set"
 { PACKAGE_PATH } = require "../../lib/config/paths"
@@ -28,7 +28,7 @@ describe "StubAnalysis", ->
 
       # A spec should have been created for obj and obj2
       (expect stubSpecTable.getSize()).toBe 2
-      stubSpec = (stubSpecTable.getStubSpecs "AccessSampler", "obj", 31)[0]
+      stubSpec = (stubSpecTable.getStubSpecs "AccessSampler", "obj", 32)[0]
 
       # First, the class name should be the object name, capitalized
       # TODO: At some point, we have to make sure we don't reuse the same
@@ -36,14 +36,16 @@ describe "StubAnalysis", ->
       (expect stubSpec.getClassName()).toEqual "Obj"
 
       # Check on fields, returning multiple values for them, and both
-      # primitives, instances, and nulls as field values
+      # primitives, instances, strings, and nulls as field values
       fieldAccesses = stubSpec.getFieldAccesses()
-      (expect Object.keys(fieldAccesses).length).toBe 3
+      (expect Object.keys(fieldAccesses).length).toBe 4
       (expect fieldAccesses["primitiveField"]).toEqual \
         { type: "int", values: [1, 2] }
       objectAccess = fieldAccesses["objectField"]
       (expect objectAccess.values[0] instanceof StubSpec).toBe true
       (expect fieldAccesses["nullField"].values).toEqual [ null ]
+      (expect fieldAccesses["stringField"]).toEqual \
+        { type: "String", values: ["Hello world"] }
 
       # Expected calls: 'doPrimitiveWork', 'doObjectWork', 'setField', 'getNull'
       methodCalls = stubSpec.getMethodCalls()

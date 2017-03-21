@@ -8,7 +8,7 @@
 { ExampleController } = require "./example-controller"
 { DefUseAnalysis } = require "./analysis/def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
-{ StubAnalysis } = require "./analysis/stubs"
+{ StubAnalysis } = require "./analysis/stub-analysis"
 
 { RangeSet } = require "./model/range-set"
 { File, SymbolSet } = require "./model/symbol-set"

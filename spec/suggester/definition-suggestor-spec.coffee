@@ -1,6 +1,6 @@
 { MissingDefinitionError } = require "../../lib/error/missing-definition"
 { DefinitionSuggester } = require "../../lib/suggester/definition-suggester"
-{ SymbolSuggestion } = require "../../lib/suggester/suggestion"
+{ SymbolSuggestion } = require "../../lib/suggester/definition-suggester"
 { Symbol, SymbolSet } = require "../../lib/model/symbol-set"
 { Range, RangeSet } = require "../../lib/model/range-set"
 { parse } = require "../../lib/analysis/parse-tree"

@@ -1,4 +1,15 @@
-{ InstanceStubSuggestion } = require "./suggestion"
+module.exports.InstanceStubSuggestion = class InstanceStubSuggestion
+
+  constructor: (symbol, stubSpec) ->
+    @symbol = symbol
+    @stubSpec = stubSpec
+
+  getSymbol: ->
+    @symbol
+
+  getStubSpec: ->
+    @stubSpec
+
 
 module.exports.InstanceStubSuggester = class InstanceStubSuggester
 

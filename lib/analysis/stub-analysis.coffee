@@ -8,7 +8,7 @@ MemberAccessAnalysis = java.import "MemberAccessAnalysis"
 # include all primitives and strings.
 module.exports.PRINTABLE_TYPE = PRINTABLE_TYPES =
   [ "byte", "short", "int", "long", "float", "double", "boolean",
-    "char", "java.lang.String" ]
+    "char", "String" ]
 
 
 module.exports.StubAnalysis = class StubAnalysis

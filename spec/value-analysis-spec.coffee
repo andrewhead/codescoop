@@ -7,14 +7,14 @@ describe "ValueAnalysis", ->
 
   describe "creates a map of values for a program runtime", ->
 
-    testFilePath = PACKAGE_PATH + "/java/tests/analysis_examples/Example.java"
-    testFileName = "Example.java"
-    valueAnalysis = new ValueAnalysis new File testFilePath, testFileName
-
     it "includes the runtime data from executing the code", ->
 
+      testFilePath = PACKAGE_PATH + "/java/tests/analysis_examples/Example.java"
+      testFileName = "Example.java"
+      valueAnalysis = new ValueAnalysis new File testFilePath, testFileName
       ranAnalysis = false
       map = undefined
+
       valueAnalysis.run ((resultMap) =>
           ranAnalysis = true
           map = resultMap
@@ -29,7 +29,6 @@ describe "ValueAnalysis", ->
         (expect "Example.java" of map).toBe true
 
         # includes keys for each of the executed lines
-        (expect 4 of map["Example.java"]).toBe true
         (expect 5 of map["Example.java"]).toBe true
         (expect 6 of map["Example.java"]).toBe true
         (expect 8 of map["Example.java"]).toBe true

@@ -17,6 +17,15 @@ describe "StubPrinter", ->
       ""
     ].join "\n"
 
+  it "prints out static classes if the static option is set", ->
+    stubSpec = new StubSpec "Stub"
+    string = stubPrinter.printToString stubSpec, { static: true }
+    (expect string).toEqual [
+      "private static class Stub {"
+      "}"
+      ""
+    ].join "\n"
+
   it "prints fields with the first specified value", ->
     stubSpec = new StubSpec "Stub",
       fieldAccesses:
@@ -166,6 +175,22 @@ describe "StubPrinter", ->
       "private class Stub {"
       "    "
       "    public Object object = null;"
+      "    "
+      "}"
+      ""
+    ].join "\n"
+
+  it "prints string literals within quotes", ->
+    stubSpec = new StubSpec "Stub",
+      fieldAccesses:
+        s:
+          type: "String"
+          values: ["Hello world"]
+    string = stubPrinter.printToString stubSpec
+    (expect string).toEqual [
+      "private class Stub {"
+      "    "
+      "    public String s = \"Hello world\";"
       "    "
       "}"
       ""

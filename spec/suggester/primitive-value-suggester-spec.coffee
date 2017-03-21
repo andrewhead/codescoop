@@ -1,5 +1,5 @@
 { PrimitiveValueSuggester } = require "../../lib/suggester/primitive-value-suggester"
-{ PrimitiveValueSuggestion } = require "../../lib/suggester/suggestion"
+{ PrimitiveValueSuggestion } = require "../../lib/suggester/primitive-value-suggester"
 { ExampleModel } = require "../../lib/model/example-model"
 { Range, RangeSet } = require "../../lib/model/range-set"
 { File, Symbol, SymbolSet } = require "../../lib/model/symbol-set"
@@ -21,7 +21,7 @@ describe "PrimitiveValueSuggester", ->
 
   it "suggests all primitive values known for a symbol", ->
     error = new MissingDefinitionError \
-      new Symbol (new File "path", "Example.java"), "i", new Range [2, 4], [2, 5]
+      new Symbol (new File "path", "Example.java"), "i", (new Range [2, 4], [2, 5]), "int"
     suggestions = suggester.getSuggestions error, model
     (expect suggestions.length).toBe 2
     (expect suggestions[0] instanceof PrimitiveValueSuggestion).toBe true
@@ -30,6 +30,6 @@ describe "PrimitiveValueSuggester", ->
 
   it "returns nothing when symbol couldn't be found", ->
     error = new MissingDefinitionError \
-      new Symbol (new File "path", "Example.java"), "a", new Range [2, 4], [2, 5]
+      new Symbol (new File "path", "Example.java"), "a", (new Range [2, 4], [2, 5]), "int"
     suggestions = suggester.getSuggestions error, model
     (expect suggestions.length).toBe 0

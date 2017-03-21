@@ -12,7 +12,7 @@ module.exports.InstanceStubSuggestionView = \
     @stubSpec = suggestion.getStubSpec()
 
   preview: ->
-    @previewReplacement = new Replacement @symbol, "new #{@stubSpec.getClassName()}()"
+    @previewReplacement = new Replacement @symbol, "(new #{@stubSpec.getClassName()}())"
     @model.getEdits().splice (@model.getEdits().indexOf @revertReplacement), 1
     @model.getEdits().push @previewReplacement
     @model.setStubOption @stubSpec

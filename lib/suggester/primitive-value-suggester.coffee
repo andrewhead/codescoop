@@ -1,4 +1,18 @@
-{ PrimitiveValueSuggestion } = require "./suggestion"
+# We assume that all primitives can be represented by a short string of
+# characters.  That's why the only data that this suggestion has is
+# a string representation of its value.
+module.exports.PrimitiveValueSuggestion = class PrimitiveValueSuggestion
+
+  constructor: (symbol, valueString) ->
+    @symbol = symbol
+    @valueString = valueString
+
+  getSymbol: ->
+    @symbol
+
+  getValueString: ->
+    @valueString
+
 
 module.exports.PrimitiveValueSuggester = class PrimitiveValueSuggester
 

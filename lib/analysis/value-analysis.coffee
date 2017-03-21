@@ -1,5 +1,5 @@
 { JAVA_CLASSPATH, java } = require '../config/paths'
-VariableTracer = java.import "VariableTracer"
+PrimitiveValueAnalysis = java.import "PrimitiveValueAnalysis"
 
 
 # In it's simplest form, this is just a JavaScript object, with data
@@ -13,10 +13,9 @@ module.exports.ValueMap = class ValueMap
 # pre-written local file instead.
 module.exports.ValueAnalysis = class ValueAnalysis
 
-  variableTracer: null
-  values: null
-
   constructor: (file) ->
+    @variableTracer = null
+    @values = null
     @file = file
 
   _constructValueMap: (javaMap) ->
@@ -45,7 +44,7 @@ module.exports.ValueAnalysis = class ValueAnalysis
   run: (callback, err) ->
     className = @file.getName().replace /\.java$/, ''
     pathToFile = @file.getPath().replace RegExp(@file.getName() + '$'), ''
-    variableTracer = new VariableTracer()
+    variableTracer = new PrimitiveValueAnalysis()
     variableTracer.run className, pathToFile, (error, result) =>
       err error if error
       callback (@_constructValueMap result)
@@ -66,8 +65,5 @@ module.exports.ValueAnalysis = class ValueAnalysis
         (java.instanceOf value, "com.sun.jdi.IntegerValue") or
         (java.instanceOf value, "com.sun.jdi.LongValue")
       return String value.valueSync()
-    else if java.instanceOf value, "com.sun.jdi.ObjectReference"
-      # I need to come up with something really clever here...
-      return "new Object()"
 
     return "unknown!"

@@ -17,6 +17,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   AUXILIARY_DECLARATIONS: { value: 10, name: "auxiliary-declarations" }
   STUB_OPTION: { value: 11, name: "stub-option" }
   STUB_SPEC_TABLE: {value: 12, name: "stub-table" }
+  STUB_SPECS: { value: 13, name: "stub-specs" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -58,6 +59,7 @@ module.exports.ExampleModel = class ExampleModel
     @activeCorrector = null
     @stubOption = null
     @stubSpecTable = null
+    @stubSpecs = makeObservableArray []
 
     @state = ExampleModelState.ANALYSIS
 
@@ -145,12 +147,12 @@ module.exports.ExampleModel = class ExampleModel
   getAuxiliaryDeclarations: ->
     @auxiliaryDeclarations
 
+  getStubOption: ->
+    @stubOption
+
   setStubOption: (stubOption) ->
     @stubOption = stubOption
     @notifyObservers @, ExampleModelProperty.STUB_OPTION, @stubOption
-
-  getStubOption: ->
-    @stubOption
 
   getStubSpecTable: ->
     @stubSpecTable
@@ -159,8 +161,8 @@ module.exports.ExampleModel = class ExampleModel
     @stubSpecTable = stubSpecTable
     @notifyObservers @, ExampleModelProperty.STUB_SPEC_TABLE, @stubSpecTable
 
-  getStubOption: ->
-    @stubOption
+  getStubSpecs: ->
+    @stubSpecs
 
   getEdits: ->
     @edits

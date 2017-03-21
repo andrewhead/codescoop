@@ -1,5 +1,5 @@
 { InstanceStubSuggester } = require "../../lib/suggester/instance-stub-suggester"
-{ InstanceStubSuggestion } = require "../../lib/suggester/suggestion"
+{ InstanceStubSuggestion } = require "../../lib/suggester/instance-stub-suggester"
 { ExampleModel } = require "../../lib/model/example-model"
 { File, Symbol } = require "../../lib/model/symbol-set"
 { Range } = require "../../lib/model/range-set"
@@ -7,7 +7,7 @@
 { MissingDefinitionError } = require "../../lib/error/missing-definition"
 
 
-fdescribe "InstanceStubSuggester", ->
+describe "InstanceStubSuggester", ->
 
   testFile = new File "path", "Example.java"
   use = new Symbol testFile, "book", (new Range [10, 16], [10, 20]), "Book"
@@ -47,5 +47,4 @@ fdescribe "InstanceStubSuggester", ->
     (expect suggestion instanceof InstanceStubSuggestion).toBe true
     for suggestion in suggestions
       (expect suggestion.getStubSpec() in [line8Spec1, line8Spec2]).toBe true
-      console.log suggestion.getSymbol()
       (expect suggestion.getSymbol().getRange().start.row).toBe 10

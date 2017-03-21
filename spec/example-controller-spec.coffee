@@ -4,7 +4,7 @@
 { Range, RangeSet } = require "../lib/model/range-set"
 { File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
-{ StubAnalysis } = require "../lib/analysis/stubs"
+{ StubAnalysis } = require "../lib/analysis/stub-analysis"
 { RangeAddition } = require "../lib/edit/range-addition"
 { PACKAGE_PATH } = require "../lib/config/paths"
 
