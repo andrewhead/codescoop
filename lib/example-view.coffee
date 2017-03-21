@@ -186,9 +186,9 @@ module.exports.ExampleView = class ExampleView
       marker = symbolMarkerPair[1]
       error = marker.examplifyError
 
-      label = "ResolveError"
-      label = "Click to define" if error instanceof MissingDefinitionError
-      label = "Click to declare" if error instanceof MissingDeclarationError
+      label = "???"
+      label = "Define" if error instanceof MissingDefinitionError
+      label = "Declare" if error instanceof MissingDeclarationError
 
       # Add a button for highlighting the undefined use
       # I find it necessary to bind the use as data: when I don"t do this,

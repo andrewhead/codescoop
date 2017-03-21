@@ -27,12 +27,20 @@ atom-text-editor div.line.definition span {
 }
 
 atom-overlay.error-choice-button {
-  // background-color: @tool-panel-background-color;
+
   background-color: @background-color-warning;
   border-color: @tool-panel-border-color;
   color: @text-color-highlight;
   padding: @component-padding;
   font-family: @font-family;
+  opacity: .8;
+
+  &:hover {
+    opacity: 1;
+    cursor: pointer;
+    z-index: 100;
+  }
+
 }
 
 atom-overlay {
@@ -51,8 +59,12 @@ atom-overlay {
     &:not(:first-of-type) {
     }
 
+    &:hover {
+      background-color: @background-color-info;
+    }
+
     // padding: @component-padding;
-    background-color: @background-color-info;
+    background-color: @background-color-info - 30%;
     border-color: @tool-panel-border-color;
     color: @text-color-highlight;
 
@@ -61,12 +73,14 @@ atom-overlay {
     div.resolution-class-header {
       font-weight: bold;
       padding: @component-padding;
+      cursor: default;
     }
 
     div.suggestion {
       border-top: 1px white dotted;
       text-align: center;
       padding: @component-padding;
+      cursor: pointer;
     }
 
   }
