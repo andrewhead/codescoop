@@ -1,10 +1,14 @@
 module.exports.MissingControlLogicConcern = class MissingControlLogicConcern
 
-  constructor: (controlCtx) ->
+  constructor: (controlCtx, symbol) ->
     @controlCtx = controlCtx
+    @symbol = symbol
 
   getControlCtx: ->
     @controlCtx
+
+  getSymbol: ->
+    @symbol = symbol
 
 # Detects which contexts (another way of saying node in the parse tree)
 # within the set of active ranges are contained by control logic that is
@@ -23,6 +27,7 @@ module.exports.MissingControlLogicDetector = class MissingControlLogicDetector
       containingControlLogicCtx = parseTree.getContainingControlLogicCtx(activeRange)
       console.log 'containingControlLogic', containingControlLogicCtx
       #resultingIFcontextRange = getContextRange(containingControlLogic)
-      missingControlLogicContexts.push new MissingControlLogicConcern containingControlLogicCtx
+      symbolRep = (new Symbol 'myfile', 'myCtrlName', activeRange, 'controllogic')
+      missingControlLogicContexts.push new MissingControlLogicConcern containingControlLogicCtx , symbolRep
 
     missingControlLogicContexts

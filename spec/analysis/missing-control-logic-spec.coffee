@@ -33,12 +33,12 @@ describe 'control-finder', ->
     parseTree = parse JAVA_CODE_1
     console.log parseTree
     ifstatements = parseTree.getIfStatements()
-    console.log ifstatements
+    console.log 'ifstatements',ifstatements
 
     (expect ifstatements.length).toBe 1
     (expect ifstatements[0].start.line).toEqual 3
     (expect ifstatements[0].start.column).toEqual 4
-    (expect ifstatements[0].stop.line).toEqual 7
+    (expect ifstatements[0].stop.line).toEqual 5
     (expect ifstatements[0].stop.column).toEqual 4
 
   it 'can find multiple if statements', ->
@@ -82,7 +82,7 @@ describe 'control-finder', ->
 
     (expect resultingIFcontextRange).toEqual new Range [3, 4], [7, 4]
 
-  fit 'can detect enclosing control logic that is not part of the active range', ->
+  it 'can detect enclosing control logic that is not part of the active range', ->
     codeBuffer = undefined
     activeRanges = [new Range [4,8],[6,8]]
     console.log 'activeRanges', activeRanges

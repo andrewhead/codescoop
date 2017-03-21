@@ -28,7 +28,7 @@ describe "ControlLogicSuggester", ->
     "}"
   ].join "\n"
 
-  fit "test suggester.getSuggestions", ->
+  it "test suggester.getSuggestions", ->
 
     parseTree = parse JAVA_CODE_2
     console.log parseTree
