@@ -530,7 +530,7 @@ public class MemberAccessTrackerThread extends Thread {
     }
 
     private boolean isPrimitive(Value value) {
-        return (!(value instanceof ObjectReference));
+        return (value instanceof StringReference || !(value instanceof ObjectReference));
     }
 
     private Object valueToObject(Value value) {

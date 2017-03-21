@@ -99,6 +99,22 @@ public class MemberAccessAnalysisTest {
     }
 
     @Test
+    public void testLogsAccessToStringField() throws ClassNotFoundException {
+
+        List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
+        ObjectDefinition instance = new ObjectDefinition("o", "StringFieldAccess", 8);
+        objectDefinitions.add(instance);
+
+        Map<ObjectDefinition, List<AccessHistory>> accesses = analysis.run(
+                "StringFieldAccess", "tests/analysis_examples", objectDefinitions);
+        List<AccessHistory> oInstances = accesses.get(instance);
+        AccessHistory accessHistory = oInstances.get(0);
+        assertEquals("Hello world", ((PrimitiveAccess)
+                accessHistory.getFieldAccesses("s").get(0)).getValue());
+
+    }
+
+    @Test
     public void testAddsPrimitiveMethodReturnValue() throws ClassNotFoundException {
 
         List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
