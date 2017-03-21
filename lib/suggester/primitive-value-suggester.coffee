@@ -21,7 +21,7 @@ module.exports.PrimitiveValueSuggester = class PrimitiveValueSuggester
     variableValuesMap = model.getValueMap()
     symbol = error.getSymbol()
 
-    # Search through teh variable value map for the value of this symbol
+    # Search through the variable value map for the value of this symbol
     # on a particular line of code.  Return if any stage of lookup fails.
     fileValues = variableValuesMap[symbol.getFile().getName()]
     return [] if not fileValues?
@@ -30,10 +30,13 @@ module.exports.PrimitiveValueSuggester = class PrimitiveValueSuggester
     variableValues = lineValues[symbol.getName()]
     return [] if not variableValues?
 
-    # Create a suggestion for each value found
+    # Create a suggestion for each distinct value found
     suggestions = []
+    suggestedValues = []
     for value in variableValues
-      suggestion = new PrimitiveValueSuggestion symbol, value
-      suggestions.push suggestion
+      if value not in suggestedValues
+        suggestion = new PrimitiveValueSuggestion symbol, value
+        suggestions.push suggestion
+        suggestedValues.push value
 
     suggestions

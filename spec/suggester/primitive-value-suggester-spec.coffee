@@ -10,14 +10,19 @@ _ = require "lodash"
 
 describe "PrimitiveValueSuggester", ->
 
-  valueMap = new ValueMap
-  _.extend valueMap,
-    "Example.java":
-      2: { i: ["2", "1"] }
-  rangeSet = new RangeSet()
-  symbols = new SymbolSet()
-  model = new ExampleModel undefined, rangeSet, symbols, undefined, valueMap
-  suggester = new PrimitiveValueSuggester()
+  suggester = undefined
+  model = undefined
+
+  beforeEach =>
+    valueMap = new ValueMap
+    _.extend valueMap,
+      "Example.java":
+        2: { i: ["2", "1"] }
+        4: { i: ["1", "1", "1", "2"] }
+    rangeSet = new RangeSet()
+    symbols = new SymbolSet()
+    model = new ExampleModel undefined, rangeSet, symbols, undefined, valueMap
+    suggester = new PrimitiveValueSuggester()
 
   it "suggests all primitive values known for a symbol", ->
     error = new MissingDefinitionError \
@@ -33,3 +38,12 @@ describe "PrimitiveValueSuggester", ->
       new Symbol (new File "path", "Example.java"), "a", (new Range [2, 4], [2, 5]), "int"
     suggestions = suggester.getSuggestions error, model
     (expect suggestions.length).toBe 0
+
+  it "consolidates duplicate suggestions", ->
+    error = new MissingDefinitionError \
+      new Symbol (new File "path", "Example.java"), "i", (new Range [4, 4], [4, 5]), "int"
+    suggestions = suggester.getSuggestions error, model
+    (expect suggestions.length).toBe 2
+    valueStrings = (suggestion.getValueString() for suggestion in suggestions)
+    (expect "1" in valueStrings)
+    (expect "2" in valueStrings)
