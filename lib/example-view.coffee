@@ -186,6 +186,11 @@ module.exports.ExampleView = class ExampleView
       marker = symbolMarkerPair[1]
       error = marker.examplifyError
 
+      # Some marked symbols (e.g., those created when replacing the contents
+      # of a symbol with an new value) aren't associated with an error.  Skip
+      # over any symbol not associated with an error.
+      continue if not error?
+
       label = "???"
       label = "Define" if error instanceof MissingDefinitionError
       label = "Declare" if error instanceof MissingDeclarationError
