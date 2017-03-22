@@ -2,7 +2,81 @@
 { JavaParser } = require '../grammar/Java/JavaParser'
 { JavaListener } = require '../grammar/Java/JavaListener'
 { InputStream, CommonTokenStream } = require 'antlr4'
+{ Range } = require "../model/range-set"
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
+
+
+module.exports.ControlStructure = class ControlStructure
+
+  constructor: (ctx) ->
+    @ctx = ctx
+
+  getCtx: ->
+    @ctx
+
+
+module.exports.IfControlStructure = class IfControlStructure extends ControlStructure
+module.exports.ForControlStructure = class ForControlStructure extends ControlStructure
+module.exports.DoWhileControlStructure = class DoWhileControlStructure extends ControlStructure
+module.exports.WhileControlStructure = class WhileControlStructure extends ControlStructure
+module.exports.TryCatchControlStructure = class TryCatchControlStructure extends ControlStructure
+
+
+# Create a control structure object that indicates the type of the
+# control structure for this ctx.  Return null if it isn't a control structure.
+module.exports.toControlStructure = toControlStructure = (ctx) ->
+
+  # The ctxs for all of the control structures share some similar structural
+  # features.  In particular, their first child is a symbol.  For readability,
+  # we consolidate that check up here.
+  if (ctx.children.length is 0) or ("symbol" not of ctx.children[0])
+    return null
+
+  # Given the structure of our Java grammar, we can just look at the
+  # text of the first symbol to tell which type of control structure this is
+  firstChildText = ctx.children[0].symbol.text
+  return (new IfControlStructure ctx) if firstChildText is "if"
+  return (new ForControlStructure ctx) if firstChildText is "for"
+  return (new DoWhileControlStructure ctx) if firstChildText is "do"
+  return (new WhileControlStructure ctx) if firstChildText is "while"
+  return (new TryCatchControlStructure ctx) if firstChildText is "try"
+
+  # If none of the above patterns match, return null
+  null
+
+
+module.exports.extractCtxRange = extractCtxRange = (ctx) ->
+
+  # Check to see that this is actually a ctx.
+  if not ("symbol" of ctx)
+    ctxStart = ctx.start
+    ctxStop = ctx.stop
+    return new Range [ctxStart.line - 1, ctxStart.column],
+      [ctxStop.line - 1, ctxStop.column + (ctxStop.stop - ctxStop.start) + 1]
+
+  # If not, this is a symbol node, and we can still extrat the range
+  else
+    node = ctx
+    symbol = node.symbol
+    return new Range [symbol.line - 1, symbol.column],
+      [symbol.line - 1, symbol.column + (symbol.stop - symbol.start) + 1]
+
+
+class CtxSearcher extends JavaListener
+
+  constructor: (range) ->
+    @range = range
+
+  # With post-order traversal, we consider ctxs from smallest to largest,
+  # guaranteeing to return the smallest node that could contain the range.
+  exitEveryRule: (ctx) ->
+    if not @ctx?
+      ctxRange = extractCtxRange ctx
+      if (ctxRange.containsRange @range) and not @ctx?
+        @ctx = ctx
+
+  getCtx: ->
+    @ctx
 
 
 class SymbolSearcher extends JavaListener
@@ -76,3 +150,8 @@ module.exports.ParseTree = class ParseTree
     symbolSearcher = new SymbolSearcher symbol
     ParseTreeWalker.walk symbolSearcher, @root
     symbolSearcher.getMatchingCtx()
+
+  getCtxForRange: (range) ->
+    ctxSearcher = new CtxSearcher range
+    ParseTreeWalker.walk ctxSearcher, @root
+    ctxSearcher.getCtx()

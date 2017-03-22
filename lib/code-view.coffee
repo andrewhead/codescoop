@@ -20,14 +20,14 @@ module.exports.CodeView = class CodeView
   getEditor: ->
     @editor
 
-  onPropertyChanged: (object, propertyName, propertyValue) ->
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
     @updateHighlights() if (
       propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED or
       propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED
     )
     @scrollToSuggestedRange() if (
       (propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED) and
-      (propertyValue.length > 0)
+      (newValue.length > 0)
     )
 
   updateHighlights: ->

@@ -16,20 +16,20 @@ module.exports.StubPreview = class StubPreview
     stubText = stubPrinter.printToString stubSpec
     @textEditor.setText stubText
 
-  onPropertyChanged: (object, propertyName, propertyValue) ->
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
 
     if propertyName is ExampleModelProperty.STUB_OPTION
 
       # If the stub option was set to null, hide the preview
-      if (not propertyValue?) and @textEditor?
+      if (not newValue?) and @textEditor?
         @textEditor.destroy()
         @textEditor = null
 
-      else if propertyValue?
+      else if newValue?
 
         # If the text editor has been initialized, just update the text
         if @textEditor?
-          @_updateStubText propertyValue
+          @_updateStubText newValue
 
         # If an editor doesn't exist for the preview, we have to create one
         # befoe we can show the stub text.
@@ -43,4 +43,4 @@ module.exports.StubPreview = class StubPreview
               activateItem: true
             }).then (editor) =>
               @textEditor = editor
-              @_updateStubText propertyValue
+              @_updateStubText newValue

@@ -1,3 +1,4 @@
+
 { makeObservableArray } = require "./observable-array"
 { RangeSet, RangeSetProperty } = require "./range-set"
 { SymbolSet } = require "./symbol-set"
@@ -21,6 +22,11 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   PARSE_TREE: { value: 14, name: "parse-tree" }
   IMPORT_TABLE: { value: 15, name: "import-table" }
   IMPORTS: { value: 16, name: "imports" }
+  EVENTS: { value: 17, name: "events" }
+  VIEWED_EVENTS: { value: 18, name: "viewed-events" }
+  PROPOSED_EXTENSION: { value: 19, name: "proposed-extension" }
+  FOCUSED_EVENT: { value: 20, name: "focused-event" }
+  EXTENSION_DECISION: { value: 21, name: "extension-accpted" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -28,6 +34,7 @@ module.exports.ExampleModelState = ExampleModelState =
   IDLE: { value: 1, name: "idle" }
   ERROR_CHOICE: { value: 2, name: "error-choice" }
   RESOLUTION: { value: 3, name: "resolution" }
+  EXTENSION: { value: 4, name: "extension" }
 
 
 module.exports.ExampleModel = class ExampleModel
@@ -48,6 +55,11 @@ module.exports.ExampleModel = class ExampleModel
     @suggestions = makeObservableArray []
     @suggestions.addObserver @
 
+    @events = makeObservableArray []
+    @events.addObserver @
+    @viewedEvents = makeObservableArray []
+    @viewedEvents.addObserver @
+
     @edits = makeObservableArray []
     @edits.addObserver @
 
@@ -57,25 +69,30 @@ module.exports.ExampleModel = class ExampleModel
     @imports = makeObservableArray []
     @imports.addObserver @
 
-    @codeBuffer = codeBuffer
-    @parseTree = parseTree
-    @valueMap = valueMap
     @errorChoice = null
     @resolutionChoice = null
     @activeCorrector = null
+
+    @codeBuffer = codeBuffer
+    @parseTree = parseTree
+    @valueMap = valueMap
     @stubOption = null
     @stubSpecTable = null
     @stubSpecs = []
 
+    @focusedEvent = null
+    @proposedExtension = null
+    @extensionDecision = null
+
     @state = ExampleModelState.ANALYSIS
 
-  onPropertyChanged: (object, propertyName, propertyValue) ->
-    @notifyObservers object, propertyName, propertyValue
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
+    @notifyObservers object, propertyName, oldValue, newValue
 
   addObserver: (observer) ->
     @observers.push observer
 
-  notifyObservers: (object, propertyName, propertyValue) ->
+  notifyObservers: (object, propertyName, oldValue, newValue) ->
     # For now, it's sufficient to bubble up the event
     if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
       propertyName = ExampleModelProperty.ACTIVE_RANGES
@@ -85,16 +102,23 @@ module.exports.ExampleModel = class ExampleModel
       propertyName = ExampleModelProperty.AUXILIARY_DECLARATIONS
     else if object is @imports
       propertyName = ExampleModelProperty.IMPORTS
+    else if object is @errors
+      propertyName = ExampleModelProperty.ERRORS
+    else if object is @events
+      propertyName = ExampleModelProperty.EVENTS
+    else if object is @viewedEvents
+      propertyName = ExampleModelProperty.VIEWED_EVENTS
     else if object is @
       proprtyName = propertyName
     else
       propertyName = ExampleModelProperty.UNKNOWN
     for observer in @observers
-      observer.onPropertyChanged this, propertyName, propertyValue
+      observer.onPropertyChanged this, propertyName, oldValue, newValue
 
   setState: (state) ->
+    oldState = state
     @state = state
-    @notifyObservers this, ExampleModelProperty.STATE, @state
+    @notifyObservers this, ExampleModelProperty.STATE, oldState, @state
 
   getState: ->
     @state
@@ -108,23 +132,29 @@ module.exports.ExampleModel = class ExampleModel
   getSymbols: ->
     @symbols
 
-  setErrorChoice: (error) ->
-    @errorChoice = error
-    @notifyObservers @, ExampleModelProperty.ERROR_CHOICE, @errorChoice
+  setErrorChoice: (errorChoice) ->
+    oldErrorChoice = @errorChoice
+    @errorChoice = errorChoice
+    @notifyObservers @, ExampleModelProperty.ERROR_CHOICE, oldErrorChoice,
+      @errorChoice
 
   getErrorChoice: ->
     @errorChoice
 
   setActiveCorrector: (corrector) ->
+    oldCorrector = @activeCorrector
     @activeCorrector = corrector
-    @notifyObservers @, ExampleModelProperty.ACTIVE_CORRECTOR, @activeCorrector
+    @notifyObservers @, ExampleModelProperty.ACTIVE_CORRECTOR, oldCorrector,
+      @activeCorrector
 
   getActiveCorrector: ->
     @activeCorrector
 
   setResolutionChoice: (resolution) ->
+    oldResolution = @resolutionChoice
     @resolutionChoice = resolution
-    @notifyObservers @, ExampleModelProperty.RESOLUTION_CHOICE, @resolutionChoice
+    @notifyObservers @, ExampleModelProperty.RESOLUTION_CHOICE, oldResolution,
+      @resolutionChoice
 
   getResolutionChoice: ->
     @resolutionChoice
@@ -133,19 +163,21 @@ module.exports.ExampleModel = class ExampleModel
     @valueMap
 
   setValueMap: (valueMap) ->
+    oldValueMap = @valueMap
     @valueMap = valueMap
-    @notifyObservers @, ExampleModelProperty.VALUE_MAP, @valueMap
+    @notifyObservers @, ExampleModelProperty.VALUE_MAP, oldValueMap, @valueMap
 
   setErrors: (errors) ->
     @errors.reset errors
-    @notifyObservers @, ExampleModelProperty.ERRORS, @errors
 
   getErrors: ->
     @errors
 
   setParseTree: (parseTree) ->
+    oldParseTree = @parseTree
     @parseTree = parseTree
-    @notifyObservers @, ExampleModelProperty.PARSE_TREE, @parseTree
+    @notifyObservers @, ExampleModelProperty.PARSE_TREE, oldParseTree,
+      @parseTree
 
   getParseTree: ->
     @parseTree
@@ -159,6 +191,12 @@ module.exports.ExampleModel = class ExampleModel
   getEdits: ->
     @edits
 
+  getEvents: ->
+    @events
+
+  getViewedEvents: ->
+    @viewedEvents
+
   getAuxiliaryDeclarations: ->
     @auxiliaryDeclarations
 
@@ -166,25 +204,58 @@ module.exports.ExampleModel = class ExampleModel
     @stubOption
 
   setStubOption: (stubOption) ->
+    oldStubOption = @stubOption
     @stubOption = stubOption
-    @notifyObservers @, ExampleModelProperty.STUB_OPTION, @stubOption
+    @notifyObservers @, ExampleModelProperty.STUB_OPTION, oldStubOption,
+      @stubOption
 
   getStubSpecTable: ->
     @stubSpecTable
 
   setStubSpecTable: (stubSpecTable) ->
+    oldStubSpecTable = @stubSpecTable
     @stubSpecTable = stubSpecTable
-    @notifyObservers @, ExampleModelProperty.STUB_SPEC_TABLE, @stubSpecTable
+    @notifyObservers @, ExampleModelProperty.STUB_SPEC_TABLE, oldStubSpecTable,
+      @stubSpecTable
 
   getStubSpecs: ->
     @stubSpecs
 
   setImportTable: (importTable) ->
+    oldImportTable = importTable
     @importTable = importTable
-    @notifyObservers @, ExampleModelProperty.IMPORT_TABLE, @importTable
+    @notifyObservers @, ExampleModelProperty.IMPORT_TABLE, oldImportTable,
+      @importTable
 
   getImportTable: ->
     @importTable
 
   getImports: ->
     @imports
+
+  getProposedExtension: ->
+    @proposedExtension
+
+  setProposedExtension: (proposedExtension) ->
+    oldProposedExtension = @proposedExtension
+    @proposedExtension = proposedExtension
+    @notifyObservers @, ExampleModelProperty.PROPOSED_EXTENSION,
+      oldProposedExtension, proposedExtension
+
+  getFocusedEvent: ->
+    @focusedEvent
+
+  setFocusedEvent: (focusedEvent) ->
+    oldFocusedEvent = @focusedEvent
+    @focusedEvent = focusedEvent
+    @notifyObservers @, ExampleModelProperty.FOCUSED_EVENT,
+      oldFocusedEvent, focusedEvent
+
+  getExtensionDecision: ->
+    @extensionDecision
+
+  setExtensionDecision: (extensionDecision) ->
+    oldExtensionDecision = @extensionDecision
+    @extensionDecision = extensionDecision
+    @notifyObservers @, ExampleModelProperty.EXTENSION_DECISION,
+      oldExtensionDecision, extensionDecision

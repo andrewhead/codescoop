@@ -76,7 +76,8 @@ module.exports.MainController = class MainController
       stubAnalysis: new StubAnalysis codeEditorFile
 
     # Prepare controllers
-    @exampleController = new ExampleController @exampleModel, @analyses
+    @exampleController = new ExampleController \
+      @exampleModel, { analyses: @analyses }
 
   # These accessors are here to let us test the controller
   getRangeSet: ->

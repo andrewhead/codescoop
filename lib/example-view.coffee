@@ -8,12 +8,14 @@ $ = require "jquery"
 { MissingDefinitionError } = require "./error/missing-definition"
 { MissingDeclarationError } = require "./error/missing-declaration"
 { MissingTypeDefinitionError } = require "./error/missing-type-definition"
+{ ControlStructureExtension } = require "./extender/control-structure-extender"
 
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
 { DeclarationSuggestionBlockView } = require "./view/declaration-suggestion"
 { InstanceStubSuggestionBlockView } = require "./view/instance-stub-suggestion"
 { ImportSuggestionBlockView } = require "./view/import-suggestion"
+{ ControlStructureExtensionView } = require "./view/control-structure-extension"
 
 
 module.exports.ExampleView = class ExampleView
@@ -43,14 +45,14 @@ module.exports.ExampleView = class ExampleView
     @model = model
     @model.addObserver @
     @textEditor = textEditor
-    @symbolMarkerPairs = []
+    @extraRangeMarkerPairs = []
     @activeRangeMarkerPairs = []
     @update()
 
   getTextEditor: () ->
     @textEditor
 
-  onPropertyChanged: (object, propertyName, propertyValue) ->
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.ACTIVE_RANGES
@@ -75,6 +77,8 @@ module.exports.ExampleView = class ExampleView
       @_markErrors @model.getErrors()
     else if @model.getState() is ExampleModelState.RESOLUTION
       @_addResolutionWidget @model.getSuggestions()
+    else if @model.getState() is ExampleModelState.EXTENSION
+      @_addExtensionWidget @model.getProposedExtension()
     @_surroundWithMain()
     @_addClassStubs()
     @_surroundWithClass()
@@ -82,9 +86,9 @@ module.exports.ExampleView = class ExampleView
     @_indentCode()
 
   _clearMarkers: ->
-    symbolMarkerPair[1].destroy() for symbolMarkerPair in @symbolMarkerPairs
+    rangeMarkerPair[1].destroy() for rangeMarkerPair in @extraRangeMarkerPairs
     rangeMarkerPair[1].destroy() for rangeMarkerPair in @activeRangeMarkerPairs
-    @symbolMarkerPairs = []
+    @extraRangeMarkerPairs = []
     @activeRangeMarkerPairs = []
 
   _addCodeLines: ->
@@ -141,25 +145,24 @@ module.exports.ExampleView = class ExampleView
         stubsText += "\n"
     @textEditor.setTextInBufferRange (new Range [0, 0], [0, 0]), stubsText
 
-  _getAdjustedSymbolRange: (symbol, rangeMarkers) ->
+  _getAdjustedRange: (range) ->
 
     # Find the active range that contains the symbol
-    symbolInActiveRange = false
+    rangeInActiveRange = false
     for rangeMarkerPair in @activeRangeMarkerPairs
       activeRange = rangeMarkerPair[0]
-      if activeRange.containsRange symbol.getRange()
-        symbolInActiveRange = true
+      if activeRange.containsRange range
+        rangeInActiveRange = true
         marker = rangeMarkerPair[1]
         markerRange = marker.getBufferRange()
         break
 
-    return null if not symbolInActiveRange  # if use not in active ranges, skip it
+    return null if not rangeInActiveRange  # if use not in active ranges, skip it
 
-    symbolRange = symbol.getRange()
-    columnOffset = symbolRange.start.column - activeRange.start.column
-    rowOffset = symbolRange.start.row - activeRange.start.row
-    width = symbolRange.end.column - symbolRange.start.column
-    height = symbolRange.end.row - symbolRange.start.row
+    columnOffset = range.start.column - activeRange.start.column
+    rowOffset = range.start.row - activeRange.start.row
+    width = range.end.column - range.start.column
+    height = range.end.row - range.start.row
     adjustedRange = new Range [
         markerRange.start.row + rowOffset
         markerRange.start.column + columnOffset
@@ -171,24 +174,24 @@ module.exports.ExampleView = class ExampleView
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
-  _markSymbol: (symbol) ->
-    adjustedRange = @_getAdjustedSymbolRange symbol
+  _markRange: (range) ->
+    adjustedRange = @_getAdjustedRange range
     return if not adjustedRange?
     marker = @textEditor.markBufferRange adjustedRange, { invalidate: "overlap" }
-    @symbolMarkerPairs.push [symbol, marker]
+    @extraRangeMarkerPairs.push [range, marker]
     marker
 
   _markErrors: (errors) ->
     for error in errors
-      marker = @_markSymbol error.getSymbol()
+      marker = @_markRange error.getSymbol().getRange()
       marker.examplifyError = error
     @_addErrorDecorations()
 
   _addErrorDecorations: ->
 
-    for symbolMarkerPair in @symbolMarkerPairs
+    for rangeMarkerPair in @extraRangeMarkerPairs
 
-      marker = symbolMarkerPair[1]
+      marker = rangeMarkerPair[1]
       error = marker.examplifyError
 
       # Some marked symbols (e.g., those created when replacing the contents
@@ -227,7 +230,7 @@ module.exports.ExampleView = class ExampleView
 
     # Make a marker for the target use
     errorChoice = @model.getErrorChoice()
-    marker = @_markSymbol errorChoice.getSymbol()
+    marker = @_markRange errorChoice.getSymbol().getRange()
 
     # Built up the interactive widget
     decoration = $ "<div></div>"
@@ -265,6 +268,31 @@ module.exports.ExampleView = class ExampleView
       position: "tail"
     @textEditor.decorateMarker marker, params
 
+  _addExtensionWidget: (extension) ->
+
+    # Make a marker for the range inside the control structure
+    rangeInsideControl = extension.getEvent().getInsideRange()
+    marker = @_markRange rangeInsideControl
+
+    # Built up the interactive widget
+    decoration = undefined
+    if extension instanceof ControlStructureExtension
+      decoration = new ControlStructureExtensionView extension, @model
+
+    # Create a decoration for deciding whether to accept the extension
+    params =
+      type: "overlay"
+      class: "extension-widget"
+      item: decoration
+      position: "tail"
+    @textEditor.decorateMarker marker, params
+
+    # Highlight the range that the extension is augmenting
+    params =
+      type: "highlight"
+      class: "extension-highlight"
+    @textEditor.decorateMarker marker, params
+
   _applyReplacements: ->
 
     for edit in @model.getEdits()
@@ -272,17 +300,17 @@ module.exports.ExampleView = class ExampleView
       symbol = edit.getSymbol()
 
       foundSymbol = false
-      for symbolMarkerPair in @symbolMarkerPairs
-        continue if not symbolMarkerPair[0].equals symbol
+      for rangeMarkerPair in @extraRangeMarkerPairs
+        continue if not rangeMarkerPair[0].isEqual symbol.getRange()
         foundSymbol = true
-        marker = symbolMarkerPair[1]
+        marker = rangeMarkerPair[1]
 
       # The first time we find the symbol (presumably before any
       # replacements have been performed), mark it and save a reference
       # to the marker, for later replacements.
       if not foundSymbol
-        adjustedRange = @_getAdjustedSymbolRange symbol
-        marker = @_markSymbol symbol
+        adjustedRange = @_getAdjustedRange symbol.getRange()
+        marker = @_markRange symbol.getRange()
 
       @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
 
@@ -328,7 +356,7 @@ module.exports.ExampleView = class ExampleView
     # XXX: Manually correct columns for markers that started at 0 before
     # indenting, and mistakenly, preserved 0.
     # This works, but maybe there's got to be a better solution.
-    for rangeMarkerPair in @symbolMarkerPairs
+    for rangeMarkerPair in @extraRangeMarkerPairs
       marker = rangeMarkerPair[1]
       markerRange = marker.getBufferRange()
       if markerRange.start.column is 0
@@ -337,5 +365,5 @@ module.exports.ExampleView = class ExampleView
           @programTemplate.indentLevel)
         marker.setBufferRange markerRange
 
-  getSymbolMarkers: ->
-    (symbolMarkerPair[1] for symbolMarkerPair in @symbolMarkerPairs)
+  getExtraRangeMarkers: ->
+    (rangeMarkerPair[1] for rangeMarkerPair in @extraRangeMarkerPairs)

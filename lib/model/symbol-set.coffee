@@ -93,9 +93,9 @@ module.exports.SymbolSet = class SymbolSet
   addObserver: (observer) ->
     @observers.push observer
 
-  notifyObservers: (propertyName, propertyValue) ->
+  notifyObservers: (propertyName, oldValue, newValue) ->
     for observer in @observers
-      observer.onPropertyChanged this, propertyName, propertyValue
+      observer.onPropertyChanged this, propertyName, oldValue, newValue
 
   getAllSymbols: ->
     # Exhaustively accrue all symbols from the various subsets

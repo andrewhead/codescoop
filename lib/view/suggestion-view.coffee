@@ -3,9 +3,8 @@ $ = require 'jquery'
 
 # This is an extension to a jQuery object for a code modification suggestion.
 # To extend it, you want to override three handlers:
-# * select: what to change in the model whan suggestion accepted
 # * preview: show a preview of application of suggestion
-# * revert: turn back a preview
+# * revert: roll back a preview
 # Each event handler takes a jQuery event as input
 module.exports.SuggestionView = class SuggestionView extends $
 

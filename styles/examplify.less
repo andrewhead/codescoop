@@ -43,10 +43,36 @@ atom-overlay.error-choice-button {
 
 }
 
+atom-overlay.extension-widget {
+
+  font-family: @font-family;
+  background-color: @background-color-info - 30%;
+  color: @text-color-highlight;
+
+  div div {
+
+    float: left;
+    padding: @component-padding;
+
+    &:not(:last-of-type) {
+      border-right: 1px white dashed;
+    }
+
+    &:not(:first-of-type) {
+      font-weight: bold;
+      &:hover {
+        background-color: @background-color-info;
+        cursor: pointer;
+      }
+    }
+
+  }
+
+}
+
 atom-overlay {
 
   &.resolution-widget {
-    // background-color: @tool-panel-background-color;
     font-family: @font-family;
   }
 
@@ -63,7 +89,6 @@ atom-overlay {
       background-color: @background-color-info;
     }
 
-    // padding: @component-padding;
     background-color: @background-color-info - 30%;
     border-color: @tool-panel-border-color;
     color: @text-color-highlight;

@@ -12,9 +12,9 @@ module.exports.makeObservableArray = (array = undefined) ->
   array.addObserver = (observer) ->
     @observers.push observer
 
-  array.notifyObservers = (object, propertyName, propertyValue) ->
+  array.notifyObservers = (object, propertyName, oldValue, newValue) ->
     for observer in @observers
-      observer.onPropertyChanged object, propertyName, propertyValue
+      observer.onPropertyChanged object, propertyName, oldValue, newValue
 
   # It should be easy to copy the array, so that people can modify a copy of
   # the array without needing to observe it
@@ -24,20 +24,36 @@ module.exports.makeObservableArray = (array = undefined) ->
   # REUSE: Snippet for watching change to array is based on
   # answer from http://stackoverflow.com/questions/35610242
   proxy = new Proxy array, {
+
     set: (target, property, value, receiver) ->
-      # Importantly, we provide the proxy instead of the array
-      # to make sure that any mutations made to the array after
-      # notification also get noticed.
+
+      # Make a copy of the old array that we can pass to observers
+      # This will NOT have a proxy associated with it (raw data)
+      oldArray = target.copy()
+
+      # Perform the modification
       target[property] = value
-      target.notifyObservers proxy, ObservableArrayProperty.ARRAY_CHANGE, proxy
+
+      # Importantly, we provide the new value as a proxy instead of the array.
+      # This is because we expect observers may want to mutate the array in
+      # ways that generate future events.
+      target.notifyObservers proxy, ObservableArrayProperty.ARRAY_CHANGE,
+        oldArray, proxy
+
+      # Return true to indicate the change was successful
       true
+
   }
+
+  # Mark the proxy with a flag that callers can check to see if the array
+  # they are manipulated is an observable array, or a typical array
+  proxy.isProxy = true
 
   # This function should be used to fully reset the contents of the array.
   # Although it looks verbose compared to just defining a new array, we
   # do this manually to make sure not to clobber the observers of the array.
   array.reset = (elements) ->
-    @splice(0, @length)
+    @splice 0, @length
     for element in elements
       @push element
 

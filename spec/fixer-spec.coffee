@@ -12,6 +12,14 @@
 { PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
 { InstanceStubSuggestion } = require '../lib/suggester/instance-stub-suggester'
 { DeclarationSuggestion } = require "../lib/suggester/declaration-suggester"
+{ ControlStructureExtension } = require "../lib/extender/control-structure-extender"
+
+
+_rangeInRanges = (range, ranges) =>
+  for otherRange in ranges
+    if range.isEqual otherRange
+      return true
+  false
 
 
 describe "Fixer", ->
@@ -131,3 +139,14 @@ describe "Fixer", ->
     it "updates the model to reflect the symbol is no longer being used", ->
       uses = model.getSymbols().getVariableUses()
       (expect uses.length).toBe 0
+
+  describe "when applying a ControlStructureExtension", ->
+
+    it "adds the structure's ranges to the model", ->
+      model = _makeModel()
+      extension = new ControlStructureExtension undefined,
+        [(new Range [0, 2], [0, 3]), new Range [1, 4], [1, 9]], undefined
+      fixer.apply model, extension
+      activeRanges = model.getRangeSet().getActiveRanges()
+      (expect _rangeInRanges (new Range [0, 2], [0, 3]), activeRanges).toBe true
+      (expect _rangeInRanges (new Range [1, 4], [1, 9]), activeRanges).toBe true

@@ -9,6 +9,8 @@
 { MissingDefinitionError } = require "../lib/error/missing-definition"
 { SymbolSuggestion } = require "../lib/suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
+{ ControlStructureExtension } = require "../lib/extender/control-structure-extender"
+{ ControlCrossingEvent } = require "../lib/event/control-crossing"
 { Replacement } = require "../lib/edit/replacement"
 { Declaration } = require "../lib/edit/declaration"
 { PACKAGE_PATH } = require "../lib/config/paths"
@@ -226,12 +228,12 @@ describe "ExampleView", ->
       # Make a bunch of helper variables that we can easily test
       decorations = editor.getDecorations { class: 'resolution-widget' }
       decoration = decorations[0]
-      markers = view.getSymbolMarkers()
+      markers = view.getExtraRangeMarkers()
       domElement = $ decoration.getProperties().item
 
     it "has a marker for resolving the error", ->
 
-      markers = view.getSymbolMarkers()
+      markers = view.getExtraRangeMarkers()
       (expect markers.length).toBe 1
       markerBufferRange = markers[0].getBufferRange()
       (expect markerBufferRange).toEqual new Range [4, 8], [4, 9]
@@ -318,3 +320,39 @@ describe "ExampleView", ->
       valueSuggestion.mouseout()
       (expect model.getEdits()[0].getText(), "i")
       valueBlock.mouseleave()
+
+  describe "when in the EXTENSION state", ->
+
+    decorations = undefined
+
+    beforeEach =>
+
+      editor = atom.workspace.buildTextEditor()
+      editor.setGrammar atom.grammars.loadGrammarSync \
+        PACKAGE_PATH + "/spec/view/java.json"
+
+      model = new ExampleModel CODE_BUFFER,
+        (new RangeSet [ (new Range [4, 4], [4, 14]) ]),
+        new SymbolSet(), PARSE_TREE
+      view = new ExampleView model, editor
+
+      # This is a convoluted, non-existent control structure given the
+      # example code for this test (in this case, it just correspondes to the
+      # lines right above and below).  But it's good enough to test the
+      # logic of the example view.  We leave all of the variables undefined
+      # that shouldn't be needed by the example view, for brevity
+      extension = new ControlStructureExtension undefined,
+        [(new Range [3, 4], [3, 14]), new Range [5, 4], [5, 14]],
+        new ControlCrossingEvent undefined, new Range [4, 4], [4, 14], undefined
+      model.setProposedExtension extension
+      model.setState ExampleModelState.EXTENSION
+      decorations = editor.getDecorations { class: 'extension-highlight' }
+
+      waitsForPromise =>
+        # Package needed for auto-indenting Java code
+        atom.packages.activatePackage('language-java')
+
+    it "highlights the line contained in the control structure", ->
+      (expect decorations.length).toBe 1
+      (expect decorations[0].getMarker().getBufferRange()).toEqual \
+        new Range [4, 4], [4, 14]

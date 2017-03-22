@@ -19,23 +19,21 @@ module.exports.RangeSet = class RangeSet
     @suggestedRanges.addObserver @
     @observers = []
 
-  onPropertyChanged: (object, propertyName, propertyValue) ->
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
     if object is @activeRanges
       propertyName = RangeSetProperty.ACTIVE_RANGES_CHANGED
-      propertyValue = @getActiveRanges()
     else if object is @suggestedRanges
       propertyName = RangeSetProperty.SUGGESTED_RANGES_CHANGED
-      propertyValue = @getSuggestedRanges()
     else
       propertyName = RangeSetProperty.UNKNOWN
-    @notifyObservers this, propertyName, propertyValue
+    @notifyObservers this, propertyName, oldValue, newValue
 
   addObserver: (observer) ->
     @observers.push observer
 
-  notifyObservers: (object, propertyName, propertyValue) ->
+  notifyObservers: (object, propertyName, oldValue, newValue) ->
     for observer in @observers
-      observer.onPropertyChanged object, propertyName, propertyValue
+      observer.onPropertyChanged object, propertyName, oldValue, newValue
 
   getActiveRanges: ->
     @activeRanges

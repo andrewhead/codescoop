@@ -3,6 +3,7 @@
 { PrimitiveValueSuggestion } = require "./suggester/primitive-value-suggester"
 { DeclarationSuggestion } = require "./suggester/declaration-suggester"
 { InstanceStubSuggestion } = require "./suggester/instance-stub-suggester"
+{ ControlStructureExtension } = require "./extender/control-structure-extender"
 { Replacement } = require "./edit/replacement"
 { Declaration } = require "./edit/declaration"
 
@@ -20,45 +21,50 @@ module.exports.Fixer = class Fixer
         break
       useIndex += 1
 
-  apply: (model, suggestion) ->
+  apply: (model, update) ->
 
     # TODO: eventually this should add the smallest range that defines
     # the symbol, but right now it adds lines
-    if suggestion instanceof SymbolSuggestion
+    if update instanceof SymbolSuggestion
       codeBuffer = model.getCodeBuffer()
-      symbolRange = suggestion.getSymbol().getRange()
+      symbolRange = update.getSymbol().getRange()
       startRowRange = codeBuffer.rangeForRow symbolRange.start.row
       endRowRange = codeBuffer.rangeForRow symbolRange.end.row
       rangeUnion = startRowRange.union endRowRange
       model.getRangeSet().getActiveRanges().push rangeUnion
 
-    else if suggestion instanceof ImportSuggestion
-      model.getImports().push suggestion.getImport()
+    else if update instanceof ImportSuggestion
+      model.getImports().push update.getImport()
 
     # For primitive values, replace the symbol with a concrete value and then
     # mark the symbol as no longer an undefined use
-    else if suggestion instanceof PrimitiveValueSuggestion
-      edit = new Replacement suggestion.getSymbol(), suggestion.getValueString()
+    else if update instanceof PrimitiveValueSuggestion
+      edit = new Replacement update.getSymbol(), update.getValueString()
       model.getEdits().push edit
-      @_removeUse model, suggestion.getSymbol()
+      @_removeUse model, update.getSymbol()
 
-    else if suggestion instanceof DeclarationSuggestion
-      symbol = suggestion.getSymbol()
+    else if update instanceof DeclarationSuggestion
+      symbol = update.getSymbol()
       declaration = new Declaration symbol.getName(), symbol.getType()
       model.getAuxiliaryDeclarations().push declaration
 
-    else if suggestion instanceof InstanceStubSuggestion
+    else if update instanceof InstanceStubSuggestion
 
-      symbol = suggestion.getSymbol()
-      stubSpec = suggestion.getStubSpec()
+      symbol = update.getSymbol()
+      stubSpec = update.getStubSpec()
 
       # Add a stub spec that can be printed as part of the snippet
       model.getStubSpecs().push stubSpec
 
       # Replace the symbol with an instantiation of the stub
-      edit = new Replacement suggestion.getSymbol(),
+      edit = new Replacement update.getSymbol(),
         "(new #{stubSpec.getClassName()}())"
       model.getEdits().push edit
 
       # Mark the undefined use as resolved
       @_removeUse model, symbol
+
+    else if update instanceof ControlStructureExtension
+      activeRanges = model.getRangeSet().getActiveRanges()
+      for range in update.getRanges()
+        activeRanges.push range

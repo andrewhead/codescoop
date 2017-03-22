@@ -18,10 +18,10 @@ codeBuffer = editor.getBuffer()
 describe "ExampleModel", ->
 
   observer =
-    onPropertyChanged: (object, name, value) ->
+    onPropertyChanged: (object, name, oldValue, newValue) ->
       @object = object
       @propertyName = name
-      @propertyValue = value
+      @propertyValue = newValue
 
   parseTree = jasmine.createSpyObj "parseTree", [ "getRoot" ]
 
