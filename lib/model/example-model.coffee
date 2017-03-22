@@ -18,6 +18,8 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   STUB_OPTION: { value: 11, name: "stub-option" }
   STUB_SPEC_TABLE: {value: 12, name: "stub-table" }
   STUB_SPECS: { value: 13, name: "stub-specs" }
+  PARSE_TREE: { value: 14, name: "parse-tree" }
+  IMPORT_TABLE: { value: 15, name: "import-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -135,6 +137,10 @@ module.exports.ExampleModel = class ExampleModel
   getErrors: ->
     @errors
 
+  setParseTree: (parseTree) ->
+    @parseTree = parseTree
+    @notifyObservers @, ExampleModelProperty.PARSE_TREE, @parseTree
+
   getParseTree: ->
     @parseTree
 
@@ -143,6 +149,9 @@ module.exports.ExampleModel = class ExampleModel
 
   getSuggestions: ->
     @suggestions
+
+  getEdits: ->
+    @edits
 
   getAuxiliaryDeclarations: ->
     @auxiliaryDeclarations
@@ -164,5 +173,9 @@ module.exports.ExampleModel = class ExampleModel
   getStubSpecs: ->
     @stubSpecs
 
-  getEdits: ->
-    @edits
+  setImportTable: (importTable) ->
+    @importTable = importTable
+    @notifyObservers @, ExampleModelProperty.IMPORT_TABLE, @importTable
+
+  getImportTable: ->
+    @importTable

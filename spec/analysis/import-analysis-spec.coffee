@@ -1,11 +1,12 @@
-{ Import, ImportFinder, ImportAnalysis } = require "../../lib/analysis/import-analysis"
+{ ImportFinder, ImportAnalysis } = require "../../lib/analysis/import-analysis"
+{ Import } = require "../../lib/model/import"
 { Range } = require "../../lib/model/range-set"
 { File } = require "../../lib/model/symbol-set"
 { parse } = require "../../lib/analysis/parse-tree"
 { PACKAGE_PATH } = require "../../lib/config/paths"
 
 
-fdescribe "ImportAnalysis", ->
+describe "ImportAnalysis", ->
 
   importTable = undefined
   testFile = new File \
