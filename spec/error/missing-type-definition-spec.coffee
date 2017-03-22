@@ -50,8 +50,7 @@ describe "MissingTypeDefinitionDetector", ->
 
     detector = new MissingTypeDefinitionDetector()
 
-  it "reports a missing definition if a relevant import is not in the active " +
-     "ranges", ->
+  it "reports a missing definition if a relevant import is not in the import set", ->
     model.getRangeSet().getActiveRanges().push new Range [6, 0], [6, 40]
     errors = detector.detectErrors model
     (expect errors.length).toBe 1
@@ -68,7 +67,7 @@ describe "MissingTypeDefinitionDetector", ->
     (expect errors[0].getSymbol().getRange()).toEqual new Range [7, 10], [7, 14]
 
   it "doesn't report missing definitions when imports are active", ->
-    model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 25]
+    model.getImports().push new Import "com.ImportedClass", Range [0, 7], [0, 24]
     model.getRangeSet().getActiveRanges().push new Range [6, 0], [6, 40]
     errors = detector.detectErrors model
     (expect errors.length).toBe 0

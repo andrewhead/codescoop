@@ -12,6 +12,7 @@ module.exports.MissingTypeDefinitionDetector = class MissingTypeDefinitionDetect
   detectErrors: (model) ->
 
     importTable = model.getImportTable()
+    activeImports = model.getImports()
     activeRanges = model.getRangeSet().getActiveRanges()
     typeUses = model.getSymbols().getTypeUses()
     typeDefs = model.getSymbols().getTypeDefs()
@@ -33,10 +34,10 @@ module.exports.MissingTypeDefinitionDetector = class MissingTypeDefinitionDetect
 
       relatedImports = importTable.getImports use.getName()
       activeRelatedImports = []
-      for import_ in relatedImports
-        for activeRange in activeRanges
-          if activeRange.containsRange import_.getRange()
-            activeRelatedImports.push import_
+      for relatedImport in relatedImports
+        for activeImport in activeImports
+          if relatedImport.equals activeImport
+            activeRelatedImports.push relatedImport
 
       if activeRelatedDefs.length is 0 and activeRelatedImports.length is 0
         error = new MissingTypeDefinitionError use

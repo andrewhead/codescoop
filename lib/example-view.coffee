@@ -1,15 +1,19 @@
-$ = require "jquery"
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require "./model/example-model"
 { Range, RangeSet } = require "./model/range-set"
+{ Point } = require "atom"
 { Replacement } = require "./edit/replacement"
+{ StubPrinter } = require "./view/stub-printer"
+$ = require "jquery"
+
 { MissingDefinitionError } = require "./error/missing-definition"
 { MissingDeclarationError } = require "./error/missing-declaration"
+{ MissingTypeDefinitionError } = require "./error/missing-type-definition"
+
 { SymbolSuggestionBlockView } = require "./view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "./view/primitive-value-suggestion"
 { DeclarationSuggestionBlockView } = require "./view/declaration-suggestion"
 { InstanceStubSuggestionBlockView } = require "./view/instance-stub-suggestion"
-{ StubPrinter } = require "./view/stub-printer"
-{ Point } = require "atom"
+{ ImportSuggestionBlockView } = require "./view/import-suggestion"
 
 
 module.exports.ExampleView = class ExampleView
@@ -74,6 +78,7 @@ module.exports.ExampleView = class ExampleView
     @_surroundWithMain()
     @_addClassStubs()
     @_surroundWithClass()
+    @_addImports()
     @_indentCode()
 
   _clearMarkers: ->
@@ -193,6 +198,7 @@ module.exports.ExampleView = class ExampleView
 
       label = "???"
       label = "Define" if error instanceof MissingDefinitionError
+      label = "Define" if error instanceof MissingTypeDefinitionError
       label = "Declare" if error instanceof MissingDeclarationError
 
       # Add a button for highlighting the undefined use
@@ -247,6 +253,8 @@ module.exports.ExampleView = class ExampleView
         block = new DeclarationSuggestionBlockView suggestions, @model, marker
       else if class_ is "InstanceStubSuggestion"
         block = new InstanceStubSuggestionBlockView suggestions, @model, marker
+      else if class_ is "ImportSuggestion"
+        block = new ImportSuggestionBlockView suggestions, @model, marker
       decoration.append block
 
     # Create a decoration from the element
@@ -278,22 +286,6 @@ module.exports.ExampleView = class ExampleView
 
       @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
 
-  _resetIndentation: ->
-    ###
-    for rowNumber in [0..@textEditor.getLastBufferRow()]
-      @textEditor.setIndentationForBufferRow
-    ###
-
-  _indentAllLines: ->
-    ###
-    # Indent the existing lines
-    # XXX: Brittle solution, at some point should do pretty-printing
-    for rowNumber in [0..@textEditor.getLastBufferRow()]
-      currentIndentation = @textEditor.indentationForBufferRow rowNumber
-      @textEditor.setIndentationForBufferRow rowNumber,
-        currentIndentation + @programTemplate.indentLevel
-    ###
-
   _surroundCurrentText: (textBefore, textAfter) ->
 
     # Add text at the start of the file
@@ -310,6 +302,20 @@ module.exports.ExampleView = class ExampleView
 
   _surroundWithClass: ->
     @_surroundCurrentText @programTemplate.classStart, @programTemplate.classEnd
+
+  _addImports: ->
+
+    imports = @model.getImports()
+    return if imports.length is 0
+
+    # Format an import statement for each of the imports
+    importsString = ""
+    for import_ in imports
+      importsString += "import #{import_.getName()};\n"
+    importsString += "\n"
+
+    # Set the text at the very start of the buffer to the import strings
+    @textEditor.setTextInBufferRange (new Range [0, 0], [0, 0]), importsString
 
   _indentCode: ->
 

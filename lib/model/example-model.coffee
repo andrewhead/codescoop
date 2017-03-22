@@ -20,6 +20,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   STUB_SPECS: { value: 13, name: "stub-specs" }
   PARSE_TREE: { value: 14, name: "parse-tree" }
   IMPORT_TABLE: { value: 15, name: "import-table" }
+  IMPORTS: { value: 16, name: "imports" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -53,6 +54,9 @@ module.exports.ExampleModel = class ExampleModel
     @auxiliaryDeclarations = makeObservableArray []
     @auxiliaryDeclarations.addObserver @
 
+    @imports = makeObservableArray []
+    @imports.addObserver @
+
     @codeBuffer = codeBuffer
     @parseTree = parseTree
     @valueMap = valueMap
@@ -61,7 +65,7 @@ module.exports.ExampleModel = class ExampleModel
     @activeCorrector = null
     @stubOption = null
     @stubSpecTable = null
-    @stubSpecs = makeObservableArray []
+    @stubSpecs = []
 
     @state = ExampleModelState.ANALYSIS
 
@@ -79,6 +83,8 @@ module.exports.ExampleModel = class ExampleModel
       propertyName = ExampleModelProperty.EDITS
     else if object is @auxiliaryDeclarations
       propertyName = ExampleModelProperty.AUXILIARY_DECLARATIONS
+    else if object is @imports
+      propertyName = ExampleModelProperty.IMPORTS
     else if object is @
       proprtyName = propertyName
     else
@@ -179,3 +185,6 @@ module.exports.ExampleModel = class ExampleModel
 
   getImportTable: ->
     @importTable
+
+  getImports: ->
+    @imports

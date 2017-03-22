@@ -1,12 +1,17 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
+{ RangeAddition } = require "./edit/range-addition"
+{ Fixer } = require "./fixer"
+
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
+{ MissingTypeDefinitionDetector } = require "./error/missing-type-definition"
+
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
-{ RangeAddition } = require "./edit/range-addition"
-{ Fixer } = require "./fixer"
+{ ImportSuggester } = require "./suggester/import-suggester"
+
 
 module.exports.ExampleController = class ExampleController
 
@@ -16,7 +21,9 @@ module.exports.ExampleController = class ExampleController
     @model = model
     @model.addObserver @
 
+    importAnalysis = analyses.importAnalysis
     variableDefUseAnalysis = analyses.variableDefUseAnalysis
+    typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
 
@@ -24,6 +31,9 @@ module.exports.ExampleController = class ExampleController
     # Load default correctors if none were passed in
     if not @correctors?
       @correctors = [
+          checker: new MissingTypeDefinitionDetector()
+          suggesters: [ new ImportSuggester() ]
+        ,
           checker: new MissingDefinitionDetector()
           suggesters: [
             new DefinitionSuggester()
@@ -36,17 +46,30 @@ module.exports.ExampleController = class ExampleController
       ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses variableDefUseAnalysis, valueAnalysis, stubAnalysis
+    @_startAnalyses importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
+      valueAnalysis, stubAnalysis
 
-  _startAnalyses: (variableDefUseAnalysis, valueAnalysis, stubAnalysis) ->
+  _startAnalyses: (importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
+    valueAnalysis, stubAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
+      import:
+        runner: importAnalysis
+        callback: (importTable) =>
+          @model.setImportTable importTable
+        error: console.error
       variableDefUse:
         runner: variableDefUseAnalysis
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
+        error: console.error
+      typeDefUse:
+        runner: typeDefUseAnalysis
+        callback: (result) =>
+          @model.getSymbols().setTypeDefs result.typeDefs
+          @model.getSymbols().setTypeUses result.typeUses
         error: console.error
       value:
         runner: valueAnalysis or= null
@@ -58,6 +81,7 @@ module.exports.ExampleController = class ExampleController
         callback: (stubSpecTable) =>
           @model.setStubSpecTable stubSpecTable
         error: console.error
+
 
     # Run analyses sequentially.  Soot can't handle when more than one
     # analysis is running at a time.  Pattern reference for chaining promises:

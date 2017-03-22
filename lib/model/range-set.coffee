@@ -7,7 +7,7 @@ module.exports.Range = (require 'atom').Range
 module.exports.RangeSetProperty = RangeSetProperty =
   UNKNOWN: { value: -1, name: "unknown" }
   ACTIVE_RANGES_CHANGED: { value: 0, name: "active-ranges-changed" }
-  SUGGESTED_RANGES_CHANGED: { value: 1, name: "suggested-line-numbers-changed" }
+  SUGGESTED_RANGES_CHANGED: { value: 1, name: "suggested-ranges-changed" }
 
 
 module.exports.RangeSet = class RangeSet
@@ -34,7 +34,6 @@ module.exports.RangeSet = class RangeSet
     @observers.push observer
 
   notifyObservers: (object, propertyName, propertyValue) ->
-    # TODO: Have different events for changes to the different line sets
     for observer in @observers
       observer.onPropertyChanged object, propertyName, propertyValue
 
@@ -45,12 +44,7 @@ module.exports.RangeSet = class RangeSet
     @suggestedRanges
 
   setSuggestedRanges: (ranges) ->
-    # Although this looks verbose, it's important that we manually transfer
-    # all new elements.  The current list of suggested line numbers has
-    # observers that will be trashed if we start the array from scratch.
-    @suggestedRanges.splice(0, @suggestedRanges.length)
-    for range in ranges
-      @suggestedRanges.push range
+    @suggestedRanges.reset ranges
 
   addSuggestedRange: (range) ->
     @suggestedRanges.push range

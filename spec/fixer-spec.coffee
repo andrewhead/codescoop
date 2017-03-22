@@ -1,14 +1,17 @@
+{ Fixer } = require "../lib/fixer"
 { ExampleModel } = require "../lib/model/example-model"
 { Symbol, SymbolSet, File } = require "../lib/model/symbol-set"
 { Range, RangeSet } = require "../lib/model/range-set"
 { StubSpec } = require "../lib/model/stub"
+{ Import } = require "../lib/model/import"
+{ Replacement } = require "../lib/edit/replacement"
+{ Declaration } = require "../lib/edit/declaration"
+
+{ ImportSuggestion } = require "../lib/suggester/import-suggester"
 { SymbolSuggestion } = require "../lib/suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
 { InstanceStubSuggestion } = require '../lib/suggester/instance-stub-suggester'
 { DeclarationSuggestion } = require "../lib/suggester/declaration-suggester"
-{ Fixer } = require "../lib/fixer"
-{ Replacement } = require "../lib/edit/replacement"
-{ Declaration } = require "../lib/edit/declaration"
 
 
 describe "Fixer", ->
@@ -39,6 +42,27 @@ describe "Fixer", ->
       if range.containsRange suggestion.getSymbol().getRange()
         activeRangeFound = true
     (expect activeRangeFound).toBe true
+
+  describe "when handling an ImportSuggestion", ->
+
+    codeBuffer = atom.workspace.buildTextEditor().getBuffer()
+    codeBuffer.setText [
+      "import org.ImportedClass;"
+      "public class Book {}"
+    ].join "\n"
+    model = new ExampleModel codeBuffer
+
+    it "adds an import range corresponding to the line the import appears on", ->
+
+      suggestion = new ImportSuggestion \
+        new Import "org.ImportedClass", new Range [0, 7], [0, 24]
+      fixer.apply model, suggestion
+
+      # Check the set of active ranges for at least one that includes the
+      # entire line that the import occurred on
+      imports = model.getImports()
+      (expect imports.length).toBe 1
+      (expect imports[0].getName()).toEqual "org.ImportedClass"
 
   describe "when handling a PrimitiveValueSuggestion", ->
 

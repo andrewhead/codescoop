@@ -1,4 +1,5 @@
-{ SymbolSuggestion } = require './suggester/definition-suggester'
+{ ImportSuggestion } = require "./suggester/import-suggester"
+{ SymbolSuggestion } = require "./suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "./suggester/primitive-value-suggester"
 { DeclarationSuggestion } = require "./suggester/declaration-suggester"
 { InstanceStubSuggestion } = require "./suggester/instance-stub-suggester"
@@ -30,6 +31,9 @@ module.exports.Fixer = class Fixer
       endRowRange = codeBuffer.rangeForRow symbolRange.end.row
       rangeUnion = startRowRange.union endRowRange
       model.getRangeSet().getActiveRanges().push rangeUnion
+
+    else if suggestion instanceof ImportSuggestion
+      model.getImports().push suggestion.getImport()
 
     # For primitive values, replace the symbol with a concrete value and then
     # mark the symbol as no longer an undefined use

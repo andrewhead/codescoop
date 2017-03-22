@@ -5,8 +5,12 @@
 { File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
+{ TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
+{ ImportAnalysis } = require "../lib/analysis/import-analysis"
 { RangeAddition } = require "../lib/edit/range-addition"
 { PACKAGE_PATH } = require "../lib/config/paths"
+{ parse } = require "../lib/analysis/parse-tree"
+fs = require "fs"
 
 
 describe "ExampleController", ->
@@ -24,47 +28,66 @@ describe "ExampleController", ->
 
   describe "when in the ANALYSIS state", ->
 
+    code = (fs.readFileSync testFile.getPath()).toString()
+    parseTree = parse code
+
+    # Prepare the analyses
     variableDefUseAnalysis = new VariableDefUseAnalysis testFile
+    typeDefUseAnalysis = new TypeDefUseAnalysis testFile, parseTree
+    importAnalysis = new ImportAnalysis testFile
     valueAnalysis = new ValueAnalysis testFile
     stubAnalysis = new StubAnalysis testFile
     model = new ExampleModel _makeCodeBuffer(),
       (new RangeSet [ new Range [5, 0], [5, 10] ]), new SymbolSet(),
-      (jasmine.createSpyObj 'parseTree', ['getRoot']), new ValueMap()
+      parseTree, new ValueMap()
 
-    # These variables will be set by our first test case
     controller = undefined
-    defs = undefined
+    importTable = undefined
+    typeDefs = undefined
+    variableDefs = undefined
     valueMap = undefined
     stubSpecTable = undefined
 
     it "enters the IDLE state when initial analyses finish", ->
 
+      # When the controller starts, it will run the analyses one after another
       runs ->
         controller = new ExampleController model,
-          { variableDefUseAnalysis, valueAnalysis, stubAnalysis }, []
+          { variableDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
+              stubAnalysis, importAnalysis }, []
 
-      # After creating the controller, we wait for analyses to finish
+      # Wait for the analyses to finish
       waitsFor =>
-        defs = model.getSymbols().getVariableDefs()
+
+        importTable = model.getImportTable()
+        variableDefs = model.getSymbols().getVariableDefs()
+        typeDefs = model.getSymbols().getTypeDefs()
         valueMap = model.getValueMap()
         stubSpecTable = model.getStubSpecTable()
-        ((defs.length > 0) and valueMap? and stubSpecTable? and
-          ("Example.java" of valueMap))
 
+        ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
+          (typeDefs.length > 0) and
+          valueMap? and ("Example.java" of valueMap) and
+          stubSpecTable? and
+          importTable?)
+
+      # Once analyses complete, we wait for a transition into the IDLE state
       waitsFor =>
         model.getState() is ExampleModelState.IDLE
 
       runs ->
 
-        _in = (symbol, symbols) =>
+        _expectIn = (name, range, symbols) =>
+          foundSymbol = false
           for otherSymbol in symbols
-            return true if otherSymbol.equals symbol
-          false
+            if (otherSymbol.getName() is name) and
+                (otherSymbol.getRange().isEqual range)
+              foundSymbol = true
+          (expect foundSymbol).toBe true
 
         # Check that the analyses have updated the model with valid symbols
-        (expect _in \
-          (new Symbol testFile, "j", (new Range [5, 8], [5, 9]), "int"),
-          defs).toBe true
+        _expectIn "j", (new Range [5, 8], [5, 9]), variableDefs
+        _expectIn "Example", (new Range [0, 13], [0, 20]), typeDefs
 
   _makeMockVariableDefUseAnalysis = =>
     # For the sake of fast timing, we mock out the variable-def-use analysis.

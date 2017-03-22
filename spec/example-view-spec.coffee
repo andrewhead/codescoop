@@ -5,6 +5,7 @@
 { Range, RangeSet } = require "../lib/model/range-set"
 { ValueMap } = require "../lib/analysis/value-analysis"
 { StubSpec } = require "../lib/model/stub"
+{ Import } = require "../lib/model/import"
 { MissingDefinitionError } = require "../lib/error/missing-definition"
 { SymbolSuggestion } = require "../lib/suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
@@ -17,10 +18,14 @@ _ = require "lodash"
 
 codeEditor = atom.workspace.buildTextEditor()
 codeEditor.setText [
-  "int i = 0;"
-  "int j = i;"
-  "i = j + 1;"
-  "j = j + 1;"
+    "public class FakeClass {"
+    "  public static void main(String[] args) {"
+    "    int i = 0;"
+    "    int j = i;"
+    "    i = j + 1;"
+    "    j = j + i;"
+    "  }"
+    "}"
   ].join '\n'
 CODE_BUFFER = codeEditor.getBuffer()
 TEST_FILE = new File "fake/path", "FakeClass.java"
@@ -40,7 +45,7 @@ describe "ExampleView", ->
       PACKAGE_PATH + "/spec/view/java.json"
 
     model = new ExampleModel CODE_BUFFER,
-      (new RangeSet [ (new Range [0, 0], [0, 10]), new Range [1, 0], [1, 10] ]),
+      (new RangeSet [ (new Range [2, 4], [2, 14]), new Range [3, 4], [3, 14] ]),
       new SymbolSet(), PARSE_TREE
     view = new ExampleView model, editor
 
@@ -62,7 +67,7 @@ describe "ExampleView", ->
     rangeSet.getActiveRanges().splice 0, 1
 
     # Add another line index to the list
-    rangeSet.getActiveRanges().push new Range [2, 0], [2, 10]
+    rangeSet.getActiveRanges().push new Range [4, 4], [4, 14]
 
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "int i = 0;").toBe -1
@@ -85,11 +90,17 @@ describe "ExampleView", ->
         "  }"
       ].join "\n").not.toBe -1
 
+  it "adds imports when rendering the text", ->
+    model.getImports().push new Import "org.Book", new Range [0, 7], [0, 15]
+    view = new ExampleView model, editor
+    exampleText = view.getTextEditor().getText()
+    (expect exampleText.startsWith "import org.Book;\n").toBe true
+
   it "marks up symbols with errors in ERROR_CHOICE mode", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [2, 0], [3, 10] ]
+    model.getRangeSet().getActiveRanges().reset [ new Range [4, 4], [5, 14] ]
     model.setErrors [
-      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5])
-      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [3, 4], [3, 5])
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9])
+      (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [5, 8], [5, 9])
     ]
     model.setState ExampleModelState.ERROR_CHOICE
 
@@ -104,8 +115,8 @@ describe "ExampleView", ->
     (expect editor.getTextInBufferRange(markerBufferRange)).toBe "j"
 
   it "supports replacements on symbols marked with errors", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [2, 0], [3, 10] ]
-    undefinedSymbol = new Symbol TEST_FILE, "i", new Range [3, 8], [3, 9]
+    model.getRangeSet().getActiveRanges().reset [ new Range [4, 0], [5, 14] ]
+    undefinedSymbol = new Symbol TEST_FILE, "i", new Range [5, 12], [5, 13]
     model.setErrors [ new MissingDefinitionError undefinedSymbol ]
     model.setState ExampleModelState.ERROR_CHOICE
     model.getEdits().push new Replacement undefinedSymbol, "42"
@@ -128,11 +139,11 @@ describe "ExampleView", ->
         PACKAGE_PATH + "/spec/view/java.json"
 
       model = new ExampleModel CODE_BUFFER,
-        (new RangeSet [ (new Range [2, 0], [2, 10]) ]),
+        (new RangeSet [ (new Range [4, 4], [4, 14]) ]),
         new SymbolSet(), PARSE_TREE
       view = new ExampleView model, editor
       model.setErrors [
-        (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5])
+        (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9])
       ]
       model.setState ExampleModelState.ERROR_CHOICE
 
@@ -157,7 +168,7 @@ describe "ExampleView", ->
       errorChoice = model.getErrorChoice()
       (expect errorChoice instanceof MissingDefinitionError).toBe true
       (expect errorChoice.getSymbol()).toEqual \
-        new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
+        new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9]
 
     it "doesn't highlight symbols with errors when it's in IDLE mode", ->
       # Only show markers when we're picking from undefined uses
@@ -186,14 +197,14 @@ describe "ExampleView", ->
         PACKAGE_PATH + "/spec/view/java.json"
 
       model = new ExampleModel CODE_BUFFER,
-        (new RangeSet [ (new Range [2, 0], [2, 10]) ]),
+        (new RangeSet [ (new Range [4, 4], [4, 14]) ]),
         new SymbolSet(), PARSE_TREE
       valueMap = new ValueMap()
       _.extend valueMap, {
         'Example.java':
-          1: { i: '0' }
-          2: { i: '0', j: '0' }
-          3: { i: '1', j: '0' }
+          3: { i: '0' }
+          4: { i: '0', j: '0' }
+          5: { i: '1', j: '0' }
       }
       model.setValueMap valueMap
 
@@ -201,10 +212,10 @@ describe "ExampleView", ->
 
       # By setting a chosen error, a set of suggestions, and the model state
       # to RESOLUTION, a decoration should be added for resolving the symbol
-      useSymbol = new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
-      defSymbol = new Symbol TEST_FILE, "j", new Range [1, 4], [1, 5]
+      useSymbol = new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9]
+      defSymbol = new Symbol TEST_FILE, "j", new Range [5, 8], [5, 9]
       model.setErrorChoice new MissingDefinitionError \
-        new Symbol TEST_FILE, "j", new Range [2, 4], [2, 5]
+        new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9]
       model.setSuggestions [
         new SymbolSuggestion defSymbol
         new PrimitiveValueSuggestion useSymbol, "1"
@@ -286,7 +297,7 @@ describe "ExampleView", ->
       (expect suggestedRanges.length).toBe 0
       codeSuggestion.mouseover()
       (expect suggestedRanges.length).toBe 1
-      (expect suggestedRanges[0]).toEqual new Range [1, 4], [1, 5]
+      (expect suggestedRanges[0]).toEqual new Range [5, 8], [5, 9]
       codeBlock.mouseleave()
       (expect suggestedRanges.length).toBe 0
 
@@ -301,7 +312,7 @@ describe "ExampleView", ->
       (expect model.getEdits().length).toBe 1
       edit = model.getEdits()[0]
       (expect edit instanceof Replacement)
-      (expect edit.getSymbol().getRange(), new Range [1, 4], [1, 5])
+      (expect edit.getSymbol().getRange(), new Range [3, 8], [3, 9])
       (expect edit.getText(), "1")
 
       valueSuggestion.mouseout()
