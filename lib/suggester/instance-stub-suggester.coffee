@@ -22,7 +22,7 @@ module.exports.InstanceStubSuggester = class InstanceStubSuggester
     # to the symbol that's missing a definition.  Filter to only the defs
     # that appear before the symbol, and then pick the symbol that's the closest
     # to the symbol's use.  XXX: This might yield invalid recommendations.
-    defs = model.getSymbols().getDefs().copy()
+    defs = model.getSymbols().getVariableDefs().copy()
     defs = defs.filter (def) =>
       (def.getFile().equals symbol.getFile()) and
       (def.getName() is symbol.getName()) and

@@ -16,7 +16,7 @@ module.exports.ExampleController = class ExampleController
     @model = model
     @model.addObserver @
 
-    defUseAnalysis = analyses.defUseAnalysis
+    variableDefUseAnalysis = analyses.variableDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
 
@@ -36,17 +36,17 @@ module.exports.ExampleController = class ExampleController
       ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses defUseAnalysis, valueAnalysis, stubAnalysis
+    @_startAnalyses variableDefUseAnalysis, valueAnalysis, stubAnalysis
 
-  _startAnalyses: (defUseAnalysis, valueAnalysis, stubAnalysis) ->
+  _startAnalyses: (variableDefUseAnalysis, valueAnalysis, stubAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
-      defUse:
-        runner: defUseAnalysis
+      variableDefUse:
+        runner: variableDefUseAnalysis
         callback: (analysis) =>
-          @model.getSymbols().setDefs analysis.getDefs()
-          @model.getSymbols().setUses analysis.getUses()
+          @model.getSymbols().setVariableDefs analysis.getDefs()
+          @model.getSymbols().setVariableUses analysis.getUses()
         error: console.error
       value:
         runner: valueAnalysis or= null

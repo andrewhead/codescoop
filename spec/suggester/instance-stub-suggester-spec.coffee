@@ -16,8 +16,8 @@ describe "InstanceStubSuggester", ->
   recentDef = new Symbol testFile, "book", (new Range [8, 11], [8, 15]), "Book"
   oldDef = new Symbol testFile, "book", (new Range [4, 11], [4, 15]), "Book"
   model = new ExampleModel()
-  model.getSymbols().setUses [use]
-  model.getSymbols().setDefs [oldDef, recentDef, irrelevantDef]
+  model.getSymbols().setVariableUses [use]
+  model.getSymbols().setVariableDefs [oldDef, recentDef, irrelevantDef]
 
   # Our example stub specs just has specs for two Book objects, each of which
   # returns a different title when called

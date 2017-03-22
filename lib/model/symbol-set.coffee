@@ -84,8 +84,10 @@ module.exports.SymbolSet = class SymbolSet
 
   constructor: (symbolArrays = undefined) ->
     symbolArrays or= {}
-    @uses = makeObservableArray (symbolArrays.uses or [])
-    @defs = makeObservableArray (symbolArrays.defs or [])
+    @variableUses = makeObservableArray (symbolArrays.uses or [])
+    @variableDefs = makeObservableArray (symbolArrays.defs or [])
+    @typeUses = makeObservableArray (symbolArrays.typeUses or [])
+    @typeDefs = makeObservableArray (symbolArrays.typeDefs or [])
     @observers = []
 
   addObserver: (observer) ->
@@ -97,16 +99,28 @@ module.exports.SymbolSet = class SymbolSet
 
   getAllSymbols: ->
     # Exhaustively accrue all symbols from the various subsets
-    @uses.copy().concat @defs.copy()
+    @variableUses.copy().concat @variableDefs.copy()
 
-  setUses: (uses) ->
-    @uses.reset uses
+  setVariableUses: (variableUses) ->
+    @variableUses.reset variableUses
 
-  getUses: ->
-    @uses
+  getVariableUses: ->
+    @variableUses
 
-  setDefs: (defs) ->
-    @defs.reset defs
+  setVariableDefs: (variableDefs) ->
+    @variableDefs.reset variableDefs
 
-  getDefs: ->
-    @defs
+  getVariableDefs: ->
+    @variableDefs
+
+  setTypeUses: (typeUses) ->
+    @typeUses.reset typeUses
+
+  getTypeUses: ->
+    @typeUses
+
+  setTypeDefs: (typeDefs) ->
+    @typeDefs.reset typeDefs
+
+  getTypeDefs: ->
+    @typeDefs

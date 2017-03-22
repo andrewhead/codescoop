@@ -43,7 +43,7 @@ describe "Fixer", ->
   describe "when handling a PrimitiveValueSuggestion", ->
 
     model = _makeModel()
-    model.getSymbols().setUses [
+    model.getSymbols().setVariableUses [
       new Symbol TEST_FILE, "i", new Range [1, 8], [1, 9]
       new Symbol TEST_FILE, "i", new Range [1, 12], [1, 13]
     ]
@@ -60,7 +60,7 @@ describe "Fixer", ->
       (expect edit.getText()).toEqual "15"
 
     it "updates the model to reflect that the symbol is no longer being used", ->
-      uses = model.getSymbols().getUses()
+      uses = model.getSymbols().getVariableUses()
       (expect uses.length).toBe 1
       (expect uses[0].getRange()).toEqual new Range [1, 12], [1, 13]
 
@@ -82,7 +82,7 @@ describe "Fixer", ->
   describe "when applying an InstanceStubSuggestion", ->
 
     model = _makeModel()
-    model.getSymbols().setUses [
+    model.getSymbols().setVariableUses [
       new Symbol TEST_FILE, "book", (new Range [4, 11], [4, 15]), "Book"
     ]
     (expect model.getStubSpecs().length).toBe 0
@@ -105,5 +105,5 @@ describe "Fixer", ->
       (expect edit.getText()).toEqual "(new Book())"
 
     it "updates the model to reflect the symbol is no longer being used", ->
-      uses = model.getSymbols().getUses()
+      uses = model.getSymbols().getVariableUses()
       (expect uses.length).toBe 0

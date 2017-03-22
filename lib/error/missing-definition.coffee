@@ -13,8 +13,8 @@ module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
 
     rangeSet = model.getRangeSet()
     symbolSet = model.getSymbols()
-    activeUses = rangeSet.getActiveSymbols symbolSet.getUses()
-    activeDefs = rangeSet.getActiveSymbols symbolSet.getDefs()
+    activeUses = rangeSet.getActiveSymbols symbolSet.getVariableUses()
+    activeDefs = rangeSet.getActiveSymbols symbolSet.getVariableDefs()
     missingDefinitionErrors = []
 
     # For each use in the active set, check to see if it was defined before

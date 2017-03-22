@@ -9,7 +9,7 @@ SymbolAppearance = java.import "SymbolAppearance"
 # Any object that represents an object in the Java
 # runtime has the suffix "J".  No objects with this suffix
 # should be passed out from this interface.
-module.exports.DefUseAnalysis = class DefUseAnalysis
+module.exports.VariableDefUseAnalysis = class VariableDefUseAnalysis
 
   constructor: (file) ->
     @file = file

@@ -1,6 +1,6 @@
 { ExampleModel, ExampleModelState } = require "../lib/model/example-model"
 { ExampleController } = require "../lib/example-controller"
-{ DefUseAnalysis } = require "../lib/analysis/def-use"
+{ VariableDefUseAnalysis } = require "../lib/analysis/variable-def-use"
 { Range, RangeSet } = require "../lib/model/range-set"
 { File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
@@ -24,7 +24,7 @@ describe "ExampleController", ->
 
   describe "when in the ANALYSIS state", ->
 
-    defUseAnalysis = new DefUseAnalysis testFile
+    variableDefUseAnalysis = new VariableDefUseAnalysis testFile
     valueAnalysis = new ValueAnalysis testFile
     stubAnalysis = new StubAnalysis testFile
     model = new ExampleModel _makeCodeBuffer(),
@@ -41,11 +41,11 @@ describe "ExampleController", ->
 
       runs ->
         controller = new ExampleController model,
-          { defUseAnalysis, valueAnalysis, stubAnalysis }, []
+          { variableDefUseAnalysis, valueAnalysis, stubAnalysis }, []
 
       # After creating the controller, we wait for analyses to finish
       waitsFor =>
-        defs = model.getSymbols().getDefs()
+        defs = model.getSymbols().getVariableDefs()
         valueMap = model.getValueMap()
         stubSpecTable = model.getStubSpecTable()
         ((defs.length > 0) and valueMap? and stubSpecTable? and
@@ -66,21 +66,21 @@ describe "ExampleController", ->
           (new Symbol testFile, "j", (new Range [5, 8], [5, 9]), "int"),
           defs).toBe true
 
-  _makeMockDefUseAnalysis = =>
-    # For the sake of fast timing, we mock out the def-use analysis.
+  _makeMockVariableDefUseAnalysis = =>
+    # For the sake of fast timing, we mock out the variable-def-use analysis.
     # We control the definition that it returns when looking for the earliest
     # definition before the symbol, trusting in practice it will do the right thing.
-    defUseAnalysis = jasmine.createSpyObj 'defUseAnalysis', ['run', 'getDefs', 'getUses']
-    defUseAnalysis.getDefs = => []
-    defUseAnalysis.getUses = => []
-    defUseAnalysis.run = (success, error) => success defUseAnalysis
-    defUseAnalysis
+    variableDefUseAnalysis = jasmine.createSpyObj 'variableDefUseAnalysis', ['run', 'getDefs', 'getUses']
+    variableDefUseAnalysis.getDefs = => []
+    variableDefUseAnalysis.getUses = => []
+    variableDefUseAnalysis.run = (success, error) => success variableDefUseAnalysis
+    variableDefUseAnalysis
 
   describe "when in the IDLE state", ->
 
     model = undefined
     controller = undefined
-    defUseAnalysis = undefined
+    variableDefUseAnalysis = undefined
     correctors = undefined
 
     beforeEach =>
@@ -89,8 +89,8 @@ describe "ExampleController", ->
             detectErrors: (parseTree, rangeSet, symbolSet) => []
       ]
       model = _makeDefaultModel()
-      defUseAnalysis = _makeMockDefUseAnalysis()
-      controller = new ExampleController model, { defUseAnalysis }, correctors
+      variableDefUseAnalysis = _makeMockVariableDefUseAnalysis()
+      controller = new ExampleController model, { variableDefUseAnalysis }, correctors
       waitsFor (=>
           model.getState() is ExampleModelState.IDLE
         ), "Waiting for state"
@@ -180,8 +180,8 @@ describe "ExampleController", ->
 
       runs =>
         model = _makeDefaultModel()
-        defUseAnalysis = _makeMockDefUseAnalysis()
-        controller = new ExampleController model, { defUseAnalysis }, correctors
+        variableDefUseAnalysis = _makeMockVariableDefUseAnalysis()
+        controller = new ExampleController model, { variableDefUseAnalysis }, correctors
 
       waitsFor =>
         model.getState() is ExampleModelState.ERROR_CHOICE
@@ -206,8 +206,8 @@ describe "ExampleController", ->
     }]
 
     model = _makeDefaultModel()
-    defUseAnalysis = _makeMockDefUseAnalysis()
-    controller = new ExampleController model, { defUseAnalysis }, correctors
+    variableDefUseAnalysis = _makeMockVariableDefUseAnalysis()
+    controller = new ExampleController model, { variableDefUseAnalysis }, correctors
     model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
     model.setState ExampleModelState.RESOLUTION
     model.setActiveCorrector correctors[0]

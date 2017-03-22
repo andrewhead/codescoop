@@ -11,7 +11,7 @@ module.exports.Fixer = class Fixer
   # Make sure a symbol is no longer marked as a "use" in the model, to hide
   # definition errors if the use has been defined some other way
   _removeUse: (model, removableUse) ->
-    uses = model.getSymbols().getUses()
+    uses = model.getSymbols().getVariableUses()
     useIndex = 0
     for use in uses
       if use.equals removableUse

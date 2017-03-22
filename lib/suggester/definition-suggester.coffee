@@ -25,7 +25,7 @@ module.exports.DefinitionSuggester = class DefinitionSuggester
 
     # Make a copy of the defs, as sort mutates the array, and we don't want to
     # observe each of the sorting events elsewhere
-    defs = symbolSet.getDefs().copy()
+    defs = symbolSet.getVariableDefs().copy()
 
     # Consider only the definitions for the symbol that occured
     # in one a scope available to the use.

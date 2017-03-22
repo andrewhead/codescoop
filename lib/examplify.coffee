@@ -6,7 +6,7 @@
 { ExampleModel } = require "./model/example-model"
 
 { ExampleController } = require "./example-controller"
-{ DefUseAnalysis } = require "./analysis/def-use"
+{ VariableDefUseAnalysis } = require "./analysis/variable-def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
 { StubAnalysis } = require "./analysis/stub-analysis"
 
@@ -67,7 +67,7 @@ module.exports.MainController = class MainController
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
     @analyses =
-      defUseAnalysis: new DefUseAnalysis codeEditorFile
+      variableDefUseAnalysis: new VariableDefUseAnalysis codeEditorFile
       valueAnalysis: new ValueAnalysis codeEditorFile
       stubAnalysis: new StubAnalysis codeEditorFile
 

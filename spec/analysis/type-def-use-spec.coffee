@@ -1,11 +1,28 @@
-{ MissingTypeDefinitionDetector } = require "../../lib/error/missing-type-definition"
-{ MissingTypeDefinitionError } = require "../../lib/error/missing-type-definition"
-{ TypeUseFinder, TypeDefFinder } = require "../../lib/error/missing-type-definition"
+{ TypeDefUseAnalysis } = require "../../lib/analysis/type-def-use"
+{ TypeUseFinder, TypeDefFinder } = require "../../lib/analysis/type-def-use"
+{ File, Symbol } = require "../../lib/model/symbol-set"
 { parse } = require "../../lib/analysis/parse-tree"
 { Range } = require "../../lib/model/range-set"
-{ File, Symbol } = require "../../lib/model/symbol-set"
-{ ExampleModel } = require "../../lib/model/example-model"
-{ Import, ImportTable } = require "../../lib/model/import"
+
+
+describe "TypeDefUseAnalysis", ->
+
+  it "calls a callback with the defs and uses found once finished", ->
+    testFile = new File "path", "filename"
+    code = [
+      "public class Book {"
+      "  Book otherBook;"
+      "}"
+    ].join "\n"
+    parseTree = parse code
+    analysis = new TypeDefUseAnalysis testFile, parseTree
+    analysis.run (result) =>
+      uses = result.typeUses
+      defs = result.typeDefs
+      (expect uses.length).toBe 1
+      (expect uses[0].getRange()).toEqual new Range [1, 2], [1, 6]
+      (expect defs.length).toBe 1
+      (expect defs[0].getRange()).toEqual new Range [0, 13], [0, 17]
 
 
 describe "TypeUseFinder", ->
@@ -152,66 +169,3 @@ describe "TypeDefFinder", ->
   it "finds class definitions in enum declarations", ->
     parseTree = parse "public enum BookType {}"
     _checkForOneTypeSymbol parseTree, "BookType", new Range [0, 12], [0, 20]
-
-
-describe "MissingTypeDefinitionDetector", ->
-
-  code = [
-    "import com.ImportedClass;"
-    ""
-    "public class Book {"
-    ""
-    "  private class InnerClass {}"
-    ""
-    "  private ImportedClass myImportedClass;"
-    "  private Book myBook;"
-    ""
-    "}"
-  ].join "\n"
-  codeEditor = atom.workspace.buildTextEditor()
-  codeBuffer = codeEditor.getBuffer()
-  codeBuffer.setText code
-  model = undefined
-  detector = undefined
-  importTable = undefined
-
-  beforeEach =>
-
-    importTable = new ImportTable
-    importTable.addImport "ImportedClass", \
-      new Import "com.ImportedClass", new Range [0, 7], [0, 24]
-
-    model = new ExampleModel codeBuffer
-    model.setParseTree (parse code)
-    model.setImportTable importTable
-
-    detector = new MissingTypeDefinitionDetector()
-
-  it "reports a missing definition if a relevant import is not in the active " +
-     "ranges", ->
-    model.getRangeSet().getActiveRanges().push new Range [6, 0], [6, 40]
-    errors = detector.detectErrors model
-    (expect errors.length).toBe 1
-    (expect errors[0] instanceof MissingTypeDefinitionError).toBe true
-    (expect errors[0].getSymbol().getName()).toBe "ImportedClass"
-    (expect errors[0].getSymbol().getRange()).toEqual new Range [6, 10], [6, 23]
-
-  it "reports a missing definition if the corresponding declaration is not " +
-     "in the active ranges", ->
-    model.getRangeSet().getActiveRanges().push new Range [7, 0], [7, 22]
-    errors = detector.detectErrors model
-    (expect errors.length).toBe 1
-    (expect errors[0].getSymbol().getName()).toBe "Book"
-    (expect errors[0].getSymbol().getRange()).toEqual new Range [7, 10], [7, 14]
-
-  it "doesn't report missing definitions when imports are active", ->
-    model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 25]
-    model.getRangeSet().getActiveRanges().push new Range [6, 0], [6, 40]
-    errors = detector.detectErrors model
-    (expect errors.length).toBe 0
-
-  it "doesn't report missing definitions when a declaration is active", ->
-    model.getRangeSet().getActiveRanges().push new Range [3, 0], [0, 29]
-    model.getRangeSet().getActiveRanges().push new Range [7, 0], [7, 22]
-    errors = detector.detectErrors model
-    (expect errors.length).toBe 0
