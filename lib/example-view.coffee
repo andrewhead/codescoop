@@ -268,6 +268,11 @@ module.exports.ExampleView = class ExampleView
       position: "tail"
     @textEditor.decorateMarker marker, params
 
+    params =
+      type: "highlight"
+      class: "resolution-highlight"
+    @textEditor.decorateMarker marker, params
+
   _addExtensionWidget: (extension) ->
 
     # Make a marker for the range inside the control structure

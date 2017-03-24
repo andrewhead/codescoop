@@ -2,9 +2,20 @@
 @import "ui-variables";
 
 
-atom-text-editor .highlight.error-choice-highlight .region {
-  background-color: @syntax-color-removed;
-  opacity: .8;
+.highlight {
+
+  &.error-choice-highlight .region {
+    background-color: @syntax-color-removed;
+    opacity: .8;
+  }
+
+  &.extension-highlight, &.resolution-highlight {
+    .region {
+      background-color: @background-color-info;
+      opacity: .6;
+    }
+  }
+
 }
 
 atom-text-editor div.line {
