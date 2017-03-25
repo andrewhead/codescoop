@@ -1,6 +1,6 @@
 { MissingDefinitionError } = require "../../lib/error/missing-definition"
 { DefinitionSuggester } = require "../../lib/suggester/definition-suggester"
-{ SymbolSuggestion } = require "../../lib/suggester/definition-suggester"
+{ DefinitionSuggestion } = require "../../lib/suggester/definition-suggester"
 { Symbol, SymbolSet } = require "../../lib/model/symbol-set"
 { Range, RangeSet } = require "../../lib/model/range-set"
 { parse } = require "../../lib/analysis/parse-tree"
@@ -74,7 +74,7 @@ describe "DefinitionSuggester", ->
 
     suggestion = suggestions[0]
     (expect suggestions.length).toBe 1
-    (expect suggestion instanceof SymbolSuggestion).toBe true
+    (expect suggestion instanceof DefinitionSuggestion).toBe true
     (expect suggestion.getSymbol()).toEqual \
       new Symbol "Example.java", "j", new Range [10, 8], [10, 9]
 

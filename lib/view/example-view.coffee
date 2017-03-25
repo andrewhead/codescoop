@@ -10,7 +10,7 @@ $ = require "jquery"
 { MissingTypeDefinitionError } = require "../error/missing-type-definition"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 
-{ SymbolSuggestionBlockView } = require "../view/symbol-suggestion"
+{ DefinitionSuggestionBlockView } = require "../view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "../view/primitive-value-suggestion"
 { DeclarationSuggestionBlockView } = require "../view/declaration-suggestion"
 { InstanceStubSuggestionBlockView } = require "../view/instance-stub-suggestion"
@@ -248,8 +248,8 @@ module.exports.ExampleView = class ExampleView
 
     for class_ in suggestionClasses
       suggestions = suggestionsByClass[class_]
-      if class_ is "SymbolSuggestion"
-        block = new SymbolSuggestionBlockView suggestions, @model, marker
+      if class_ is "DefinitionSuggestion"
+        block = new DefinitionSuggestionBlockView suggestions, @model, marker
       else if class_ is "PrimitiveValueSuggestion"
         block = new PrimitiveValueSuggestionBlockView suggestions, @model, marker
       else if class_ is "DeclarationSuggestion"

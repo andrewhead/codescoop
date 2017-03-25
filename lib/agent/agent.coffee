@@ -1,7 +1,5 @@
 { ExampleModelProperty } = require "../../lib/model/example-model"
 { ExampleModelState } = require "../../lib/model/example-model"
-{ ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
-{ IfControlStructure, ForControlStructure, WhileControlStructure, DoWhileControlStructure, TryCatchControlStructure } = require "../../lib/analysis/parse-tree"
 
 
 # Interface for an agent that listens to changes in the model and acts on the
@@ -42,15 +40,3 @@ module.exports.Agent = class Agent
         when ExampleModelState.ERROR_CHOICE then @onEnterErrorChoiceState()
         when ExampleModelState.RESOLUTION then @onEnterResolutionState()
         when ExampleModelState.EXTENSION then @onEnterExtensionState()
-
-
-# Many agents may want to just accept all try-catch blocks (which may be
-# needed to compile the program) and for-loops (which can define variables).
-# This method can be used as those agents' `acceptExtension` method.
-module.exports.acceptOnlyForLoopsAndTryBlocks =\
-  acceptOnlyForLoopsAndTryBlocks = (extension) ->
-    return false if not (extension instanceof ControlStructureExtension)
-    controlStructure = extension.getControlStructure()
-    accept = ((controlStructure instanceof ForControlStructure) or
-      (controlStructure instanceof TryCatchControlStructure))
-    accept

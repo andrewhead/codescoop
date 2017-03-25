@@ -1,7 +1,7 @@
 { ScopeFinder } = require '../analysis/scope'
 
 
-module.exports.SymbolSuggestion = class SymbolSuggestion
+module.exports.DefinitionSuggestion = class DefinitionSuggestion
 
   constructor: (symbol) ->
     @symbol = symbol
@@ -65,4 +65,4 @@ module.exports.DefinitionSuggester = class DefinitionSuggester
         return def1.getRange().compare def2.getRange()
 
     # Package the sorted defs as a list of suggestions
-    ((new SymbolSuggestion def) for def in defs)
+    ((new DefinitionSuggestion def) for def in defs)

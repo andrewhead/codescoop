@@ -1,5 +1,5 @@
 { ImportSuggestion } = require "./suggester/import-suggester"
-{ SymbolSuggestion } = require "./suggester/definition-suggester"
+{ DefinitionSuggestion } = require "./suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "./suggester/primitive-value-suggester"
 { DeclarationSuggestion } = require "./suggester/declaration-suggester"
 { InstanceStubSuggestion } = require "./suggester/instance-stub-suggester"
@@ -25,7 +25,7 @@ module.exports.Fixer = class Fixer
 
     # TODO: eventually this should add the smallest range that defines
     # the symbol, but right now it adds lines
-    if update instanceof SymbolSuggestion
+    if update instanceof DefinitionSuggestion
       codeBuffer = model.getCodeBuffer()
       symbolRange = update.getSymbol().getRange()
       startRowRange = codeBuffer.rangeForRow symbolRange.start.row

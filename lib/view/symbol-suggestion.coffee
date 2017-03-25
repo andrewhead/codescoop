@@ -2,7 +2,7 @@
 { SuggestionBlockView } = require './suggestion-block-view'
 
 
-module.exports.SymbolSuggestionView = class SymbolSuggestionView extends SuggestionView
+module.exports.DefinitionSuggestionView = class DefinitionSuggestionView extends SuggestionView
 
   constructor: (suggestion, model) ->
     super suggestion, model,
@@ -17,11 +17,11 @@ module.exports.SymbolSuggestionView = class SymbolSuggestionView extends Suggest
     @rangeSet.removeSuggestedRange @suggestion.getSymbol().getRange()
 
 
-module.exports.SymbolSuggestionBlockView = \
-    class SymbolSuggestionBlockView extends SuggestionBlockView
+module.exports.DefinitionSuggestionBlockView = \
+    class DefinitionSuggestionBlockView extends SuggestionBlockView
 
   constructor: (suggestions, model, errorMarker) ->
     super "Add code", suggestions, model, errorMarker
 
   createSuggestionView: (suggestion) ->
-    new SymbolSuggestionView suggestion, @model
+    new DefinitionSuggestionView suggestion, @model

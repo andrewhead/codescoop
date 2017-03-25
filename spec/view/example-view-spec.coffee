@@ -6,7 +6,7 @@
 { StubSpec } = require "../../lib/model/stub"
 { Import } = require "../../lib/model/import"
 { MissingDefinitionError } = require "../../lib/error/missing-definition"
-{ SymbolSuggestion } = require "../../lib/suggester/definition-suggester"
+{ DefinitionSuggestion } = require "../../lib/suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "../../lib/suggester/primitive-value-suggester"
 { ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
 { ControlCrossingEvent } = require "../../lib/event/control-crossing"
@@ -218,7 +218,7 @@ describe "ExampleView", ->
       model.setErrorChoice new MissingDefinitionError \
         new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9]
       model.setSuggestions [
-        new SymbolSuggestion defSymbol
+        new DefinitionSuggestion defSymbol
         new PrimitiveValueSuggestion useSymbol, "1"
         new PrimitiveValueSuggestion useSymbol, "0"
       ]
@@ -283,7 +283,7 @@ describe "ExampleView", ->
       (expect model.getResolutionChoice()).toBe null
       codeSuggestion.click()
       resolutionChoice = model.getResolutionChoice()
-      (expect resolutionChoice instanceof SymbolSuggestion).toBe true
+      (expect resolutionChoice instanceof DefinitionSuggestion).toBe true
       codeBlock.mouseleave()
 
     it "highlights suggested lines for symbol suggestions on mouse over", ->

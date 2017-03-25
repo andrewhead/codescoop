@@ -8,7 +8,7 @@
 { Declaration } = require "../lib/edit/declaration"
 
 { ImportSuggestion } = require "../lib/suggester/import-suggester"
-{ SymbolSuggestion } = require "../lib/suggester/definition-suggester"
+{ DefinitionSuggestion } = require "../lib/suggester/definition-suggester"
 { PrimitiveValueSuggestion } = require "../lib/suggester/primitive-value-suggester"
 { InstanceStubSuggestion } = require '../lib/suggester/instance-stub-suggester'
 { DeclarationSuggestion } = require "../lib/suggester/declaration-suggester"
@@ -38,9 +38,9 @@ describe "Fixer", ->
   TEST_FILE = new File '.', 'test-file.java'
   fixer = new Fixer()
 
-  it "adds a range that includes a symbol of a SymbolSuggestion", ->
+  it "adds a range that includes a symbol of a DefinitionSuggestion", ->
     model = _makeModel()
-    suggestion = new SymbolSuggestion \
+    suggestion = new DefinitionSuggestion \
       new Symbol TEST_FILE, "i", new Range [0, 4], [0, 5]
     fixer.apply model, suggestion
 
