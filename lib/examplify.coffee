@@ -1,6 +1,6 @@
 { CompositeDisposable } = require "atom"
-{ CodeView } = require "./code-view"
-{ ExampleView } = require "./example-view"
+{ CodeView } = require "./view/code-view"
+{ ExampleView } = require "./view/example-view"
 { StubPreview } = require "./view/stub-preview"
 
 { ExampleModel } = require "./model/example-model"
@@ -24,7 +24,6 @@ EXAMPLE_FILE_NAME = "SmallScoop.java"
 module.exports = plugin =
 
   subscriptions: null
-  # controller: null
 
   activate: (state) ->
     @subscriptions = new CompositeDisposable()

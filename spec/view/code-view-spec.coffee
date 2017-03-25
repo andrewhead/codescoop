@@ -1,5 +1,5 @@
-{ CodeView } = require "../lib/code-view"
-{ Range, RangeSet } = require "../lib/model/range-set"
+{ CodeView } = require "../../lib/view/code-view"
+{ Range, RangeSet } = require "../../lib/model/range-set"
 $ = require "jquery"
 
 
