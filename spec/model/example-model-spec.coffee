@@ -1,7 +1,7 @@
-{ ExampleModel, ExampleModelProperty } = require '../lib/model/example-model'
-{ Range, RangeSet } = require "../lib/model/range-set"
-{ SymbolSet } = require "../lib/model/symbol-set"
-{ ValueMap } = require "../lib/analysis/value-analysis"
+{ ExampleModel, ExampleModelProperty } = require '../../lib/model/example-model'
+{ Range, RangeSet } = require "../../lib/model/range-set"
+{ SymbolSet } = require "../../lib/model/symbol-set"
+{ ValueMap } = require "../../lib/analysis/value-analysis"
 
 
 makeEditor = -> atom.workspace.buildTextEditor()

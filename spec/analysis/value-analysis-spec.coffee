@@ -1,6 +1,6 @@
-{ ValueAnalysis } = require '../lib/analysis/value-analysis'
-{ PACKAGE_PATH } = require '../lib/config/paths'
-{ File } = require '../lib/model/symbol-set'
+{ ValueAnalysis } = require '../../lib/analysis/value-analysis'
+{ PACKAGE_PATH } = require '../../lib/config/paths'
+{ File } = require '../../lib/model/symbol-set'
 
 
 describe "ValueAnalysis", ->
