@@ -59,13 +59,13 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector
 
           event = new ControlCrossingEvent controlStructure, lastRange, newRange
 
-          # But only add the event if the user hasn't already seen and
-          # made a decision based on it.
-          eventAlreadySeen = false
-          for pastEvent in @model.getViewedEvents()
+          # But only add the event if the user hasn't already seen it and if
+          # it has not yet been added to the queue of events.
+          eventWasQueuedBefore = false
+          for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
             if pastEvent.hasControlStructure event.getControlStructure()
-              eventAlreadySeen = true
-          (@model.getEvents().push event) if not eventAlreadySeen
+              eventWasQueuedBefore = true
+          (@model.getEvents().push event) if not eventWasQueuedBefore
 
   findCrossedControlStructures: (parseTree, lastRange, newRange) ->
 

@@ -131,7 +131,24 @@ describe "ControlCrossingDetector", ->
       model.getRangeSet().getActiveRanges().push new Range [4, 8], [4, 14]
       (expect model.getEvents().length).toBe 0
 
-    it "does not suggest the same control structure twice", ->
+    it "does not suggest a control structure that was crossed before and " +
+        "has already enqueued an event", ->
+
+      # Mock a past event with the same control structure as the one that
+      # will be triggered by added active ranges
+      pastCrossingEvent = new ControlCrossingEvent \
+        (new IfControlStructure undefined), undefined, undefined
+      (spyOn pastCrossingEvent, "hasControlStructure").andReturn true
+      model.getEvents().push pastCrossingEvent
+
+      # No new events should be added now when we cross the structure again
+      activeRanges = model.getRangeSet().getActiveRanges()
+      activeRanges.push new Range [4, 8], [4, 14]
+      activeRanges.push new Range [2, 4], [2, 10]
+      (expect model.getEvents().length).toBe 1
+
+    it "does not suggest a control structure that was crossed before and " +
+        "which the user has already decided to accept or reject", ->
 
       # Mock a past event with the same control structure as the one that
       # will be triggered by added active ranges
