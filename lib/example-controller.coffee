@@ -33,15 +33,15 @@ module.exports.ExampleController = class ExampleController
     stubAnalysis = analyses.stubAnalysis
 
     @correctors = extras.correctors or [
-        checker: new MissingTypeDefinitionDetector()
-        suggesters: [ new ImportSuggester() ]
-      ,
         checker: new MissingDefinitionDetector()
         suggesters: [
           new DefinitionSuggester()
           new PrimitiveValueSuggester()
           new InstanceStubSuggester()
         ]
+      ,
+        checker: new MissingTypeDefinitionDetector()
+        suggesters: [ new ImportSuggester() ]
       ,
         checker: new MissingDeclarationDetector()
         suggesters: [ new DeclarationSuggester() ]
