@@ -367,8 +367,8 @@ public class DataflowAnalysis {
     };
 
     public static void main(String[] args) {
-        DataflowAnalysis analysis = new DataflowAnalysis("tests/");
-        analysis.analyze("Main");
+        DataflowAnalysis analysis = new DataflowAnalysis(args[0]);
+        analysis.analyze(args[1]);
     }
 
 
