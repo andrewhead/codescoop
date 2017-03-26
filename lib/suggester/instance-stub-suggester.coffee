@@ -29,14 +29,15 @@ module.exports.InstanceStubSuggester = class InstanceStubSuggester
       ((def.getRange().compare symbol.getRange()) < 1)
     defs.sort (def1, def2) =>
       def2.getRange().compare def1.getRange()
-    closestDef = defs[0]
 
-    # Return all stub specs for instances defined at that location
-    className = closestDef.getFile().getName().replace /\.java$/, ''
-    stubSpecs = stubSpecTable.getStubSpecs className,
-      closestDef.getName(), closestDef.getRange().start.row
     suggestions = []
-    for stubSpec in stubSpecs
-      suggestions.push new InstanceStubSuggestion symbol, stubSpec
+    if defs.length > 0
+      # Return all stub specs for instances defined at the closest def location
+      closestDef = defs[0]
+      className = closestDef.getFile().getName().replace /\.java$/, ''
+      stubSpecs = stubSpecTable.getStubSpecs className,
+        closestDef.getName(), closestDef.getRange().start.row
+      for stubSpec in stubSpecs
+        suggestions.push new InstanceStubSuggestion symbol, stubSpec
 
     suggestions

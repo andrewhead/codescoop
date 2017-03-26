@@ -367,9 +367,28 @@ public class DataflowAnalysis {
     };
 
     public static void main(String[] args) {
+
         DataflowAnalysis analysis = new DataflowAnalysis(args[0]);
         analysis.analyze(args[1]);
-    }
 
+        System.out.println("");
+        System.out.println("====");
+        System.out.println("Defs");
+        System.out.println("====");
+        for (SymbolAppearance def: analysis.getDefinitions()) {
+            System.out.println(def);
+        }
+
+        System.out.println("");
+        System.out.println("====");
+        System.out.println("Uses");
+        System.out.println("====");
+        for (SymbolAppearance use: analysis.getUses()) {
+            System.out.println(use);
+        }
+
+        System.out.println("");
+
+    }
 
 }

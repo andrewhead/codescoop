@@ -48,3 +48,10 @@ describe "InstanceStubSuggester", ->
     for suggestion in suggestions
       (expect suggestion.getStubSpec() in [line8Spec1, line8Spec2]).toBe true
       (expect suggestion.getSymbol().getRange().start.row).toBe 10
+
+  it "doesn't crash if there's not def above the symbol use", ->
+    suggester = new InstanceStubSuggester()
+    error = new MissingDefinitionError \
+      new Symbol testFile, "undefinedInt", new Range [11, 16], [11, 28], "int"
+    suggestions = suggester.getSuggestions error, model
+    (expect suggestions.length).toBe 0
