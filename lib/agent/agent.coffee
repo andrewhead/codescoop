@@ -21,6 +21,7 @@ module.exports.Agent = class Agent
   constructor: (model) ->
     @model = model
     @model.addObserver @
+    @activated = true
 
   onEnterErrorChoiceState: ->
     errorChoice = @chooseError @model.getErrors()
@@ -34,9 +35,25 @@ module.exports.Agent = class Agent
     extensionDecision = @acceptExtension @model.getProposedExtension()
     @model.setExtensionDecision extensionDecision
 
-  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
-    if propertyName is ExampleModelProperty.STATE
-      switch newValue
+  run: ->
+    @_step @model.getState()
+
+  _step: (modelState) ->
+    if @activated
+      switch modelState
         when ExampleModelState.ERROR_CHOICE then @onEnterErrorChoiceState()
         when ExampleModelState.RESOLUTION then @onEnterResolutionState()
         when ExampleModelState.EXTENSION then @onEnterExtensionState()
+
+  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
+    if propertyName is ExampleModelProperty.STATE
+      @_step newValue
+
+  activate: ->
+    @activated = true
+
+  deactivate: ->
+    @activated = false
+
+  isActivated: ->
+    @activated

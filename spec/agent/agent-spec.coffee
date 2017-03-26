@@ -4,6 +4,67 @@
 
 describe "Agent", ->
 
+  describe "when asked explicitly to run", ->
+
+    model = undefined
+
+    beforeEach =>
+      model = new ExampleModel()
+
+    it "chooses an error when the model is in ERROR_CHOICE state", ->
+
+      # Create agent after the model is already in the ERROR_CHOICE state.
+      # If we create it before, it will run in response to the model change.
+      model.setState ExampleModelState.ERROR_CHOICE
+      agent = new Agent model
+      agent.chooseError = => { errorId: 42 }
+      (spyOn agent, "chooseError").andCallThrough()
+
+      (expect agent.chooseError).not.toHaveBeenCalled()
+      agent.run()
+      (expect agent.chooseError).toHaveBeenCalled()
+
+    it "chooses a resolution when the model is in RESOLUTION state", ->
+
+      model.setState ExampleModelState.RESOLUTION
+      agent = new Agent model
+      agent.chooseResolution = => { resolutionId: 42 }
+      (spyOn agent, "chooseResolution").andCallThrough()
+
+      (expect agent.chooseResolution).not.toHaveBeenCalled()
+      agent.run()
+      (expect agent.chooseResolution).toHaveBeenCalled()
+
+    it "makes a decision when the model is in EXTENSION state", ->
+
+      model.setState ExampleModelState.EXTENSION
+      agent = new Agent model
+      agent.acceptExtension = => false
+      (spyOn agent, "acceptExtension").andCallThrough()
+
+      (expect agent.acceptExtension).not.toHaveBeenCalled()
+      agent.run()
+      (expect agent.acceptExtension).toHaveBeenCalled()
+
+  it "stops listening for events when deactivated", ->
+    model = new ExampleModel()
+    agent = new Agent model
+    agent.chooseError = => { errorId: 42 }
+    (spyOn agent, "chooseError").andCallThrough()
+    agent.deactivate()
+    model.setState ExampleModelState.ERROR_CHOICE
+    (expect agent.chooseError).not.toHaveBeenCalled()
+
+  it "starts listening for events when reactivated", ->
+    model = new ExampleModel()
+    agent = new Agent model
+    agent.chooseError = => { errorId: 42 }
+    (spyOn agent, "chooseError").andCallThrough()
+    agent.deactivate()
+    agent.activate()
+    model.setState ExampleModelState.ERROR_CHOICE
+    (expect agent.chooseError).toHaveBeenCalled()
+
   describe "when the model enters the ERROR_CHOICE state", ->
 
     model = undefined

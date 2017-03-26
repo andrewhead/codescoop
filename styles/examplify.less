@@ -1,5 +1,6 @@
 @import "syntax-variables";
 @import "ui-variables";
+@import "chosen";
 
 
 .highlight {
@@ -119,6 +120,96 @@ atom-overlay {
       cursor: pointer;
     }
 
+  }
+
+}
+
+
+div.agent-runner {
+
+  float: right;
+  display: flex;
+  align-items: center;
+
+  p {
+    display: inline;
+  }
+
+  // This whole block is here to make the "chosen" selection
+  // fit in with the GitHub atom visual theme.
+  #agent_select_chosen {
+
+    // Needed to make Chosen not initially render to 0px
+    width: initial !important;
+
+    a.chosen-single {
+      background: @button-background-color;
+      border-color: @button-border-color;
+      border: 1px solid @button-border-color;
+      padding: @component-padding;
+      color: @text-color-highlight;
+      height: initial;
+    }
+
+    &.chosen-container-active {
+      a.chosen-single {
+        box-shadow: 0 1px 0 (@button-border-color - 20%) inset;
+      }
+    }
+
+    div.chosen-drop {
+
+      // Option list goes above select input, not below
+      top: initial;
+      bottom: 100%;
+
+      border-radius: 4px;
+      border-color: @button-background-color;
+      background-color: @button-background-color + 40%;
+      box-shadow: 0 1px 0 black inset;
+
+      ul.chosen-results {
+        margin-top: 6px;
+
+        li {
+          color: @text-color-highlight;
+          &.highlighted {
+            background-color: white;
+            background-image: none;
+            color: @button-background-color;
+          }
+        }
+      }
+
+    }
+
+  }
+
+  p, #agent_select_chosen, button {
+    font-size: 18px;
+    margin-top: @component-padding;
+    margin-bottom: @component-padding;
+    margin-right: @component-padding;
+  }
+
+}
+
+.agent-button {
+
+  border-radius: @component-border-radius;
+  padding: @component-padding;
+
+  background-color: @button-background-color;
+  border-color: @button-border-color;
+  color: @text-color-highlight;
+  font-family: @font-family;
+
+  &:hover {
+    background-color: @button-background-color-hover;
+  }
+
+  &:active {
+    background-color: @button-background-color-selected;
   }
 
 }

@@ -2,6 +2,7 @@
 { CodeView } = require "./view/code-view"
 { ExampleView } = require "./view/example-view"
 { StubPreview } = require "./view/stub-preview"
+{ AgentRunnerView } = require "./view/agent-runner-view"
 
 { ExampleModel } = require "./model/example-model"
 
@@ -11,6 +12,8 @@
 { TypeDefUseAnalysis } = require "./analysis/type-def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
 { StubAnalysis } = require "./analysis/stub-analysis"
+
+{ AgentRunner } = require "./agent/agent-runner"
 
 { RangeSet } = require "./model/range-set"
 { File, SymbolSet } = require "./model/symbol-set"
@@ -60,10 +63,18 @@ module.exports.MainController = class MainController
     @exampleModel = new ExampleModel codeEditor.getBuffer(), @rangeSet,\
       @symbols, @parseTree
 
-    # Prepare views
+    # Prepare agents
+    @agentRunner = new AgentRunner @exampleModel
+
+    # Prepare views (note that this involves removing *previous* views)
     @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
     @stubPreview = new StubPreview @exampleModel
+    for bottomPanel in atom.workspace.getBottomPanels()
+      bottomPanel.destroy() if bottomPanel.item instanceof AgentRunner
+    atom.views.addViewProvider AgentRunner, (agentRunner) =>
+      (new AgentRunnerView @exampleModel, agentRunner).getNode()
+    atom.workspace.addBottomPanel { item: @agentRunner }
 
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()

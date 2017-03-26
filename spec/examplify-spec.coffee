@@ -1,6 +1,7 @@
 { Range } = require '../lib/model/range-set'
 { MainController } = require '../lib/examplify'
 { PACKAGE_PATH } = require '../lib/config/paths'
+{ AgentRunner } = require "../lib/agent/agent-runner"
 $ = require 'jquery'
 
 
@@ -65,6 +66,24 @@ describe "The Examplify Plugin", ->
       editor.setSelectedBufferRange new Range [4, 0], [4, 35]
       atom.commands.dispatch workspaceElement, "examplify:add-selection-to-example"
       (expect controller.getModel().getRangeSet().getActiveRanges().length).toBe 2
+
+  it "creates a bottom panel for running agents", ->
+
+    editor = atom.workspace.getActiveTextEditor()
+    editor.setSelectedBufferRange new Range [5, 0], [5, 43]
+    atom.commands.dispatch workspaceElement, "examplify:make-example-code"
+
+    waitsForPromise =>
+      activationPromise
+
+    waitsFor =>
+      atom.workspace.getBottomPanels().length is 1
+
+    runs =>
+      bottomPanels = atom.workspace.getBottomPanels()
+      (expect bottomPanels.length).toBe 1
+      agentPanel = bottomPanels[0]
+      (expect agentPanel.item instanceof AgentRunner).toBe true
 
 
 describe "MainController", ->
