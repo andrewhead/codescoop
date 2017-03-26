@@ -6,8 +6,8 @@
 module.exports.InstanceStubSuggestionView = \
     class InstanceStubSuggestionView extends SuggestionView
 
-  constructor: (suggestion, model, errorMarker) ->
-    super suggestion, model, "Preview stub"
+  constructor: (suggestion, model, errorMarker, i) ->
+    super suggestion, model, ("Stub " + String(i + 1))
     @symbol = suggestion.getSymbol()
     @stubSpec = suggestion.getStubSpec()
 
@@ -30,5 +30,5 @@ module.exports.InstanceStubSuggestionBlockView = \
   constructor: (suggestions, model, errorMarker) ->
     super "Stub out", suggestions, model, errorMarker
 
-  createSuggestionView: (suggestion) ->
-    new InstanceStubSuggestionView suggestion, @model, @errorMarker
+  createSuggestionView: (suggestion, model, errorMarker, i) ->
+    new InstanceStubSuggestionView suggestion, model, errorMarker, i

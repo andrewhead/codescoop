@@ -20,5 +20,5 @@ module.exports.ImportSuggestionBlockView = \
   constructor: (suggestions, model, errorMarker) ->
     super "Import", suggestions, model, errorMarker
 
-  createSuggestionView: (suggestion) ->
-    new ImportSuggestionView suggestion, @model
+  createSuggestionView: (suggestion, model, errorMarker) ->
+    new ImportSuggestionView suggestion, model

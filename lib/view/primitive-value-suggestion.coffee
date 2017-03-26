@@ -31,5 +31,5 @@ module.exports.PrimitiveValueSuggestionBlockView = \
   constructor: (suggestions, model, errorMarker) ->
     super "Set value", suggestions, model, errorMarker
 
-  createSuggestionView: (suggestion) ->
-    new PrimitiveValueSuggestionView suggestion, @model, @errorMarker
+  createSuggestionView: (suggestion, model, errorMarker) ->
+    new PrimitiveValueSuggestionView suggestion, model, errorMarker

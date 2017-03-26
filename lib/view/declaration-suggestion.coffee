@@ -21,5 +21,5 @@ module.exports.DeclarationSuggestionBlockView = \
   constructor: (suggestions, model, errorMarker) ->
     super "Declare", suggestions, model, errorMarker
 
-  createSuggestionView: (suggestion) ->
-    new DeclarationSuggestionView suggestion, @model
+  createSuggestionView: (suggestion, model, errorMarker) ->
+    new DeclarationSuggestionView suggestion, model

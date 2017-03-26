@@ -8,7 +8,13 @@ SuggestionBlockViewState =
 
 # When extending this block view, you must define a custom title,
 # and override the createSuggestionView class which produces interactive
-# suggestions that have access to the model
+# suggestions that have access to the model. The createSuggestionView
+# function takes four parameters:
+# * suggestion: the suggestion for this item in the suggestion list
+# * model: the example model
+# * errorMarker: the text editor marker that points to the error
+# * i: the index of the suggestion (starts at 0)
+# The createSuggestionView function should return a SuggestionView
 module.exports.SuggestionBlockView = class SuggestionBlockView extends $
 
   constructor: (title, suggestions, model, errorMarker) ->
@@ -30,8 +36,8 @@ module.exports.SuggestionBlockView = class SuggestionBlockView extends $
       .text title
       .mouseover =>
         if @state is SuggestionBlockViewState.HEADER
-          for suggestion in @suggestions
-            suggestionView = @createSuggestionView suggestion, @model, @errorMarker
+          for suggestion, i in @suggestions
+            suggestionView = @createSuggestionView suggestion, @model, @errorMarker, i
             @append suggestionView
             @suggestionViews.push suggestionView
           @state = SuggestionBlockViewState.SUGGESTIONS

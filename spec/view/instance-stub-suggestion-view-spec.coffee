@@ -13,7 +13,10 @@ describe "InstanceStubSuggestionView", ->
   symbol = new Symbol testFile, "book", (new Range [3, 4], [3, 8]), "Book"
   stubSpec = new StubSpec "Book"
   suggestion = new InstanceStubSuggestion symbol, stubSpec
-  view = new InstanceStubSuggestionView suggestion, model, undefined
+  view = new InstanceStubSuggestionView suggestion, model, undefined, 41
+
+  it "has a label that includes the index of the suggestion", ->
+    (expect view.text()).toEqual "Stub 42"
 
   describe "when previewing a suggestion", ->
 

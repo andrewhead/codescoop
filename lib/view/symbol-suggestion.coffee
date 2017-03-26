@@ -23,5 +23,5 @@ module.exports.DefinitionSuggestionBlockView = \
   constructor: (suggestions, model, errorMarker) ->
     super "Add code", suggestions, model, errorMarker
 
-  createSuggestionView: (suggestion) ->
-    new DefinitionSuggestionView suggestion, @model
+  createSuggestionView: (suggestion, model, errorMarker) ->
+    new DefinitionSuggestionView suggestion, model
