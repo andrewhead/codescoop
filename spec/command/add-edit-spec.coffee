@@ -9,6 +9,13 @@ describe "AddEdit", ->
   beforeEach =>
     model = new ExampleModel()
 
+  it "adds its edit to the model when applied", ->
+    edit = new Replacement undefined, "newText"
+    command = new AddEdit edit
+    command.apply model
+    (expect model.getEdits().length).toBe 1
+    (expect model.getEdits()[0].getText()).toEqual "newText"
+
   it "removes its edit from ExampleModel when reverted", ->
     edit = new Replacement undefined, "newText"
     command = new AddEdit edit

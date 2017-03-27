@@ -1,5 +1,6 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
-{ Fixer } = require "./command/fixer"
+{ CommandFinder } = require "./command/command-finder"
+{ CommandStack } = require "./command/command-stack"
 
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
@@ -11,6 +12,7 @@
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
 { ImportSuggester } = require "./suggester/import-suggester"
+{ ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
 
 
@@ -22,8 +24,8 @@ module.exports.ExampleController = class ExampleController
     @model = model
     @model.addObserver @
 
-    # Create a fixer that will update the model with corrections
-    @fixer = extras.fixer or new Fixer()
+    @commandFinder = extras.commandFinder or new CommandFinder()
+    @commandStack = extras.commandStack or new CommandStack()
 
     analyses = extras.analyses or {}
     importAnalysis = analyses.importAnalysis
@@ -167,7 +169,13 @@ module.exports.ExampleController = class ExampleController
     else if @model.getState() is ExampleModelState.RESOLUTION
 
       if (propertyName is ExampleModelProperty.RESOLUTION_CHOICE) and newValue?
-        @fixer.apply @model, newValue
+
+        # Look up commands for this suggestion, execute and save them
+        commandGroup = @commandFinder.getCommandsForSuggestion newValue
+        @commandStack.push commandGroup
+        for command in commandGroup
+          command.apply @model
+
         @model.setActiveCorrector null
         @model.setState ExampleModelState.IDLE
 
@@ -178,19 +186,43 @@ module.exports.ExampleController = class ExampleController
       # we'll cause an infinite loop if we keep watching it get set to null.
       if (propertyName is ExampleModelProperty.EXTENSION_DECISION) and newValue?
 
-        extensionDecision = newValue
-        if extensionDecision
-          @fixer.apply @model, @model.getProposedExtension()
+        extensionDecision = new ExtensionDecision \
+          @model.getFocusedEvent(), @model.getProposedExtension(), newValue
 
-        # Regardless of the decision to extend or not, remove the event from the
-        # list of events, and add it to the list of previously viewed events
-        event = @model.getFocusedEvent()
-        @model.getViewedEvents().push event
-        eventIndex = @model.getEvents().indexOf event
-        @model.getEvents().splice eventIndex, 1
+        # Look up commands for this decision for this extension.
+        # Then execute and save them to the stack.
+        commandGroup = @commandFinder.getCommandsForExtensionDecision extensionDecision
+        @commandStack.push commandGroup
+        for command in commandGroup
+          command.apply @model
 
         # Reset state and model variables
         @model.setFocusedEvent null
         @model.setProposedExtension null
         @model.setExtensionDecision null
         @model.setState ExampleModelState.IDLE
+
+  undo: ->
+
+    # Revert the last command and remove it from the stack
+    lastCommandGroup = @commandStack.pop()
+    if lastCommandGroup?
+      for command in lastCommandGroup
+        command.revert @model
+
+    # Reset state associated with... ERROR_CHOICE state...
+    @model.getErrors().reset []
+    @model.setActiveCorrector null
+    @model.setErrorChoice null
+
+    # RESOLUTION state...
+    @model.getSuggestions().reset []
+    @model.setResolutionChoice null
+
+    # And EXTENSION state...
+    @model.setFocusedEvent null
+    @model.setProposedExtension null
+    @model.setExtensionDecision null
+
+    # Reset the example editor to IDLE
+    @model.setState ExampleModelState.IDLE

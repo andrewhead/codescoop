@@ -85,6 +85,26 @@ describe "The Examplify Plugin", ->
       agentPanel = bottomPanels[0]
       (expect agentPanel.item instanceof AgentRunner).toBe true
 
+  it "calls \"undo\" to the controller when \"undo\" command is run", ->
+
+    editor = atom.workspace.getActiveTextEditor()
+    editor.setSelectedBufferRange new Range [5, 0], [5, 43]
+    atom.commands.dispatch workspaceElement, "examplify:make-example-code"
+    waitsForPromise =>
+      activationPromise
+
+    # Wait for the controller to be initialized
+    runs =>
+      examplifyPackage = atom.packages.getActivePackage 'examplify'
+    waitsFor =>
+      examplifyPackage.mainModule.controller
+
+    runs =>
+      exampleController = examplifyPackage.mainModule.controller.exampleController
+      (spyOn exampleController, "undo")
+      atom.commands.dispatch workspaceElement, "examplify:undo"
+      (expect exampleController.undo).toHaveBeenCalled()
+
 
 describe "MainController", ->
 

@@ -18,17 +18,11 @@
 { ArchiveEvent } = require "../command/archive-event"
 
 
-module.exports.Fixer = class Fixer
+module.exports.CommandFinder = class CommandFinder
 
-  # Make sure a symbol is no longer marked as a "use" in the model, to hide
-  # definition errors if the use has been defined some other way
-  _removeUse: (model, removableUse) ->
-
-
-  # After applying the fix, the fixer should return a group of commands that
-  # specify everything needed to revert the fix.  This usually means references
-  # to any objects that the fixer creates and adds to the model.
-  apply: (model, update) ->
+  # Return a group of commands that specify everything needed to revert the fix.
+  # This usually means references the commandFinder creates.
+  getCommandsForSuggestion: (update) ->
 
     commandGroup = []
 
@@ -62,16 +56,9 @@ module.exports.Fixer = class Fixer
       # Mark the undefined use as resolved
       commandGroup.push new RemoveUse update.getSymbol()
 
-    else if update instanceof ExtensionDecision
-      extensionCommandGroup = @_applyExtensionDecision model, update
-      commandGroup = commandGroup.concat extensionCommandGroup
-
-    for command in commandGroup
-      command.apply model
-
     commandGroup
 
-  _applyExtensionDecision: (model, extensionDecision) ->
+  getCommandsForExtensionDecision: (extensionDecision) ->
 
     commandGroup = []
 
@@ -79,7 +66,7 @@ module.exports.Fixer = class Fixer
     # that the event has been addressed
     commandGroup.push new ArchiveEvent extensionDecision.getEvent()
 
-    # Don't apply the fix from the extension if it wasn't accepted
+    # Don't create a fix from the extension if it wasn't accepted
     if extensionDecision.getDecision()
       extension = extensionDecision.getExtension()
       if extension instanceof ControlStructureExtension

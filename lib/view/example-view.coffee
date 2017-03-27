@@ -55,15 +55,17 @@ module.exports.ExampleView = class ExampleView
   onPropertyChanged: (object, propertyName, oldValue, newValue) ->
     @update() if propertyName in [
       ExampleModelProperty.STATE
-      ExampleModelProperty.ACTIVE_RANGES
       ExampleModelProperty.AUXILIARY_DECLARATIONS
     ]
+    if (propertyName is ExampleModelProperty.ACTIVE_RANGES) and
+        (newValue.length > oldValue.length)
+      @update()
     # Currently, replacements can only be applied without updating if
     # the symbol was already marked in the last update.  If not, then
     # the replacement will be in the wrong place.
-    @_applyReplacements() if propertyName in [
-      ExampleModelProperty.EDITS
-    ]
+    if (propertyName is ExampleModelProperty.EDITS) and
+        (newValue.length > oldValue.length)
+      @_applyReplacements()
 
   update: ->
     @_clearMarkers()

@@ -9,6 +9,14 @@ describe "AddRange", ->
   beforeEach =>
     model = new ExampleModel()
 
+  it "adds a range to the model when applied", ->
+    range = new Range [0, 7], [0, 18]
+    command = new AddRange range
+    command.apply model
+    activeRanges = model.getRangeSet().getActiveRanges()
+    (expect activeRanges.length).toBe 1
+    (expect activeRanges[0]).toEqual new Range [0, 7], [0, 18]
+
   it "removes its range from ExampleModel when reverted", ->
 
     rangeToRevert = new Range [0, 7], [0, 18]

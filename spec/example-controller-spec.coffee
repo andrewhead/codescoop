@@ -4,9 +4,11 @@
 { Range, RangeSet } = require "../lib/model/range-set"
 { File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
+{ CommandStack } = require "../lib/command/command-stack"
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
 { TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
 { ImportAnalysis } = require "../lib/analysis/import-analysis"
+{ ArchiveEvent } = require "../lib/command/archive-event"
 { PACKAGE_PATH } = require "../lib/config/paths"
 { parse } = require "../lib/analysis/parse-tree"
 fs = require "fs"
@@ -153,7 +155,7 @@ describe "ExampleController", ->
           name: "mock-corrector-2"
           checker: { detectErrors: (parseTree, rangeSet, symbolSet) => [] }
           suggester: { getSuggestions: (error, parseTree, rangeSet, symbolSet) => [] }
-          fixer: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
+          commandFinder: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
         correctors.push secondCorrector
 
         (spyOn firstCorrector.checker, "detectErrors").andCallThrough()
@@ -284,85 +286,99 @@ describe "ExampleController", ->
 
   describe "when in the RESOLUTION state", ->
 
-    # These lines get the controller into the RESOLUTION state
-    fixer = { apply: (model, update) -> @appliedUpdate = update }
-    correctors = [{
-      checker: { detectErrors: -> [ "error" ] }
-      suggesters: [ { getSuggestions: -> [1] } ]
-    }]
+    command = { apply: (model) -> @wasApplied = true }
+    commandStack = new CommandStack()
+    commandFinder = { getCommandsForSuggestion: (s) -> [ command ] }
     model = _makeDefaultModel()
-    controller = new ExampleController model, { correctors, fixer }
+    controller = new ExampleController model, { commandFinder, commandStack }
     model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
     model.setState ExampleModelState.RESOLUTION
-    model.setActiveCorrector correctors[0]
-
-    # Before faking the resolution, pretend the errors have gone away
-    correctors[0].checker.detectErrors = => []
+    model.setActiveCorrector { correctorId: 42 }
     model.setResolutionChoice { resolutionId: 42 }
 
     it "updates the state to IDLE when a resolution was chosen", ->
       (expect model.getState()).toBe ExampleModelState.IDLE
 
+    it "adds a relevant command to the stack", ->
+      (expect commandStack.peek()[0]).toBe command
+
     it "applies the corrector's fix", ->
-      (expect fixer.appliedUpdate.resolutionId).toBe 42
+      (expect command.wasApplied).toBe true
 
     it "sets the active corrector back to nothing", ->
       (expect model.getActiveCorrector()).toBe null
-
 
   describe "when in the EXTENSION state", ->
 
     model = undefined
     controller = undefined
-    fixer = undefined
+    commandStack = undefined
 
     beforeEach =>
       extenders = [ extender: { getExtension: (event) => {} } ]
-      fixer = { apply: (model, value) -> @wasCalledWithValue = value }
-      model = _makeDefaultModel()
+      commandStack = new CommandStack()
+      model = new ExampleModel()
       model.getEvents().reset [ { eventId: 1 } ]
-      controller = new ExampleController model, { extenders, fixer }
+      controller = new ExampleController model, { extenders, commandStack }
       waitsFor =>
         model.getState() is ExampleModelState.EXTENSION
+      runs =>
+        model.setExtensionDecision true
 
     it "transitions back to IDLE when an extension was accepted", ->
-      model.setExtensionDecision true
       (expect model.getState()).toBe ExampleModelState.IDLE
 
-    it "transitions back to IDLE when an extension was rejected", ->
-      model.setExtensionDecision false
-      (expect model.getState()).toBe ExampleModelState.IDLE
-
-    it "applies the extension when an extension was accepted", ->
-      (expect fixer.wasCalledWithValue?).toBe false
-      model.setExtensionDecision true
-      (expect fixer.wasCalledWithValue).toEqual {}
-
-    it "does not apply the extension when an extension was rejected", ->
-      (expect fixer.wasCalledWithValue?).toBe false
-      model.setExtensionDecision false
-      (expect fixer.wasCalledWithValue?).toBe false
-
-    it "dequeues the event when the extension was accepted", ->
-      model.setExtensionDecision true
-      (expect model.getEvents()).toEqual []
-
-    it "dequeues the event when the extension was rejected", ->
-      model.setExtensionDecision false
-      (expect model.getEvents()).toEqual []
-
-    it "saves the event that caused the extension, if accepted", ->
-      model.setExtensionDecision true
-      (expect model.getViewedEvents().length).toBe 1
-      (expect model.getViewedEvents()[0].eventId).toBe 1
-
-    it "saves the event that caused the extension, if rejected", ->
-      model.setExtensionDecision true
-      (expect model.getViewedEvents().length).toBe 1
-      (expect model.getViewedEvents()[0].eventId).toBe 1
+    it "applies archive commands and adds them to the stack", ->
+      (expect commandStack.getHeight()).toBe 1
+      commandGroup = commandStack.peek()
+      (expect commandGroup[0] instanceof ArchiveEvent)
 
     it "on transition, it sets extension-related model fields to null", ->
-      model.setExtensionDecision true
       (expect model.getFocusedEvent()).toBe null
       (expect model.getProposedExtension()).toBe null
       (expect model.getExtensionDecision()).toBe null
+
+  describe "when `undo` is called on it", ->
+
+    model = undefined
+    controller = undefined
+    commandFinder = undefined
+    commandStack = undefined
+    command = undefined
+
+    beforeEach =>
+
+      commandStack = new CommandStack()
+      command = { revert: (model) -> @revertCalled = true }
+      commandStack.push [ command ]
+
+      # Move the controller into the RESOLUTION state
+      correctors = [{
+        checker: { detectErrors: -> [] }
+        suggesters: [ { getSuggestions: -> [1] } ]
+      }]
+      model = new ExampleModel()
+      controller = new ExampleController model, { correctors, commandStack }
+      model.setState ExampleModelState.RESOLUTION
+
+      # Set a bunch of properties on the model that should be rewound
+      model.setActiveCorrector correctors[0]
+      model.setErrorChoice { errorId: 42 }
+      model.getSuggestions().reset [{ suggestionId: 42 }]
+
+      # Now, the important part: call undo
+      controller.undo()
+
+    it "sets the state to IDLE", ->
+      (expect model.getState()).toBe ExampleModelState.IDLE
+
+    it "pops one command off the command stack", ->
+      (expect commandStack.getHeight()).toBe 0
+
+    it "calls revert on the command at the top of the stack", ->
+      (expect command.revertCalled).toBe true
+
+    it "sets decision-related model variables to null", ->
+      (expect model.getActiveCorrector()).toBe null
+      (expect model.getErrorChoice()).toBe null
+      (expect model.getSuggestions().length).toBe 0

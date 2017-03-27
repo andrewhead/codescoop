@@ -40,6 +40,8 @@ module.exports = plugin =
         selectedRange = @codeEditor.getSelectedBufferRange()
         rangeSet = @controller.getModel().getRangeSet()
         rangeSet.getActiveRanges().push selectedRange
+      "examplify:undo": =>
+        @controller.exampleController.undo()
     )
 
   deactivate: () ->
