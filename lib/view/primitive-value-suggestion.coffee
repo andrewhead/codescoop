@@ -24,6 +24,9 @@ module.exports.PrimitiveValueSuggestionView = \
     @model.getEdits().splice (@model.getEdits().indexOf @previewReplacement), 1
     @model.getEdits().push @revertReplacement
 
+  cleanup: ->
+    @model.getEdits().remove @revertReplacement
+
 
 module.exports.PrimitiveValueSuggestionBlockView = \
     class PrimitiveValueSuggestionBlockView extends SuggestionBlockView
