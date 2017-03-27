@@ -57,4 +57,12 @@ module.exports.makeObservableArray = (array = undefined) ->
     for element in elements
       @push element
 
+  # Convenience method as we often have to remove things from arrays
+  # Only removes the first instance of the element from the array.
+  array.remove = (element) ->
+    for arrayElement, index in @
+      if element is arrayElement
+        @.splice index, 1
+        break
+
   proxy

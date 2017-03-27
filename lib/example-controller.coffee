@@ -1,5 +1,5 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
-{ Fixer } = require "./fixer"
+{ Fixer } = require "./command/fixer"
 
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
