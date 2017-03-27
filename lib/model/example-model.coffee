@@ -78,7 +78,7 @@ module.exports.ExampleModel = class ExampleModel
     @valueMap = valueMap
     @stubOption = null
     @stubSpecTable = null
-    @stubSpecs = []
+    @stubSpecs = makeObservableArray []
 
     @focusedEvent = null
     @proposedExtension = null

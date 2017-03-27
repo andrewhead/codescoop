@@ -11,5 +11,8 @@ module.exports.AddLineForRange = class AddRange
     @lineRange = startRowRange.union endRowRange
     model.getRangeSet().getActiveRanges().push @lineRange
 
+  revert: (model) ->
+    model.getRangeSet().getActiveRanges().remove @lineRange
+
   getRange: ->
     @range

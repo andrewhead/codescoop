@@ -6,5 +6,8 @@ module.exports.AddStubSpec = class AddStubSpec
   apply: (model) ->
     model.getStubSpecs().push @stubSpec
 
+  revert: (model) ->
+    model.getStubSpecs().remove @stubSpec
+
   getStubSpec: ->
     @stubSpec

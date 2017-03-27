@@ -6,5 +6,8 @@ module.exports.AddDeclaration = class AddDeclaration
   apply: (model) ->
     model.getAuxiliaryDeclarations().push @declaration
 
+  revert: (model) ->
+    model.getAuxiliaryDeclarations().remove @declaration
+
   getDeclaration: ->
     @declaration

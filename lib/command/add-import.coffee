@@ -6,5 +6,8 @@ module.exports.AddImport = class AddImport
   apply: (model) ->
     model.getImports().push @import
 
+  revert: (model) ->
+    model.getImports().remove @import
+
   getImport: ->
     @import

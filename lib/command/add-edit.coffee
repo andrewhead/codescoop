@@ -6,5 +6,8 @@ module.exports.AddEdit = class AddEdit
   apply: (model) ->
     model.getEdits().push @edit
 
+  revert: (model) ->
+    model.getEdits().remove @edit
+
   getEdit: ->
     @edit

@@ -10,5 +10,8 @@ module.exports.RemoveUse = class RemoveUse
         uses.splice useIndex, 1
         break
 
+  revert: (model) ->
+    model.getSymbols().getVariableUses().push @symbol
+
   getSymbol: ->
     @symbol

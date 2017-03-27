@@ -11,5 +11,9 @@ module.exports.ArchiveEvent = class ArchiveEvent
         break
     model.getViewedEvents().push @event
 
+  revert: (model) ->
+    model.getViewedEvents().remove @event
+    model.getEvents().unshift @event
+
   getEvent: ->
     @event
