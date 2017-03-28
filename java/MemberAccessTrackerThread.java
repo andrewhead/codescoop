@@ -242,6 +242,7 @@ public class MemberAccessTrackerThread extends Thread {
         // the method exit that we were looking for.
         ObjectReference instance = stackFrame.thisObject();
         if (instance == null) return;
+        if (wasCalledFromThis(event.thread(), instance, 1)) return;
 
         // We currently can't control whether this listener is activated for unwatched instances
         // that share a class with the watched instance.  We need to do a check to see if
@@ -274,6 +275,7 @@ public class MemberAccessTrackerThread extends Thread {
         // If this is a null instance, we might be dealing with a static variable
         // For right now, we ignore it, but we might need this at some time in the future.
         if (instance == null) return;
+        if (wasCalledFromThis(event.thread(), instance, 0)) return;
 
         Access access = makeAccessFromValue(value);
         List<AccessHistory> accessHistories =
@@ -505,6 +507,22 @@ public class MemberAccessTrackerThread extends Thread {
         } else { 
             // Unknown type of event was received
         }
+    }
+
+    // Call this with `startDepth` = 0 if you want to consider `this` starting at the top of
+    // the stack frame, and `startDepth` = 1 if you want to start looking for `this` one stack
+    // frame below the top.  The former is better for checking for field accesses from `this`, and
+    // the latter for checking for method accesses from `this` (as method exit events will
+    // always, by definition, have the instance it was called on as `this` in the top stack frame).
+    private boolean wasCalledFromThis(ThreadReference thread, ObjectReference instance,
+            int startDepth) {
+        try {
+            for (int i = startDepth; i < thread.frameCount(); i++) {
+                StackFrame frame = thread.frame(i);
+                if (frame.thisObject() == instance) return true;
+            }
+        } catch (IncompatibleThreadStateException itse) {}
+        return false;
     }
 
     private ObjectReference getInstanceFromStack(ThreadReference thread, String instanceName) {

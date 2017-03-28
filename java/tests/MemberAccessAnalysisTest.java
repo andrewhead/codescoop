@@ -179,6 +179,31 @@ public class MemberAccessAnalysisTest {
     }
 
     @Test
+    public void testDontTrackFieldOrMethodAccessesFromThis() throws ClassNotFoundException {
+
+        List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
+        ObjectDefinition instance = new ObjectDefinition("o", "AccessesFromThis", 17);
+        objectDefinitions.add(instance);
+
+        Map<ObjectDefinition, List<AccessHistory>> accesses = analysis.run(
+                "AccessesFromThis", "tests/analysis_examples", objectDefinitions);
+
+        assertEquals(0, accesses.get(instance).get(0).getFieldAccesses("fieldAccessedFromThis").size());
+        MethodIdentifier listMethodId = new MethodIdentifier(
+                "methodCalledFromThis", new ArrayList<String>());
+        assertEquals(0, accesses.get(instance).get(0).getReturnValues(listMethodId).size());
+        /*
+        List<Access> fieldAccesses = accesses.get(instance).get(0).getFieldAccesses("objects");
+        assertEquals(1, fieldAccesses.size());
+        AccessHistory listAccess = (AccessHistory) fieldAccesses.get(0);
+        List<Access> sizeResults = listAccess.getReturnValues(listMethodId);
+        assertEquals(1, sizeResults.size());
+        assertEquals(0, ((PrimitiveAccess) sizeResults.get(0)).getValue());
+        */
+
+    }
+
+    @Test
     public void testTracksChangesToNamedReturnedObject() throws ClassNotFoundException {
 
         List<ObjectDefinition> objectDefinitions = new ArrayList<ObjectDefinition>();
