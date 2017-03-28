@@ -1,10 +1,16 @@
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.reflect.ClassPath;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
 
+// Discover what classes can be imported by an import statement.  In the past, this was implemented
+// using "Reflections" (https://github.com/ronmamo/reflections).  However, we found that it
+// couldn't find some classes provided by some wilcard imports (for example, SSLSocket from
+// javax.net.ssl).  So we re-implemented wildcards using a beta feature from Guava.
 public class ImportAnalysis {
 
     // This function will probably crash if an import statement is importing static members,
@@ -24,18 +30,23 @@ public class ImportAnalysis {
             return classNameSet;
         }
 
-        // If it doesn't return just one class, it might be a wildcard import.
-        // We fetch the fully-qualified names of all classes from the package specified
-        // in the import statement using "Reflections"
-        // REUSE: This snippet is based on the tip from this Stack Overflow post:
+        // Use Guava to import classes from wildcard imports, using a pattern from this reference;
         // http://stackoverflow.com/questions/520328/can-you-find-all-classes-in-a-package-using-reflection
-        Reflections reflections = new Reflections(importName, new SubTypesScanner(false));
-        Set<Class<? extends Object>> classSet = reflections.getSubTypesOf(Object.class);
-
-        // Save the string names for each of the classes
-        for (Class<? extends Object> klazz: classSet) {
-            classNameSet.add(klazz.getCanonicalName());
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (importName.endsWith(".*")) {
+            String packageName = importName.replaceAll("\\.\\*$", "");
+            try {
+                for (ClassPath.ClassInfo classInfo: ClassPath.from(loader).getTopLevelClasses()) {
+                    if (classInfo.getName().startsWith(packageName)) {
+                        Class<?> klazz = classInfo.load();
+                        classNameSet.add(klazz.getCanonicalName());
+                    }
+                }
+            } catch (IOException exception) {
+            } catch (NoClassDefFoundError exception) {}
+            
         }
+
         return classNameSet;
 
     }

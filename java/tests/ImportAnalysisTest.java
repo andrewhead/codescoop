@@ -19,4 +19,13 @@ public class ImportAnalysisTest extends TestCase {
         assertTrue(classNames.contains("java.util.HashSet"));
     }
 
+    // This is an obscure case, though in a previous version of ImportAnalysis, it couldn't
+    // find an `SSLSocket` class that is provided by `javax.net.ssl`.  The problem is
+    // fixed, and we make sure we don't revert it with this test.
+    public void testFindSSLSocketInJavaxPackage() {
+        ImportAnalysis importAnalysis = new ImportAnalysis();
+        Set<String> classNames = importAnalysis.getClassNames("javax.net.ssl.*");
+        assertTrue(classNames.contains("javax.net.ssl.SSLSocket"));
+    }
+
 }
