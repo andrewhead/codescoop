@@ -234,6 +234,7 @@ module.exports.ScopeFinder = class ScopeFinder
 
     scopes
 
+  # Returns scopes from leaves of the tree to the base
   findSymbolScopes: (symbol) ->
 
     symbolScopes = []
