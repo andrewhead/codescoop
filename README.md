@@ -2,6 +2,10 @@
 
 Make useful example code from your existing code.
 
+## Running on new code
+
+1. Compile code with debug flags, e.g., `calvisitor:java freshaccount$ javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
+
 ## Annoying, brittle installation requirements
 
 ### Platform requirements
