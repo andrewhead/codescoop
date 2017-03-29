@@ -143,10 +143,16 @@ module.exports.ExampleController = class ExampleController
 
   onPropertyChanged: (object, propertyName, oldValue, newValue) ->
 
-    if @model.getState() is ExampleModelState.IDLE
+    # If the active ranges have changed, stop what is currently happening,
+    # and send the controller back to IDLE to check for errors and resolutions
+    if propertyName is ExampleModelProperty.ACTIVE_RANGES
+      @_resetChoiceState()
+      @model.setState ExampleModelState.IDLE
 
-      if (propertyName is ExampleModelProperty.STATE) or
-          (propertyName is ExampleModelProperty.ACTIVE_RANGES)
+    # Otherwise, take actions based on the current state
+    else if @model.getState() is ExampleModelState.IDLE
+
+      if propertyName is ExampleModelProperty.STATE
 
         # First, see if any events have been detected.  If they have,
         # look if there are any extensions related to those events.  We'll
@@ -210,6 +216,13 @@ module.exports.ExampleController = class ExampleController
       for command in lastCommandGroup
         command.revert @model
 
+    @_resetChoiceState()
+
+    # Reset the example editor to IDLE
+    @model.setState ExampleModelState.IDLE
+
+  _resetChoiceState: ->
+
     # Reset state associated with... ERROR_CHOICE state...
     @model.getErrors().reset []
     @model.setActiveCorrector null
@@ -223,6 +236,3 @@ module.exports.ExampleController = class ExampleController
     @model.setFocusedEvent null
     @model.setProposedExtension null
     @model.setExtensionDecision null
-
-    # Reset the example editor to IDLE
-    @model.setState ExampleModelState.IDLE

@@ -109,7 +109,7 @@ module.exports.StubAnalysis = class StubAnalysis
       argumentTypes = (type for type in methodIdJ.getTypeNamesSync().toArraySync())
       returnValuesJ = accessHistoryJ.getReturnValuesSync methodIdJ
       for accessJ in returnValuesJ.toArraySync()
-        @accesses.push \
+        @accesses.push
           type: "method",
           data: { stub, methodName, argumentTypes, accessJ }
 

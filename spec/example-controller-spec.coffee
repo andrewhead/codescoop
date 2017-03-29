@@ -382,3 +382,35 @@ describe "ExampleController", ->
       (expect model.getActiveCorrector()).toBe null
       (expect model.getErrorChoice()).toBe null
       (expect model.getSuggestions().length).toBe 0
+
+  describe "when active ranges are added in the middle of another task", ->
+
+    model = undefined
+    controller = undefined
+
+    beforeEach =>
+
+      # Move the controller into the RESOLUTION state
+      correctors = [{
+        checker: { detectErrors: -> [] }
+        suggesters: [ { getSuggestions: -> [1] } ]
+      }]
+      model = new ExampleModel()
+      controller = new ExampleController model, { correctors }
+      model.setState ExampleModelState.RESOLUTION
+
+      # Set a bunch of properties on the model that should be rewound
+      model.setActiveCorrector correctors[0]
+      model.setErrorChoice { errorId: 42 }
+      model.getSuggestions().reset [{ suggestionId: 42 }]
+
+      # Add a new range to the model
+      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+
+    it "resets the state to IDLE", ->
+      (expect model.getState()).toBe ExampleModelState.IDLE
+
+    it "resets decision-related model variables to null", ->
+      (expect model.getActiveCorrector()).toBe null
+      (expect model.getErrorChoice()).toBe null
+      (expect model.getSuggestions().length).toBe 0
