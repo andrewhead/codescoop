@@ -322,7 +322,6 @@ module.exports.ExampleView = class ExampleView
       # replacements have been performed), mark it and save a reference
       # to the marker, for later replacements.
       if not foundSymbol
-        adjustedRange = @_getAdjustedRange symbol.getRange()
         marker = @_markRange symbol.getRange()
 
       @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
