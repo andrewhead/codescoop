@@ -153,6 +153,12 @@ div.agent-runner {
       padding: @component-padding;
       color: @text-color-highlight;
       height: initial;
+
+      span {
+        margin: .25em;
+        overflow: initial;
+      }
+
     }
 
     &.chosen-container-active {
@@ -177,6 +183,7 @@ div.agent-runner {
 
         li {
           color: @text-color-highlight;
+          line-height: 1.5em;
           &.highlighted {
             background-color: white;
             background-image: none;
@@ -190,7 +197,7 @@ div.agent-runner {
   }
 
   p, #agent_select_chosen, button {
-    font-size: 18px;
+    font-size: 20px;
     margin-top: @component-padding;
     margin-bottom: @component-padding;
     margin-right: @component-padding;

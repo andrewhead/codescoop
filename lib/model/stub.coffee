@@ -3,7 +3,7 @@ module.exports.StubSpec = class StubSpec
   constructor: (className, extraSpec) ->
     extraSpec or= []
     @className = className
-    @fieldAccesses = extraSpec.fieldAccesses or []
+    @fieldAccesses = extraSpec.fieldAccesses or {}
     @methodCalls = extraSpec.methodCalls or []
     @superclassName = extraSpec.superclassName
 
@@ -12,6 +12,28 @@ module.exports.StubSpec = class StubSpec
 
   setClassName: (className) ->
     @className = className
+
+  # Assumes stub spec has already been initialized with a list of fields
+  # that can be accessed and their types in the `extraSpec`.  If the stub
+  # hasn't been initialized with this field, no access will be saved.
+  addFieldAccess: (fieldName, value) ->
+    if fieldName of @fieldAccesses
+      @fieldAccesses[fieldName].values.push value
+
+  # Assumes stub spec has already been initialized with a list of methods
+  # available for the stub in the `extraSpec`.  If the stub hasn't been
+  # initialized with this method signature, no return value will be saved.
+  addMethodCall: (methodName, argumentTypes, returnValue) ->
+    for otherMethod in @methodCalls
+      otherMethodName = otherMethod.signature.name
+      otherMethodArgumentTypes = otherMethod.signature.argumentTypes
+      namesMatch = otherMethodName is methodName
+      argumentsMatch = otherMethodArgumentTypes.every (element, i) =>
+        element is argumentTypes[i]
+      argumentLengthsMatch = otherMethodArgumentTypes.length is argumentTypes.length
+      if namesMatch and argumentsMatch and argumentLengthsMatch
+        otherMethod.returnValues.push returnValue
+        break
 
   getFieldAccesses: ->
     @fieldAccesses
