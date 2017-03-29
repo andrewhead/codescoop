@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright 2006 Sun Microsystems, Inc.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,6 +52,8 @@ import java.security.cert.X509Certificate;
 public class InstallCert {
 
     public static void main(String[] args) throws Exception {
+        String[] otherArgs = { "woot.com:443" };
+        args = otherArgs;
         String host;
         int port;
         char[] passphrase;
@@ -68,8 +71,7 @@ public class InstallCert {
         File file = new File("jssecacerts");
         if (file.isFile() == false) {
             char SEP = File.separatorChar;
-            File dir = new File(System.getProperty("java.home") + SEP
-                    + "lib" + SEP + "security");
+            File dir = new File(System.getProperty("java.home") + SEP + "lib" + SEP + "security");
             file = new File(dir, "jssecacerts");
             if (file.isFile() == false) {
                 file = new File(dir, "cacerts");
@@ -82,8 +84,7 @@ public class InstallCert {
         in.close();
 
         SSLContext context = SSLContext.getInstance("TLS");
-        TrustManagerFactory tmf =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);
         X509TrustManager defaultTrustManager = (X509TrustManager) tmf.getTrustManagers()[0];
         SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
@@ -110,8 +111,7 @@ public class InstallCert {
             return;
         }
 
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.println();
         System.out.println("Server sent " + chain.length + " certificate(s):");
@@ -120,8 +120,7 @@ public class InstallCert {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         for (int i = 0; i < chain.length; i++) {
             X509Certificate cert = chain[i];
-            System.out.println
-                    (" " + (i + 1) + " Subject " + cert.getSubjectDN());
+            System.out.println(" " + (i + 1) + " Subject " + cert.getSubjectDN());
             System.out.println("   Issuer  " + cert.getIssuerDN());
             sha1.update(cert.getEncoded());
             System.out.println("   sha1    " + toHexString(sha1.digest()));
@@ -131,7 +130,8 @@ public class InstallCert {
         }
 
         System.out.println("Enter certificate to add to trusted keystore or 'q' to quit: [1]");
-        String line = reader.readLine().trim();
+        // String line = reader.readLine().trim();
+        String line = "1";
         int k;
         try {
             k = (line.length() == 0) ? 0 : Integer.parseInt(line) - 1;
@@ -151,23 +151,26 @@ public class InstallCert {
         System.out.println();
         System.out.println(cert);
         System.out.println();
-        System.out.println
-                ("Added certificate to keystore 'jssecacerts' using alias '"
-                        + alias + "'");
+        System.out.println("Added certificate to keystore 'jssecacerts' using alias '" + alias + "'");
+
     }
 
     private static final char[] HEXDIGITS = "0123456789abcdef".toCharArray();
 
     private static String toHexString(byte[] bytes) throws IOException {
-        StringBuilder sb = new StringBuilder(bytes.length * 3);
+        // StringBuilder sb = new StringBuilder(bytes.length * 3);
+        String s = "";
         for (int i=0; i<bytes.length; i++) {
             int b = bytes[i];
             b &= 0xff;
-            sb.append(HEXDIGITS[b >> 4]);
-            sb.append(HEXDIGITS[b & 15]);
-            sb.append(' ');
+            s += (HEXDIGITS[b >> 4]);
+            s += (HEXDIGITS[b & 15]);
+            // sb.append(HEXDIGITS[b >> 4]);
+            // sb.append(HEXDIGITS[b & 15]);
+            // sb.append(' ');
         }
-        return sb.toString();
+        // return sb.toString();
+        return s;
     }
 
     private static class SavingTrustManager implements X509TrustManager {
@@ -180,13 +183,13 @@ public class InstallCert {
         }
 
         public X509Certificate[] getAcceptedIssuers() {
-	   
-	    /** 
+
+	    /**
 	     * This change has been done due to the following resolution advised for Java 1.7+
 		http://infposs.blogspot.kr/2013/06/installcert-and-java-7.html
-       	     **/ 
-	    
-	    return new X509Certificate[0];	
+       	     **/
+
+	    return new X509Certificate[0];
             //throw new UnsupportedOperationException();
         }
 
