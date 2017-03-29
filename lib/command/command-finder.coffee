@@ -5,6 +5,7 @@
 { InstanceStubSuggestion } = require "../suggester/instance-stub-suggester"
 { ExtensionDecision } = require "../extender/extension-decision"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
+{ MediatingUseExtension } = require "../extender/mediating-use-extender"
 { Replacement } = require "../edit/replacement"
 { Declaration } = require "../edit/declaration"
 
@@ -68,9 +69,15 @@ module.exports.CommandFinder = class CommandFinder
 
     # Don't create a fix from the extension if it wasn't accepted
     if extensionDecision.getDecision()
+
       extension = extensionDecision.getExtension()
+
       if extension instanceof ControlStructureExtension
         for range in extension.getRanges()
           commandGroup.push new AddRange range
+
+      else if extension instanceof MediatingUseExtension
+        commandGroup.push new AddLineForRange \
+          extension.getMediatingUse().getRange()
 
     commandGroup

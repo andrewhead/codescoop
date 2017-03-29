@@ -193,6 +193,17 @@ describe "ExampleController", ->
       controller = undefined
       extenders = undefined
 
+      it "discards events that couldn't be handled by any extender", ->
+        extenders = [ extender: { getExtension: (event) => null } ]
+        model = new ExampleModel()
+        model.getEvents().push { eventId: 42 }
+        (expect model.getEvents().length).toBe 1
+        controller = new ExampleController model, { extenders }
+        waitsFor =>
+          model.getState() is ExampleModelState.IDLE
+        runs =>
+          (expect model.getEvents().length).toBe 0
+
       describe "where the events are enqueued in IDLE state", ->
 
         beforeEach =>

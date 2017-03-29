@@ -63,6 +63,7 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector
           # it has not yet been added to the queue of events.
           eventWasQueuedBefore = false
           for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
+            continue if not (pastEvent instanceof ControlCrossingEvent)
             if pastEvent.hasControlStructure event.getControlStructure()
               eventWasQueuedBefore = true
           (@model.getEvents().push event) if not eventWasQueuedBefore
@@ -90,17 +91,3 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector
         crossedControlStructures.push controlStructure if controlStructure?
 
     crossedControlStructures
-
-  detectErrors: (model) ->
-
-    parseTree = model.getParseTree()
-    activeRanges = model.getRangeSet().getActiveRanges()
-
-    missingControlLogicContexts = []
-
-    for activeRange in activeRanges
-      containingControlLogicCtx = parseTree.getContainingControlLogicCtx(activeRange)
-      symbol = (new Symbol 'myfile', 'myCtrlName', activeRange, 'controllogic')
-      missingControlLogicContexts.push new ControlCrossingEvent containingControlLogicCtx , symbol
-
-    missingControlLogicContexts

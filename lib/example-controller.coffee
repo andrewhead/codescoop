@@ -6,6 +6,7 @@
 { MissingDeclarationDetector } = require "./error/missing-declaration"
 { MissingTypeDefinitionDetector } = require "./error/missing-type-definition"
 { ControlCrossingDetector } = require "./event/control-crossing"
+{ MediatingUseDetector } = require "./event/mediating-use"
 
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
@@ -14,6 +15,7 @@
 { ImportSuggester } = require "./suggester/import-suggester"
 { ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
+{ MediatingUseExtender } = require "./extender/mediating-use-extender"
 
 
 module.exports.ExampleController = class ExampleController
@@ -51,6 +53,9 @@ module.exports.ExampleController = class ExampleController
     @extenders = extras.extenders or [
         listener: new ControlCrossingDetector model
         extender: new ControlStructureExtender()
+      ,
+        listener: new MediatingUseDetector model
+        extender: new MediatingUseExtender()
     ]
 
     # Before the state can update, the analyses must complete
@@ -122,7 +127,11 @@ module.exports.ExampleController = class ExampleController
         break
 
   checkForExtensions: ->
+
     event = @model.getEvents()[0]
+
+    # Try to apply each extender to the event, returning once a viable
+    # extension is found for the event.
     for extender in @extenders
       extension = extender.extender.getExtension event
       if extension?
@@ -130,6 +139,12 @@ module.exports.ExampleController = class ExampleController
         @model.setProposedExtension extension
         @model.setState ExampleModelState.EXTENSION
         return true
+
+    # If we get to the end, there was no extension for this event.
+    # The event is no longer of any use to us.  We move it to the set of
+    # viewed events, to prevent it from being created later.
+    @model.getEvents().remove event
+    @model.getViewedEvents().push event
     false
 
   getSuggestions: ->

@@ -110,7 +110,7 @@ describe "DefinitionSuggester", ->
       (expect ranges[1]).toEqual new Range [12, 4], [12, 5]
       (expect ranges[2]).toEqual new Range [13, 4], [13, 5]
 
-  fdescribe "when used with nested scopes", ->
+  describe "when used with nested scopes", ->
 
     it "finds defs that affect the same variable from a cousin scope", ->
 

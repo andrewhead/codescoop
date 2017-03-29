@@ -9,6 +9,7 @@ $ = require "jquery"
 { MissingDeclarationError } = require "../error/missing-declaration"
 { MissingTypeDefinitionError } = require "../error/missing-type-definition"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
+{ MediatingUseExtension } = require "../extender/mediating-use-extender"
 
 { DefinitionSuggestionBlockView } = require "../view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "../view/primitive-value-suggestion"
@@ -16,6 +17,7 @@ $ = require "jquery"
 { InstanceStubSuggestionBlockView } = require "../view/instance-stub-suggestion"
 { ImportSuggestionBlockView } = require "../view/import-suggestion"
 { ControlStructureExtensionView } = require "../view/control-structure-extension"
+{ MediatingUseExtensionView } = require "../view/mediating-use-extension"
 
 
 module.exports.ExampleView = class ExampleView
@@ -278,13 +280,17 @@ module.exports.ExampleView = class ExampleView
   _addExtensionWidget: (extension) ->
 
     # Make a marker for the range inside the control structure
-    rangeInsideControl = extension.getEvent().getInsideRange()
-    marker = @_markRange rangeInsideControl
+    marker = undefined
 
     # Built up the interactive widget
     decoration = undefined
     if extension instanceof ControlStructureExtension
+      rangeInsideControl = extension.getEvent().getInsideRange()
+      marker = @_markRange rangeInsideControl
       decoration = new ControlStructureExtensionView extension, @model
+    else if extension instanceof MediatingUseExtension
+      marker = @_markRange extension.getUse().getRange()
+      decoration = new MediatingUseExtensionView extension, @model
 
     # Create a decoration for deciding whether to accept the extension
     params =

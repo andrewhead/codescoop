@@ -1,4 +1,5 @@
 { IfControlStructure, ForControlStructure, WhileControlStructure, DoWhileControlStructure, TryCatchControlStructure } = require "../../lib/analysis/parse-tree"
+{ ControlCrossingEvent } = require "../event/control-crossing"
 { extractCtxRange } = require "../analysis/parse-tree"
 { JavaParser } = require "../grammar/Java/JavaParser"
 { Range } = require "../model/range-set"
@@ -39,6 +40,8 @@ _getBlockBraceRanges = (statementCtx) =>
 module.exports.ControlStructureExtender = class ControlStructureExtender
 
   getExtension: (event) ->
+
+    return null if not (event instanceof ControlCrossingEvent)
 
     controlStructure = event.getControlStructure()
     ctx = controlStructure.getCtx()

@@ -8,6 +8,7 @@
 { Replacement } = require "../../lib/edit/replacement"
 { Declaration } = require "../../lib/edit/declaration"
 { ControlCrossingEvent } = require "../../lib/event/control-crossing"
+{ MediatingUseEvent } = require "../../lib/event/mediating-use"
 
 { AddLineForRange } = require "../../lib/command/add-line-for-range"
 { AddRange } = require "../../lib/command/add-range"
@@ -23,8 +24,9 @@
 { PrimitiveValueSuggestion } = require "../../lib/suggester/primitive-value-suggester"
 { InstanceStubSuggestion } = require '../../lib/suggester/instance-stub-suggester'
 { DeclarationSuggestion } = require "../../lib/suggester/declaration-suggester"
-{ ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
 { ExtensionDecision } = require "../../lib/extender/extension-decision"
+{ ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
+{ MediatingUseExtension } = require "../../lib/extender/mediating-use-extender"
 
 
 describe "CommandFinder", ->
@@ -172,3 +174,37 @@ describe "CommandFinder", ->
         it "returns a command group with just an archived event", ->
           (expect commandGroup.length).toBe 1
           (expect commandGroup[0] instanceof ArchiveEvent).toBe true
+
+    describe "when given a decision for a MediatingUseExtension", ->
+
+      model = undefined
+      commandGroup = undefined
+      testFile = undefined
+      commandFinder = undefined
+      beforeEach =>
+        model = new ExampleModel()
+        commandFinder = new CommandFinder()
+        testFile = new File "path", "file_name"
+
+      it "on acceptance, returns a command group with a line addition", ->
+        decision = new ExtensionDecision \
+          (new MediatingUseEvent()),
+          (new MediatingUseExtension \
+            (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),
+            (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")),
+          true
+        commandGroup = commandFinder.getCommandsForExtensionDecision decision
+        (expect commandGroup.length).toBe 2
+        (expect commandGroup[1] instanceof AddLineForRange).toBe true
+        (expect commandGroup[1].getRange()).toEqual new Range [5, 23], [5, 24]
+
+      it "on rejection, returns a command group an event archiving command", ->
+        decision = new ExtensionDecision \
+          (new MediatingUseEvent()),
+          (new MediatingUseExtension \
+            (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),
+            (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")),
+          false
+        commandGroup = commandFinder.getCommandsForExtensionDecision decision
+        (expect commandGroup.length).toBe 1
+        (expect commandGroup[0] instanceof ArchiveEvent).toBe true
