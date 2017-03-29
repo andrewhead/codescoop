@@ -4,7 +4,8 @@ Make useful example code from your existing code.
 
 ## Running on new code
 
-1. Compile code with debug flags, e.g., `calvisitor:java freshaccount$ javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
+- InstallCert: Compile code with debug flags, e.g., `calvisitor:java freshaccount$ javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
+- Chat Client: Don't forget to specify the classpath when compiling with debug flages, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
 
 ## Annoying, brittle installation requirements
 
