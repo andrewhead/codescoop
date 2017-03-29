@@ -88,9 +88,6 @@ module.exports.MediatingUseDetector = class MediatingUseDetector
       oldActiveRanges = oldValue
       newActiveRanges = newValue
 
-      # Only check for a crossing when a new range was added, and when there
-      # are at least two ranges (a new and an earlier range) in the set
-      if (newActiveRanges.length > oldActiveRanges.length) and
-          (oldActiveRanges.length >= 1)
+      if newActiveRanges.length > oldActiveRanges.length
         @detectMediatedUses()
         @removeObsoleteMediatedUseEvents()

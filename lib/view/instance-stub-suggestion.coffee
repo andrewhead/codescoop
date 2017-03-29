@@ -13,14 +13,11 @@ module.exports.InstanceStubSuggestionView = \
 
   preview: ->
     @previewReplacement = new Replacement @symbol, "(new #{@stubSpec.getClassName()}())"
-    @model.getEdits().splice (@model.getEdits().indexOf @revertReplacement), 1
     @model.getEdits().push @previewReplacement
     @model.setStubOption @stubSpec
 
   revert: ->
-    @revertReplacement = new Replacement @symbol, @symbol.getName()
-    @model.getEdits().splice (@model.getEdits().indexOf @previewReplacement), 1
-    @model.getEdits().push @revertReplacement
+    @model.getEdits().remove @previewReplacement
     @model.setStubOption null
 
 

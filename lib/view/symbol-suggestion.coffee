@@ -14,7 +14,7 @@ module.exports.DefinitionSuggestionView = class DefinitionSuggestionView extends
     @rangeSet.addSuggestedRange @suggestion.getSymbol().getRange()
 
   revert: ->
-    @rangeSet.removeSuggestedRange @suggestion.getSymbol().getRange()
+    @rangeSet.getSuggestedRanges().remove @suggestion.getSymbol().getRange()
 
 
 module.exports.DefinitionSuggestionBlockView = \

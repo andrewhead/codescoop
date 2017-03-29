@@ -47,9 +47,6 @@ module.exports.RangeSet = class RangeSet
   addSuggestedRange: (range) ->
     @suggestedRanges.push range
 
-  removeSuggestedRange: (range) ->
-    @suggestedRanges.splice((@suggestedRanges.indexOf range), 1)
-
   getActiveSymbols: (symbols) ->
     activeSymbols = []
     for symbol in symbols

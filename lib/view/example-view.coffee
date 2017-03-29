@@ -49,6 +49,7 @@ module.exports.ExampleView = class ExampleView
     @textEditor = textEditor
     @extraRangeMarkerPairs = []
     @activeRangeMarkerPairs = []
+    @editMarkerPairs = []
     @update()
 
   getTextEditor: () ->
@@ -62,12 +63,13 @@ module.exports.ExampleView = class ExampleView
     if (propertyName is ExampleModelProperty.ACTIVE_RANGES) and
         (newValue.length > oldValue.length)
       @update()
-    # Currently, replacements can only be applied without updating if
-    # the symbol was already marked in the last update.  If not, then
-    # the replacement will be in the wrong place.
-    if (propertyName is ExampleModelProperty.EDITS) and
-        (newValue.length > oldValue.length)
-      @_applyReplacements()
+    if (propertyName is ExampleModelProperty.EDITS)
+      if (newValue.length > oldValue.length)
+        @_applyReplacements()
+      else if (newValue.length < oldValue.length)
+        deletedReplacements = oldValue.filter (replacement) =>
+          replacement not in newValue
+        (@_revertReplacement replacement) for replacement in deletedReplacements
 
   update: ->
     @_clearMarkers()
@@ -92,8 +94,12 @@ module.exports.ExampleView = class ExampleView
   _clearMarkers: ->
     rangeMarkerPair[1].destroy() for rangeMarkerPair in @extraRangeMarkerPairs
     rangeMarkerPair[1].destroy() for rangeMarkerPair in @activeRangeMarkerPairs
+    for editMarkerPair in @editMarkerPairs
+      markerFromSymbol = editMarkerPair[2]
+      editMarkerPair[1].destroy() if not markerFromSymbol
     @extraRangeMarkerPairs = []
     @activeRangeMarkerPairs = []
+    @editMarkerPairs = []
 
   _addCodeLines: ->
 
@@ -149,9 +155,17 @@ module.exports.ExampleView = class ExampleView
         stubsText += "\n"
     @textEditor.setTextInBufferRange (new Range [0, 0], [0, 0]), stubsText
 
+  # Find the location that an active range from the code view maps to in
+  # the example view.  There are two steps:
+  # 1. Find this range's position relative to an active range that has
+  #    already been included in the example
+  # 2. Make corrections based on which parts of that range have been
+  #    altered by edits (like replacements)
   _getAdjustedRange: (range) ->
 
-    # Find the active range that contains the symbol
+    # Find the active range that contains the range.  Both the range passed in
+    # and the active ranges here are in terms of coordinates in the original
+    # source code.  We do the mapping to example editor coordinates later.
     rangeInActiveRange = false
     for rangeMarkerPair in @activeRangeMarkerPairs
       activeRange = rangeMarkerPair[0]
@@ -161,20 +175,72 @@ module.exports.ExampleView = class ExampleView
         markerRange = marker.getBufferRange()
         break
 
-    return null if not rangeInActiveRange  # if use not in active ranges, skip it
+    # If we can't find the range in one of the included ranges, skip it.
+    return null if not rangeInActiveRange
 
-    columnOffset = range.start.column - activeRange.start.column
-    rowOffset = range.start.row - activeRange.start.row
+    # Determine range size.
     width = range.end.column - range.start.column
     height = range.end.row - range.start.row
-    adjustedRange = new Range [
-        markerRange.start.row + rowOffset
-        markerRange.start.column + columnOffset
+
+    # Step 2.  If there are no replacements in this range, we're almost done!
+    # If there are replacements in this range, we want to adjust the position
+    # of the range relative to the end of the last replacement before the
+    # range.  Find this range before this one, and adjust offset.
+    # XXX: Replacement adjustments only work when all replacements are on
+    # the same line and none have newlines.
+    replacementBeforeRange = undefined
+    @model.getEdits().forEach (edit) =>
+      if (edit instanceof Replacement)
+        replacement = edit
+        replacementRange = edit.getSymbol().getRange()
+        if (activeRange.containsRange replacementRange) and
+            ((replacementRange.compare range) is -1) and
+            (replacementRange.start.row is range.start.row)
+          if not replacementBeforeRange?
+            replacementBeforeRange = replacement
+          else if (replacementRange.compare replacementRange) is -1
+            replacementBeforeRange = replacement
+
+    if replacementBeforeRange?
+
+      priorRange = replacementBeforeRange.getSymbol().getRange()
+      columnsAfterReplacement = range.start.column - priorRange.end.column
+
+      # Find out how many characters the prior replacement added / subtracted
+      priorRangeOriginalWidth = priorRange.end.column - priorRange.start.column
+      priorRangeNewText = replacementBeforeRange.getText()
+      replacementWidthDelta = priorRangeNewText.length - priorRangeOriginalWidth
+
+      # Recursively look of the position of the replacement range, in case it
+      # might be offset by some replacement before it.
+      adjustedPriorRange = @_getAdjustedRange priorRange
+
+      # Create a new range relative to the prior replacement
+      adjustedStartColumn = adjustedPriorRange.end.column +
+        columnsAfterReplacement + replacementWidthDelta
+      nextRange = new Range [
+        adjustedPriorRange.end.row,
+        adjustedStartColumn,
       ], [
-        markerRange.start.row + rowOffset + height
-        markerRange.start.column + columnOffset + width
+        adjustedPriorRange.end.row + height,
+        adjustedStartColumn + width
       ]
-    adjustedRange
+      return nextRange
+
+    # If there were no replacements before this, just return the offset of
+    # this range relative to its active range's position in the example editor.
+    else
+
+      columnOffset = range.start.column - activeRange.start.column
+      rowOffset = range.start.row - activeRange.start.row
+      adjustedRange = new Range [
+          markerRange.start.row + rowOffset
+          markerRange.start.column + columnOffset
+        ], [
+          markerRange.start.row + rowOffset + height
+          markerRange.start.column + columnOffset + width
+        ]
+      return adjustedRange
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
@@ -306,25 +372,61 @@ module.exports.ExampleView = class ExampleView
       class: "extension-highlight"
     @textEditor.decorateMarker marker, params
 
+  _revertReplacement: (replacement) ->
+
+    for editMarkerPair, i in @editMarkerPairs
+
+      # Find the marker that corresponds to the edit
+      edit = editMarkerPair[0]
+      marker = editMarkerPair[1]
+      isMarkerFromSymbol = editMarkerPair[2]
+      if edit is replacement
+
+        # Revert the text to the original text
+        @textEditor.setTextInBufferRange marker.getBufferRange(),
+          edit.getSymbol().getName()
+
+        # Cleanup: destroy the marker for the edit
+        if not isMarkerFromSymbol
+          marker.destroy()
+        @editMarkerPairs.splice i, 1
+        break
+
   _applyReplacements: ->
 
-    for edit in @model.getEdits()
-      continue if edit not instanceof Replacement
-      symbol = edit.getSymbol()
+    # Sort the edits from first to last as they appear in the original code.
+    # This should ensure that when we're resolving we resolve offsets for
+    # later edits, they take into account the offset changes from performing
+    # the earlier edits.
+    edits = @model.getEdits().copy().sort (edit1, edit2) =>
+      edit1.getSymbol().getRange().compare edit2.getSymbol().getRange()
 
+    # Recall the edits that have been made in the past.  Don't add any edits
+    # a second time if they were already marked
+    savedEdits = (editMarkerPair[0] for editMarkerPair in @editMarkerPairs)
+
+    for edit in edits
+
+      continue if edit in savedEdits
+      continue if edit not instanceof Replacement
+
+      # Look if the range for the symbol was already marked.  If so,
+      # just reuse that symbol.
+      symbol = edit.getSymbol()
       foundSymbol = false
       for rangeMarkerPair in @extraRangeMarkerPairs
         continue if not rangeMarkerPair[0].isEqual symbol.getRange()
         foundSymbol = true
         marker = rangeMarkerPair[1]
 
-      # The first time we find the symbol (presumably before any
-      # replacements have been performed), mark it and save a reference
-      # to the marker, for later replacements.
+      # Otherwise, we need to mark the range for the first time.
       if not foundSymbol
         marker = @_markRange symbol.getRange()
 
-      @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
+      # Replace the text in the range with the replacement text
+      if marker?
+        @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
+        @editMarkerPairs.push [ edit, marker, foundSymbol ]
 
   _surroundCurrentText: (textBefore, textAfter) ->
 

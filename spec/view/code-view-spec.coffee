@@ -92,7 +92,8 @@ describe "CodeView", () ->
 
   it "removes suggested line highlighting when suggested line removed", ->
 
-    rangeSet = new RangeSet [], [ new Range [1, 0], [1, 5] ]
+    suggestedRange = new Range [1, 0], [1, 5]
+    rangeSet = new RangeSet [], [ suggestedRange ]
     editor = _makeEditor()
     codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView(editor)
@@ -100,7 +101,7 @@ describe "CodeView", () ->
 
     codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 1
-    rangeSet.removeSuggestedRange new Range [1, 0], [1, 5]
+    rangeSet.getSuggestedRanges().remove suggestedRange
     expect(($ (editorView.querySelectorAll "div.lines .suggested")).length).toBe 0
 
   it "scrolls to a suggested range when a suggested range added", ->

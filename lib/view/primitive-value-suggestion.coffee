@@ -13,19 +13,10 @@ module.exports.PrimitiveValueSuggestionView = \
 
   preview: ->
     @previewReplacement = new Replacement @symbol, @valueString
-    @model.getEdits().remove @revertReplacement
     @model.getEdits().push @previewReplacement
 
   revert: ->
-    # XXX: For now, given the way the view applies edits, we have to make
-    # another explicit edit to reverse the preview.  Hopefully we can
-    # architect this out in the future.
-    @revertReplacement = new Replacement @symbol, @symbol.getName()
     @model.getEdits().remove @previewReplacement
-    @model.getEdits().push @revertReplacement
-
-  cleanup: ->
-    @model.getEdits().remove @revertReplacement
 
 
 module.exports.PrimitiveValueSuggestionBlockView = \

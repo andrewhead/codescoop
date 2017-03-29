@@ -12,57 +12,47 @@ module.exports.makeObservableArray = (array = undefined) ->
   array.addObserver = (observer) ->
     @observers.push observer
 
-  array.notifyObservers = (object, propertyName, oldValue, newValue) ->
+  array.notifyObservers = (arrayBefore) ->
     for observer in @observers
-      observer.onPropertyChanged object, propertyName, oldValue, newValue
+      observer.onPropertyChanged @, ObservableArrayProperty.ARRAY_CHANGE,
+        arrayBefore, @
 
   # It should be easy to copy the array, so that people can modify a copy of
   # the array without needing to observe it
   array.copy = ->
     @concat()
 
-  # REUSE: Snippet for watching change to array is based on
-  # answer from http://stackoverflow.com/questions/35610242
-  proxy = new Proxy array, {
-
-    set: (target, property, value, receiver) ->
-
-      # Make a copy of the old array that we can pass to observers
-      # This will NOT have a proxy associated with it (raw data)
-      oldArray = target.copy()
-
-      # Perform the modification
-      target[property] = value
-
-      # Importantly, we provide the new value as a proxy instead of the array.
-      # This is because we expect observers may want to mutate the array in
-      # ways that generate future events.
-      target.notifyObservers proxy, ObservableArrayProperty.ARRAY_CHANGE,
-        oldArray, proxy
-
-      # Return true to indicate the change was successful
-      true
-
-  }
-
   # Mark the proxy with a flag that callers can check to see if the array
   # they are manipulated is an observable array, or a typical array
-  proxy.isProxy = true
+  array.isProxy = true
+
+  # The mutators below are the actions that we want to notify observers
+  # of when they occur.  We expect all accesses to the array will be made
+  # through push, reset, and remove.
+  array.originalPush = array.push
+  array.push = (element) ->
+    arrayBefore = @.copy()
+    @originalPush element
+    @notifyObservers arrayBefore
 
   # This function should be used to fully reset the contents of the array.
   # Although it looks verbose compared to just defining a new array, we
   # do this manually to make sure not to clobber the observers of the array.
   array.reset = (elements) ->
+    arrayBefore = @.copy()
     @splice 0, @length
     for element in elements
-      @push element
+      @originalPush element
+    @notifyObservers arrayBefore
 
   # Convenience method as we often have to remove things from arrays
   # Only removes the first instance of the element from the array.
   array.remove = (element) ->
+    arrayBefore = @.copy()
     for arrayElement, index in @
       if element is arrayElement
         @.splice index, 1
         break
+    @notifyObservers arrayBefore
 
-  proxy
+  array

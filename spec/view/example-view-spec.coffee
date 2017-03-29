@@ -124,6 +124,42 @@ describe "ExampleView", ->
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "j = j + 42;").not.toBe -1
 
+  it "successfully applies multiple replacements within the same active range", ->
+    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    replacements = [
+      (new Replacement (new Symbol \
+        TEST_FILE, "i", (new Range [5, 8], [5, 9]), "int"), "42")
+      (new Replacement (new Symbol \
+        TEST_FILE, "i", (new Range [5, 12], [5, 13]), "int"), "43")
+    ]
+    model.getEdits().reset replacements
+    model.setState ExampleModelState.IDLE
+    exampleText = view.getTextEditor().getText()
+    expect(exampleText.indexOf "j = 42 + 43;").not.toBe -1
+
+  it "successfully applies multiple replacements, even if out of order", ->
+    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    replacements = [
+      (new Replacement (new Symbol \
+        TEST_FILE, "i", (new Range [5, 12], [5, 13]), "int"), "43")
+      (new Replacement (new Symbol \
+        TEST_FILE, "i", (new Range [5, 8], [5, 9]), "int"), "42")
+    ]
+    model.getEdits().reset replacements
+    model.setState ExampleModelState.IDLE
+    exampleText = view.getTextEditor().getText()
+    expect(exampleText.indexOf "j = 42 + 43;").not.toBe -1
+
+  it "reverts edits when it's in ERROR_CHOICE state and edits disappear", ->
+    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    model.setState ExampleModelState.ERROR_CHOICE
+    edit = new Replacement (new Symbol \
+      TEST_FILE, "i", (new Range [5, 8], [5, 9]), "int"), "42"
+    model.getEdits().reset [ edit ]
+    (expect view.getTextEditor().getText().indexOf "j = 42 + i;").not.toBe -1
+    model.getEdits().remove edit
+    (expect view.getTextEditor().getText().indexOf "j = 42 + i;").toBe -1
+
   describe "after marking up a symbol", ->
 
     editor = undefined
@@ -317,7 +353,7 @@ describe "ExampleView", ->
       (expect edit.getText(), "1")
 
       valueSuggestion.mouseout()
-      (expect model.getEdits()[0].getText(), "i")
+      (expect model.getEdits().length).toBe 0
       valueBlock.mouseleave()
 
   describe "when in the EXTENSION state", ->

@@ -8,12 +8,16 @@
 
 describe "InstanceStubSuggestionView", ->
 
-  model = new ExampleModel()
-  testFile = new File "path", "file_name"
-  symbol = new Symbol testFile, "book", (new Range [3, 4], [3, 8]), "Book"
-  stubSpec = new StubSpec "Book"
-  suggestion = new InstanceStubSuggestion symbol, stubSpec
-  view = new InstanceStubSuggestionView suggestion, model, undefined, 41
+  model = undefined
+  view = undefined
+  symbol = undefined
+  beforeEach =>
+    model = new ExampleModel()
+    testFile = new File "path", "file_name"
+    symbol = new Symbol testFile, "book", (new Range [3, 4], [3, 8]), "Book"
+    stubSpec = new StubSpec "Book"
+    suggestion = new InstanceStubSuggestion symbol, stubSpec
+    view = new InstanceStubSuggestionView suggestion, model, undefined, 41
 
   it "has a label that includes the index of the suggestion", ->
     (expect view.text()).toEqual "Stub 42"
@@ -40,9 +44,7 @@ describe "InstanceStubSuggestionView", ->
 
     it "resets the edits for the stub", ->
       edits = model.getEdits()
-      (expect edits.length).toBe 1
-      (expect edits[0].symbol).toBe symbol
-      (expect edits[0].text).toBe "book"
+      (expect edits.length).toBe 0
 
     it "sets the stub option back to null", ->
       (expect model.getStubOption()).toBe null

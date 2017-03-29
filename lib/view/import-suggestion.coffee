@@ -11,7 +11,7 @@ module.exports.ImportSuggestionView = class ImportSuggestionView extends Suggest
     @rangeSet.addSuggestedRange @suggestion.getImport().getRange()
 
   revert: ->
-    @rangeSet.removeSuggestedRange @suggestion.getImport().getRange()
+    @rangeSet.getSuggestedRanges().remove @suggestion.getImport().getRange()
 
 
 module.exports.ImportSuggestionBlockView = \

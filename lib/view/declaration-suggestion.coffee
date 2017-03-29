@@ -9,10 +9,8 @@ module.exports.DeclarationSuggestionView = \
     super suggestion, model, suggestion.getName()
 
   preview: ->
-    # @rangeSet.addSuggestedRange @suggestion.getSymbol().getRange()
 
   revert: ->
-    # @rangeSet.removeSuggestedRange @suggestion.getSymbol().getRange()
 
 
 module.exports.DeclarationSuggestionBlockView = \
