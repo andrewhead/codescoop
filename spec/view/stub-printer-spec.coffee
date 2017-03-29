@@ -196,6 +196,22 @@ describe "StubPrinter", ->
       ""
     ].join "\n"
 
+  it "escapes newlines and quotes in string literals", ->
+    stubSpec = new StubSpec "Stub",
+      fieldAccesses:
+        s:
+          type: "String"
+          values: ["\"\n\""]
+    string = stubPrinter.printToString stubSpec
+    (expect string).toEqual [
+      "private class Stub {"
+      "    "
+      "    public String s = \"\\\"\\n\\\"\";"
+      "    "
+      "}"
+      ""
+    ].join "\n"
+
   it "creates sub-types when a method returns multiple object instances", ->
     stubSpec = new StubSpec "Stub",
       methodCalls: [
