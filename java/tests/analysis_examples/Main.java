@@ -9,7 +9,6 @@ public class Main {
     private static final boolean DEBUG = true;
 
     public Main() {
-        this.database = new Database();
     }
 
     private class Database {
@@ -128,6 +127,7 @@ public class Main {
 
     public Booklist getBooklist(String genre, int max_books) {
 
+        Database database = new Database();
         Booklist booklist = new Booklist();
         List titles = new ArrayList();
 
