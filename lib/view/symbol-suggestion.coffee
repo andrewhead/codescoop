@@ -11,7 +11,7 @@ module.exports.DefinitionSuggestionView = class DefinitionSuggestionView extends
       "Line " + (suggestion.getSymbol().getRange().start.row + 1)
 
   preview: ->
-    @rangeSet.addSuggestedRange @suggestion.getSymbol().getRange()
+    @rangeSet.getSuggestedRanges().push @suggestion.getSymbol().getRange()
 
   revert: ->
     @rangeSet.getSuggestedRanges().remove @suggestion.getSymbol().getRange()

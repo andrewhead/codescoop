@@ -3,14 +3,18 @@
 { PrimitiveValueSuggestion } = require "../suggester/primitive-value-suggester"
 { DeclarationSuggestion } = require "../suggester/declaration-suggester"
 { InstanceStubSuggestion } = require "../suggester/instance-stub-suggester"
+{ InnerClassSuggestion } = require "../suggester/inner-class-suggester"
 { ExtensionDecision } = require "../extender/extension-decision"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
+
+{ ClassRange } = require "../model/range-set"
 { Replacement } = require "../edit/replacement"
 { Declaration } = require "../edit/declaration"
 
 { AddLineForRange } = require "../command/add-line-for-range"
 { AddRange } = require "../command/add-range"
+{ AddClassRange } = require "../command/add-class-range"
 { AddImport } = require "../command/add-import"
 { AddEdit } = require "../command/add-edit"
 { RemoveUse } = require "../command/remove-use"
@@ -19,47 +23,49 @@
 { ArchiveEvent } = require "../command/archive-event"
 
 
-module.exports.CommandFinder = class CommandFinder
+module.exports.CommandCreator = class CommandCreator
 
   # Return a group of commands that specify everything needed to revert the fix.
-  # This usually means references the commandFinder creates.
-  getCommandsForSuggestion: (update) ->
+  # This usually means references the commandCreator creates.
+  createCommandGroupForSuggestion: (suggestion) ->
 
     commandGroup = []
 
-    if update instanceof DefinitionSuggestion
-      commandGroup.push new AddLineForRange update.getSymbol().getRange()
+    if suggestion instanceof DefinitionSuggestion
+      commandGroup.push new AddLineForRange suggestion.getSymbol().getRange()
 
-    else if update instanceof ImportSuggestion
-      commandGroup.push new AddImport update.getImport()
+    else if suggestion instanceof ImportSuggestion
+      commandGroup.push new AddImport suggestion.getImport()
 
     # For primitive values, replace the symbol with a concrete value and then
     # mark the symbol as no longer an undefined use
-    else if update instanceof PrimitiveValueSuggestion
-      edit = new Replacement update.getSymbol(), update.getValueString()
+    else if suggestion instanceof PrimitiveValueSuggestion
+      edit = new Replacement suggestion.getSymbol(), suggestion.getValueString()
       commandGroup.push new AddEdit edit
-      commandGroup.push new RemoveUse update.getSymbol()
+      commandGroup.push new RemoveUse suggestion.getSymbol()
 
-    else if update instanceof DeclarationSuggestion
-      symbol = update.getSymbol()
+    else if suggestion instanceof DeclarationSuggestion
+      symbol = suggestion.getSymbol()
       declaration = new Declaration symbol.getName(), symbol.getType()
       commandGroup.push new AddDeclaration declaration
 
-    else if update instanceof InstanceStubSuggestion
-
-      # Add a stub spec that can be printed as part of the snippet
-      commandGroup.push new AddStubSpec update.getStubSpec()
-
-      # Replace the symbol with an instantiation of the stub
+    # For stubs of instances, add a stub spec that can be printed as part of
+    # the snippet.  Replace the symbol with an instantiation of the stub.  Then
+    # Mark the undefined use as resolved
+    else if suggestion instanceof InstanceStubSuggestion
+      commandGroup.push new AddStubSpec suggestion.getStubSpec()
       commandGroup.push new AddEdit new Replacement \
-        update.getSymbol(), "(new #{update.getStubSpec().getClassName()}())"
+        suggestion.getSymbol(), "(new #{suggestion.getStubSpec().getClassName()}())"
+      commandGroup.push new RemoveUse suggestion.getSymbol()
 
-      # Mark the undefined use as resolved
-      commandGroup.push new RemoveUse update.getSymbol()
+    else if suggestion instanceof InnerClassSuggestion
+      commandGroup.push new AddClassRange \
+        new ClassRange suggestion.getRange(),
+          suggestion.getSymbol(),suggestion.isStatic()
 
     commandGroup
 
-  getCommandsForExtensionDecision: (extensionDecision) ->
+  createCommandGroupForExtensionDecision: (extensionDecision) ->
 
     commandGroup = []
 

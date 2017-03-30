@@ -52,11 +52,11 @@ describe "MediatingUseDetector", ->
 
   it "finds uses between a def and use and returns them in line order", ->
     (expect model.getEvents().length).toBe 0
-    activeRanges = [
+    snippetRanges = [
       new Range [2, 0], [2, 14]  # 'i' def
       new Range [7, 0], [7, 10]  # 'i' final use
     ]
-    model.getRangeSet().getActiveRanges().reset activeRanges
+    model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 2
     events = model.getEvents()
     (expect events[0] instanceof MediatingUseEvent).toBe true
@@ -66,12 +66,12 @@ describe "MediatingUseDetector", ->
     (expect events[1].getMediatingUse().getRange()).toEqual new Range [5, 23], [5, 24]
 
   it "only recommends uses that aren't in the active ranges", ->
-    activeRanges = [
+    snippetRanges = [
       new Range [2, 0], [2, 14]  # 'i' def
       new Range [5, 0], [5, 26]  # 'i' mediating use #1
       new Range [7, 0], [7, 10]  # 'i' final use
     ]
-    model.getRangeSet().getActiveRanges().reset activeRanges
+    model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 1
     (expect model.getEvents()[0].getMediatingUse().getRange()).toEqual \
       new Range [4, 23], [4, 24]
@@ -79,11 +79,11 @@ describe "MediatingUseDetector", ->
   it "only associates defs and uses in the same scope", ->
     # These two active ranges contain an unrelated def and use.  The
     # event detector should find no link between the two.
-    activeRanges = [
+    snippetRanges = [
       new Range [2, 0], [2, 14]    # 'i' def in 'main'
       new Range [11, 0], [11, 26]  # 'i' final use in 'anotherMethod'
     ]
-    model.getRangeSet().getActiveRanges().reset activeRanges
+    model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 0
 
   it "doesn't detect an intervening use that was already queued", ->
@@ -93,11 +93,11 @@ describe "MediatingUseDetector", ->
       (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")   # 'i' mediating use
     # This set of active ranges will produce exactly the same mediating
     # event as the one that is already enqueued in the model's events
-    activeRanges = [
+    snippetRanges = [
       new Range [2, 0], [2, 14]  # 'i' def
       new Range [7, 0], [7, 10]  # 'i' final use
     ]
-    model.getRangeSet().getActiveRanges().reset activeRanges
+    model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 2
 
   it "doesn't detect an intervening use that was already viewed", ->
@@ -107,11 +107,11 @@ describe "MediatingUseDetector", ->
       (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")   # 'i' mediating use
     # This set of active ranges will produce exactly the same mediating
     # event as the one that is already enqueued in the model's events
-    activeRanges = [
+    snippetRanges = [
       new Range [2, 0], [2, 14]  # 'i' def
       new Range [7, 0], [7, 10]  # 'i' final use
     ]
-    model.getRangeSet().getActiveRanges().reset activeRanges
+    model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 1
 
   describe "when there are nested scopes", ->
@@ -149,9 +149,9 @@ describe "MediatingUseDetector", ->
     it "only detects uses that correspond to the declaration of the def", ->
       # In other words, it shouldn't find the printed `i` on line 5, which
       # refers to a different `i`.
-      activeRanges = [
+      snippetRanges = [
         new Range [2, 0], [2, 14]  # 'i' def
         new Range [7, 0], [7, 10]  # 'i' final use
       ]
-      model.getRangeSet().getActiveRanges().reset activeRanges
+      model.getRangeSet().getSnippetRanges().reset snippetRanges
       (expect model.getEvents().length).toBe 0

@@ -98,8 +98,8 @@ describe "ControlCrossingDetector", ->
 
     it "suggests control structures when a new range added causes a control " +
         "crossing", ->
-      model.getRangeSet().getActiveRanges().push new Range [4, 8], [4, 14]
-      model.getRangeSet().getActiveRanges().push new Range [2, 4], [2, 10]
+      model.getRangeSet().getSnippetRanges().push new Range [4, 8], [4, 14]
+      model.getRangeSet().getSnippetRanges().push new Range [2, 4], [2, 10]
       events = model.getEvents()
       (expect events.length).toBe 1
       (expect events[0] instanceof ControlCrossingEvent)
@@ -110,8 +110,8 @@ describe "ControlCrossingDetector", ->
     it "does not suggest anything when active ranges are removed", ->
 
       # Load the model with a set of active ranges
-      activeRanges = model.getRangeSet().getActiveRanges()
-      activeRanges.reset [
+      snippetRanges = model.getRangeSet().getSnippetRanges()
+      snippetRanges.reset [
         new Range [4, 8], [4, 14]
         new Range [2, 4], [2, 10]
         new Range [3, 3], [3, 4]  # irrelevant range that will be removed
@@ -121,14 +121,14 @@ describe "ControlCrossingDetector", ->
 
       # At this point, removing an active range should not cause a
       # control crossing event
-      activeRanges.splice 2, 1
+      snippetRanges.splice 2, 1
       (expect model.getEvents().length).toBe 0
 
     it "does not suggest anything when no control structure was crossed", ->
       # (In this case, the outside range is added first, and then the one
       # inside the control structure.  This shouldn't result in a crossing).
-      model.getRangeSet().getActiveRanges().push new Range [2, 4], [2, 10]
-      model.getRangeSet().getActiveRanges().push new Range [4, 8], [4, 14]
+      model.getRangeSet().getSnippetRanges().push new Range [2, 4], [2, 10]
+      model.getRangeSet().getSnippetRanges().push new Range [4, 8], [4, 14]
       (expect model.getEvents().length).toBe 0
 
     it "does not suggest a control structure that was crossed before and " +
@@ -142,9 +142,9 @@ describe "ControlCrossingDetector", ->
       model.getEvents().push pastCrossingEvent
 
       # No new events should be added now when we cross the structure again
-      activeRanges = model.getRangeSet().getActiveRanges()
-      activeRanges.push new Range [4, 8], [4, 14]
-      activeRanges.push new Range [2, 4], [2, 10]
+      snippetRanges = model.getRangeSet().getSnippetRanges()
+      snippetRanges.push new Range [4, 8], [4, 14]
+      snippetRanges.push new Range [2, 4], [2, 10]
       (expect model.getEvents().length).toBe 1
 
     it "does not suggest a control structure that was crossed before and " +
@@ -158,7 +158,7 @@ describe "ControlCrossingDetector", ->
       model.getViewedEvents().push pastCrossingEvent
 
       # No new events should be added now when we cross the structure again
-      activeRanges = model.getRangeSet().getActiveRanges()
-      activeRanges.push new Range [4, 8], [4, 14]
-      activeRanges.push new Range [2, 4], [2, 10]
+      snippetRanges = model.getRangeSet().getSnippetRanges()
+      snippetRanges.push new Range [4, 8], [4, 14]
+      snippetRanges.push new Range [2, 4], [2, 10]
       (expect model.getEvents().length).toBe 0

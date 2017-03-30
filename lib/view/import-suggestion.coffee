@@ -8,7 +8,7 @@ module.exports.ImportSuggestionView = class ImportSuggestionView extends Suggest
     super suggestion, model, suggestion.getImport().getName()
 
   preview: ->
-    @rangeSet.addSuggestedRange @suggestion.getImport().getRange()
+    @rangeSet.getSuggestedRanges().push @suggestion.getImport().getRange()
 
   revert: ->
     @rangeSet.getSuggestedRanges().remove @suggestion.getImport().getRange()

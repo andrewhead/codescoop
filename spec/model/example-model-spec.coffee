@@ -29,6 +29,6 @@ describe "ExampleModel", ->
     rangeSet = new RangeSet()
     exampleModel = new ExampleModel codeBuffer, rangeSet, new SymbolSet(), parseTree, new ValueMap()
     exampleModel.addObserver observer
-    rangeSet.getActiveRanges().push new Range [0, 0], [0, 10]
+    rangeSet.getSnippetRanges().push new Range [0, 0], [0, 10]
     (expect observer.propertyName).toBe ExampleModelProperty.ACTIVE_RANGES
     (expect observer.propertyValue).toEqual [ new Range [0, 0], [0, 10] ]

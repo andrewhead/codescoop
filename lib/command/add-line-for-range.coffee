@@ -9,10 +9,10 @@ module.exports.AddLineForRange = class AddRange
     startRowRange = codeBuffer.rangeForRow @range.start.row
     endRowRange = codeBuffer.rangeForRow @range.end.row
     @lineRange = startRowRange.union endRowRange
-    model.getRangeSet().getActiveRanges().push @lineRange
+    model.getRangeSet().getSnippetRanges().push @lineRange
 
   revert: (model) ->
-    model.getRangeSet().getActiveRanges().remove @lineRange
+    model.getRangeSet().getSnippetRanges().remove @lineRange
 
   getRange: ->
     @range

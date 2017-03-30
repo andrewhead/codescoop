@@ -41,12 +41,12 @@ describe "MissingDefinitionDetector", ->
   model = new ExampleModel undefined, rangeSet, symbols, parseTree
 
   it "reports no problems when no variables lack definitions", ->
-    rangeSet.getActiveRanges().reset [ new Range [2, 0], [2, 14] ]
+    rangeSet.getSnippetRanges().reset [ new Range [2, 0], [2, 14] ]
     errors = detector.detectErrors model
     (expect errors.length).toBe 0
 
   it "detects missing variable definitions", ->
-    rangeSet.getActiveRanges().reset [ new Range [3, 0], [3, 18] ]
+    rangeSet.getSnippetRanges().reset [ new Range [3, 0], [3, 18] ]
     errors = detector.detectErrors model
     (expect errors.length).toBe 1
     error = errors[0]
@@ -54,7 +54,7 @@ describe "MissingDefinitionDetector", ->
     (expect error.getSymbol().getRange()).toEqual new Range [3, 12], [3, 13]
 
   it "doesn't flag a variable as defined if definition occurs below a use", ->
-    rangeSet.getActiveRanges().reset [
+    rangeSet.getSnippetRanges().reset [
       new Range [3, 0], [3, 18]
       new Range [4, 0], [4, 14]
     ]
@@ -63,7 +63,7 @@ describe "MissingDefinitionDetector", ->
     (expect errors[0].getSymbol().getName()).toEqual "i"
 
   it "skips temporary variables (those with a $)", ->
-    rangeSet.getActiveRanges().reset [
+    rangeSet.getSnippetRanges().reset [
       new Range [2, 0], [3, 18]
       new Range [5, 0], [4, 10]
     ]

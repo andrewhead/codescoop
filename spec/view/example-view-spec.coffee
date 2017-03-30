@@ -1,7 +1,7 @@
 { ExampleView } = require "../../lib/view/example-view"
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require "../../lib/model/example-model"
 { File, Symbol, SymbolSet } = require "../../lib/model/symbol-set"
-{ Range, RangeSet } = require "../../lib/model/range-set"
+{ Range, ClassRange, RangeSet } = require "../../lib/model/range-set"
 { ValueMap } = require "../../lib/analysis/value-analysis"
 { StubSpec } = require "../../lib/model/stub"
 { Import } = require "../../lib/model/import"
@@ -65,10 +65,10 @@ describe "ExampleView", ->
 
     # Remove first line from the list
     rangeSet = model.getRangeSet()
-    rangeSet.getActiveRanges().splice 0, 1
+    rangeSet.getSnippetRanges().remove rangeSet.getSnippetRanges()[0]
 
     # Add another line index to the list
-    rangeSet.getActiveRanges().push new Range [4, 4], [4, 14]
+    rangeSet.getSnippetRanges().push new Range [4, 4], [4, 14]
 
     exampleText = view.getTextEditor().getText()
     expect(exampleText.indexOf "int i = 0;").toBe -1
@@ -91,6 +91,44 @@ describe "ExampleView", ->
         "  }"
       ].join "\n").not.toBe -1
 
+  describe "when rendering inner classes", ->
+
+    beforeEach =>
+      codeBuffer = atom.workspace.buildTextEditor().getBuffer()
+      model = new ExampleModel codeBuffer
+
+    it "adds classes when rendering the text", ->
+      model.getCodeBuffer().setText [
+        "public class Example {"
+        "  private static class InnerClass {"
+        "  }"
+        "}"
+      ].join "\n"
+      classRange = new ClassRange (new Range [1, 2], [2, 3]), undefined, true
+      model.getRangeSet().getClassRanges().push classRange
+      view = new ExampleView model, editor
+      exampleText = view.getTextEditor().getText()
+      (expect exampleText.indexOf [
+        "  private static class InnerClass {"
+        "  }"
+      ].join "\n").not.toBe -1
+
+    it "adds a static modifier to the class declaration if it not static", ->
+      model.getCodeBuffer().setText [
+        "public class Example {"
+        "  private class InnerClass {"
+        "  }"
+        "}"
+      ].join "\n"
+      classRange = new ClassRange (new Range [1, 2], [2, 3]), undefined, false
+      model.getRangeSet().getClassRanges().push classRange
+      view = new ExampleView model, editor
+      exampleText = view.getTextEditor().getText()
+      (expect exampleText.indexOf [
+        "  private static class InnerClass {"
+        "  }"
+      ].join "\n").not.toBe -1
+
   it "adds imports when rendering the text", ->
     model.getImports().push new Import "org.Book", new Range [0, 7], [0, 15]
     view = new ExampleView model, editor
@@ -98,7 +136,7 @@ describe "ExampleView", ->
     (expect exampleText.startsWith "import org.Book;\n").toBe true
 
   it "marks up symbols with errors in ERROR_CHOICE mode", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [4, 4], [5, 14] ]
+    model.getRangeSet().getSnippetRanges().reset [ new Range [4, 4], [5, 14] ]
     model.setErrors [
       (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [4, 8], [4, 9])
       (new MissingDefinitionError new Symbol TEST_FILE, "j", new Range [5, 8], [5, 9])
@@ -116,7 +154,7 @@ describe "ExampleView", ->
     (expect editor.getTextInBufferRange(markerBufferRange)).toBe "j"
 
   it "supports replacements on symbols marked with errors", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [4, 0], [5, 14] ]
+    model.getRangeSet().getSnippetRanges().reset [ new Range [4, 0], [5, 14] ]
     undefinedSymbol = new Symbol TEST_FILE, "i", new Range [5, 12], [5, 13]
     model.setErrors [ new MissingDefinitionError undefinedSymbol ]
     model.setState ExampleModelState.ERROR_CHOICE
@@ -125,7 +163,7 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "j = j + 42;").not.toBe -1
 
   it "successfully applies multiple replacements within the same active range", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    model.getRangeSet().getSnippetRanges().reset [ new Range [5, 0], [5, 14] ]
     replacements = [
       (new Replacement (new Symbol \
         TEST_FILE, "i", (new Range [5, 8], [5, 9]), "int"), "42")
@@ -138,7 +176,7 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "j = 42 + 43;").not.toBe -1
 
   it "successfully applies multiple replacements, even if out of order", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    model.getRangeSet().getSnippetRanges().reset [ new Range [5, 0], [5, 14] ]
     replacements = [
       (new Replacement (new Symbol \
         TEST_FILE, "i", (new Range [5, 12], [5, 13]), "int"), "43")
@@ -151,7 +189,7 @@ describe "ExampleView", ->
     expect(exampleText.indexOf "j = 42 + 43;").not.toBe -1
 
   it "reverts edits when it's in ERROR_CHOICE state and edits disappear", ->
-    model.getRangeSet().getActiveRanges().reset [ new Range [5, 0], [5, 14] ]
+    model.getRangeSet().getSnippetRanges().reset [ new Range [5, 0], [5, 14] ]
     model.setState ExampleModelState.ERROR_CHOICE
     edit = new Replacement (new Symbol \
       TEST_FILE, "i", (new Range [5, 8], [5, 9]), "int"), "42"

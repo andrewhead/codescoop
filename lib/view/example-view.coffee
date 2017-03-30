@@ -16,6 +16,7 @@ $ = require "jquery"
 { DeclarationSuggestionBlockView } = require "../view/declaration-suggestion"
 { InstanceStubSuggestionBlockView } = require "../view/instance-stub-suggestion"
 { ImportSuggestionBlockView } = require "../view/import-suggestion"
+{ InnerClassSuggestionBlockView } = require "../view/inner-class-suggestion"
 { ControlStructureExtensionView } = require "../view/control-structure-extension"
 { MediatingUseExtensionView } = require "../view/mediating-use-extension"
 
@@ -72,21 +73,30 @@ module.exports.ExampleView = class ExampleView
         (@_revertReplacement replacement) for replacement in deletedReplacements
 
   update: ->
+
+    # Remove any markers that were on the code before
     @_clearMarkers()
-    # We add in the code, then add the markers, then the boilerplate.
-    # By adding the code first, we get to use the character offsets of
-    # each symbol to mark them, before inserting other boilerplate code
+
+    # Add in the code!  We do this before we add markers to any of it.
+    # One of the most important steps is to mark this code as it's
+    # added, so we can locate errors in their new, relative positions in the
+    # example editor, instead of using their positions in the original code.
     @_addCodeLines()
     @_addAuxiliaryDeclarations()
     @_applyReplacements()
+    @_surroundWithMain()
+    @_addClassStubs()
+    @_addInnerClasses()
+
+    # Add user interface that marks up the code and accepts user input
     if @model.getState() is ExampleModelState.ERROR_CHOICE
       @_markErrors @model.getErrors()
     else if @model.getState() is ExampleModelState.RESOLUTION
       @_addResolutionWidget @model.getSuggestions()
     else if @model.getState() is ExampleModelState.EXTENSION
       @_addExtensionWidget @model.getProposedExtension()
-    @_surroundWithMain()
-    @_addClassStubs()
+
+    # Finish up the code with more boilerplace, imports, and pretty-printing
     @_surroundWithClass()
     @_addImports()
     @_indentCode()
@@ -105,7 +115,7 @@ module.exports.ExampleView = class ExampleView
 
     # Make a copy here, as sort mutates the array, and we don"t want to observe
     # each of the sorting events (would cause infinite recursion)
-    ranges = @model.getRangeSet().getActiveRanges().copy()
+    ranges = @model.getRangeSet().getSnippetRanges().copy()
     rangesSorted = ranges.sort (a, b) => a.compare b
 
     @textEditor.setText "\n"
@@ -154,6 +164,44 @@ module.exports.ExampleView = class ExampleView
       if i is stubSpecs.length - 1
         stubsText += "\n"
     @textEditor.setTextInBufferRange (new Range [0, 0], [0, 0]), stubsText
+
+  _addInnerClasses: ->
+
+    _addTextAtEndOfBuffer = (text) =>
+      # Find the end of the buffer, and add text at the end
+      lastLine = @textEditor.getLastBufferRow()
+      lastChar = (@textEditor.lineTextForBufferRow lastLine).length
+      range = new Range [lastLine, lastChar], [lastLine, lastChar]
+      @textEditor.setTextInBufferRange range, text
+
+    classRanges = @model.getRangeSet().getClassRanges()
+    _addTextAtEndOfBuffer "\n" if classRanges.length > 0
+
+    # For each class, print its declaration to file
+    for classRange, i in classRanges
+
+      # Get the original class declaration from the code editor.
+      # If it wasn't defined as a static class, we redefine it as one.
+      rangeInCode = classRange.getRange()
+      declaration = @model.getCodeBuffer().getTextInRange rangeInCode
+      if not classRange.isStatic()
+        declaration = declaration.replace /\bclass\b/, "static class"
+
+      # Find the end of the buffer, and add text at the end
+      lastLine = @textEditor.getLastBufferRow()
+      lastChar = (@textEditor.lineTextForBufferRow lastLine).length
+      insertRange = new Range [lastLine, lastChar], [lastLine, lastChar]
+      declarationRange = @textEditor.setTextInBufferRange insertRange, declaration
+
+      # Mark the range of this declaration, so we can annotate it with
+      # errors and resolutions at some later time.
+      marker = @textEditor.markBufferRange declarationRange
+      @activeRangeMarkerPairs.push [rangeInCode, marker]
+
+      # White space between class declarations
+      _addTextAtEndOfBuffer "\n"
+      if i isnt classRanges.length - 1
+        _addTextAtEndOfBuffer "\n"
 
   # Find the location that an active range from the code view maps to in
   # the example view.  There are two steps:
@@ -231,14 +279,20 @@ module.exports.ExampleView = class ExampleView
     # this range relative to its active range's position in the example editor.
     else
 
-      columnOffset = range.start.column - activeRange.start.column
+      startColumn = undefined
+      if range.start.row is activeRange.start.row
+        columnOffset = range.start.column - activeRange.start.column
+        startColumn = markerRange.start.column + columnOffset
+      else
+        startColumn = range.start.column
+
       rowOffset = range.start.row - activeRange.start.row
       adjustedRange = new Range [
           markerRange.start.row + rowOffset
-          markerRange.start.column + columnOffset
+          startColumn
         ], [
           markerRange.start.row + rowOffset + height
-          markerRange.start.column + columnOffset + width
+          startColumn + width
         ]
       return adjustedRange
 
@@ -328,6 +382,8 @@ module.exports.ExampleView = class ExampleView
         block = new InstanceStubSuggestionBlockView suggestions, @model, marker
       else if class_ is "ImportSuggestion"
         block = new ImportSuggestionBlockView suggestions, @model, marker
+      else if class_ is "InnerClassSuggestion"
+        block = new InnerClassSuggestionBlockView suggestions, @model, marker
       decoration.append block
 
     # Create a decoration from the element

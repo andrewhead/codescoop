@@ -56,7 +56,7 @@ describe "CodeView", () ->
     # the view should update the DOM automatically
     codeView.updateHighlights()
     expect(($ (editorView.querySelectorAll "div.lines .active")).length).toBe 0
-    rangeSet.getActiveRanges().push new Range [1, 0], [1, 5]
+    rangeSet.getSnippetRanges().push new Range [1, 0], [1, 5]
     expect(($ (editorView.querySelectorAll "div.lines .active")).length).toBe 1
 
   it "adds an extra highlight to suggested lines", ->

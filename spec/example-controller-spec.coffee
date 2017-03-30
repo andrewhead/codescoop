@@ -123,7 +123,7 @@ describe "ExampleController", ->
           ), "Waiting for state"
 
       it "leaves the state at IDLE if no errors found", ->
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect model.getState()).toBe ExampleModelState.IDLE
 
       it "applies correctors when new lines are added", ->
@@ -139,7 +139,7 @@ describe "ExampleController", ->
         (expect firstCorrector.checker.detectErrors).not.toHaveBeenCalled()
 
         # Once we update the active ranges, the corrector should be applied
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
 
       it "applies correctors in the order they were added to the controller", ->
@@ -155,36 +155,36 @@ describe "ExampleController", ->
           name: "mock-corrector-2"
           checker: { detectErrors: (parseTree, rangeSet, symbolSet) => [] }
           suggester: { getSuggestions: (error, parseTree, rangeSet, symbolSet) => [] }
-          commandFinder: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
+          commandCreator: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
         correctors.push secondCorrector
 
         (spyOn firstCorrector.checker, "detectErrors").andCallThrough()
         (spyOn secondCorrector.checker, "detectErrors").andCallThrough()
 
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
 
         (expect firstCorrector.checker.detectErrors).toHaveBeenCalled()
         (expect secondCorrector.checker.detectErrors).not.toHaveBeenCalled()
 
       it "updates to ERROR_CHOICE when lines are chosen and errors found", ->
         correctors[0].checker.detectErrors = () => [ "error1" ]
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
 
       it "updates model errors when lines are chosen and errors are found", ->
         correctors[0].checker.detectErrors = () => [ "error1", "error2" ]
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect model.getErrors()).toEqual [ "error1", "error2" ]
 
       it "transitions to ERROR_CHOICE if it enters IDLE with errors", ->
         correctors[0].checker.detectErrors = () => [ "error1" ]
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect model.getState()).toBe ExampleModelState.ERROR_CHOICE
 
       it "saves a reference to the corrector that found the error", ->
         (expect model.getActiveCorrector()).toBe null
         correctors[0].checker.detectErrors = () => [ "error1" ]
-        model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+        model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
         (expect model.getActiveCorrector()).toBe correctors[0]
 
     describe "when handling events", ->
@@ -221,7 +221,7 @@ describe "ExampleController", ->
         it "transitions to EXTENSION if events were detected", ->
           event = { eventId: 42 }
           model.getEvents().push event
-          model.getRangeSet().getActiveRanges().push new Range [0, 1], [0, 2]
+          model.getRangeSet().getSnippetRanges().push new Range [0, 1], [0, 2]
           (expect model.getState()).toBe ExampleModelState.EXTENSION
           (expect "isExtension" of model.getProposedExtension()).toBe true
           (expect model.getFocusedEvent().eventId).toBe 42
@@ -299,10 +299,10 @@ describe "ExampleController", ->
 
     command = { apply: (model) -> @wasApplied = true }
     commandStack = new CommandStack()
-    commandFinder = { getCommandsForSuggestion: (s) -> [ command ] }
+    commandCreator = { createCommandGroupForSuggestion: (s) -> [ command ] }
     model = _makeDefaultModel()
-    controller = new ExampleController model, { commandFinder, commandStack }
-    model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+    controller = new ExampleController model, { commandCreator, commandStack }
+    model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
     model.setState ExampleModelState.RESOLUTION
     model.setActiveCorrector { correctorId: 42 }
     model.setResolutionChoice { resolutionId: 42 }
@@ -353,7 +353,7 @@ describe "ExampleController", ->
 
     model = undefined
     controller = undefined
-    commandFinder = undefined
+    commandCreator = undefined
     commandStack = undefined
     command = undefined
 
@@ -416,7 +416,7 @@ describe "ExampleController", ->
       model.getSuggestions().reset [{ suggestionId: 42 }]
 
       # Add a new range to the model
-      model.getRangeSet().getActiveRanges().push new Range [0, 0], [0, 10]
+      model.getRangeSet().getSnippetRanges().push new Range [0, 0], [0, 10]
 
     it "resets the state to IDLE", ->
       (expect model.getState()).toBe ExampleModelState.IDLE

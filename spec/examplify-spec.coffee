@@ -60,12 +60,12 @@ describe "The Examplify Plugin", ->
 
       # Initially, there should only be one selection in the active set...
       controller = examplifyPackage.mainModule.controller
-      (expect controller.getModel().getRangeSet().getActiveRanges().length).toBe 1
+      (expect controller.getModel().getRangeSet().getSnippetRanges().length).toBe 1
 
       # After we make another selection, it should get added to the active set
       editor.setSelectedBufferRange new Range [4, 0], [4, 35]
       atom.commands.dispatch workspaceElement, "examplify:add-selection-to-example"
-      (expect controller.getModel().getRangeSet().getActiveRanges().length).toBe 2
+      (expect controller.getModel().getRangeSet().getSnippetRanges().length).toBe 2
 
   it "creates a bottom panel for running agents", ->
 
@@ -124,7 +124,7 @@ describe "MainController", ->
     selection = codeEditor.addSelectionForBufferRange selectedRange
 
     mainController = new MainController codeEditor, exampleEditor
-    (expect mainController.getRangeSet().getActiveRanges()).toEqual \
+    (expect mainController.getRangeSet().getSnippetRanges()).toEqual \
       [ new Range [1, 0], [1, 2] ]
 
   it 'highlights lines on the screen when invoked with a selection', ->

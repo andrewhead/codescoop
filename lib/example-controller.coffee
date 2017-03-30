@@ -1,5 +1,5 @@
 { ExampleModelState, ExampleModelProperty } = require "./model/example-model"
-{ CommandFinder } = require "./command/command-finder"
+{ CommandCreator } = require "./command/command-creator"
 { CommandStack } = require "./command/command-stack"
 
 { MissingDefinitionDetector } = require "./error/missing-definition"
@@ -13,6 +13,7 @@
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
 { ImportSuggester } = require "./suggester/import-suggester"
+{ InnerClassSuggester } = require "./suggester/inner-class-suggester"
 { ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
 { MediatingUseExtender } = require "./extender/mediating-use-extender"
@@ -26,7 +27,7 @@ module.exports.ExampleController = class ExampleController
     @model = model
     @model.addObserver @
 
-    @commandFinder = extras.commandFinder or new CommandFinder()
+    @commandCreator = extras.commandCreator or new CommandCreator()
     @commandStack = extras.commandStack or new CommandStack()
 
     analyses = extras.analyses or {}
@@ -45,7 +46,10 @@ module.exports.ExampleController = class ExampleController
         ]
       ,
         checker: new MissingTypeDefinitionDetector()
-        suggesters: [ new ImportSuggester() ]
+        suggesters: [
+          new ImportSuggester()
+          new InnerClassSuggester()
+        ]
       ,
         checker: new MissingDeclarationDetector()
         suggesters: [ new DeclarationSuggester() ]
@@ -192,7 +196,7 @@ module.exports.ExampleController = class ExampleController
       if (propertyName is ExampleModelProperty.RESOLUTION_CHOICE) and newValue?
 
         # Look up commands for this suggestion, execute and save them
-        commandGroup = @commandFinder.getCommandsForSuggestion newValue
+        commandGroup = @commandCreator.createCommandGroupForSuggestion newValue
         @commandStack.push commandGroup
         for command in commandGroup
           command.apply @model
@@ -212,7 +216,7 @@ module.exports.ExampleController = class ExampleController
 
         # Look up commands for this decision for this extension.
         # Then execute and save them to the stack.
-        commandGroup = @commandFinder.getCommandsForExtensionDecision extensionDecision
+        commandGroup = @commandCreator.createCommandGroupForExtensionDecision extensionDecision
         @commandStack.push commandGroup
         for command in commandGroup
           command.apply @model

@@ -4,10 +4,10 @@ module.exports.AddRange = class AddRange
     @range = range
 
   apply: (model) ->
-    model.getRangeSet().getActiveRanges().push @range
+    model.getRangeSet().getSnippetRanges().push @range
 
   revert: (model) ->
-    model.getRangeSet().getActiveRanges().remove @range
+    model.getRangeSet().getSnippetRanges().remove @range
 
   getRange: ->
     @range

@@ -37,7 +37,8 @@ module.exports.StubPrinter = class StubPrinter
 
   _getLiteralForValue: (value, typeName) ->
     if typeName is "String"
-      # Escape string so that it can be included as a literal.
+      # Escape string so that it can be included as a literal.  Tip from:
+      # http://stackoverflow.com/questions/770523/escaping-strings-in-javascript
       # XXX: This assumes that the escaping rules for Java are the same as
       # those for JSON, which might not be true
       return "\"" + JSON.stringify(value).slice(1, -1) + "\""
