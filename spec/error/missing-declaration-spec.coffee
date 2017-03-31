@@ -6,7 +6,7 @@
 { Declaration } = require "../../lib/edit/Declaration"
 
 
-fdescribe "MissingDeclarationDetector", ->
+describe "MissingDeclarationDetector", ->
 
   describe "when called on a simple 'main'", ->
     parseTree = parse [
