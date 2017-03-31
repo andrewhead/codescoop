@@ -18,8 +18,9 @@ javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:$REFLECTIONS_JARS:. tests/*.java
 # Compile classes for all of the files we're going to run test analysis on
 # Use `-g` so we get symbol information, for extracting variable names during analysis.
 javac -g tests/analysis_examples/*.java
+javac -g -cp $SOOT_JARS:$JDI_JARS tests/scenarios/examplify/*.java
+javac -g -cp ./libs/database.jar tests/scenarios/database-use/*.java
 javac -g tests/scenarios/InstallCertFolder/*.java
-javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$REFLECTIONS_JARS tests/scenarios/examplify/*.java
 
 # Discover and run tests
 java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$REFLECTIONS_JARS $@
