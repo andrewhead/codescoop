@@ -24,7 +24,7 @@ public class MemberAccessAnalysis {
     public static void main(String [] args) {
         MemberAccessAnalysis analysis = new MemberAccessAnalysis();
         try {
-            analysis.run(args[0], args[1]);
+            analysis.run(args[1], args[0]);
         } catch (ClassNotFoundException cnfe) {
             System.out.println("Could not find class " + args[1]);
         }
@@ -80,6 +80,8 @@ public class MemberAccessAnalysis {
 
         String vmStdout = streamToString(vm.process().getInputStream());
         String vmStderr = streamToString(vm.process().getErrorStream());
+        System.out.println("Stdout: " + vmStdout);
+        System.out.println("Stderr: " + vmStderr);
 
         if (vmStderr.contains("Error: Could not find or load main class")) {
             throw new ClassNotFoundException("Could not find or load main class");
