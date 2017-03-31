@@ -26,7 +26,7 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
       for activeRange in rangeSet.getActiveRanges()
         if activeRange.containsRange symbol.getRange()
           activeSymbols.push symbol
-        break
+          break
 
     # Then, we collect the active symbols that are undeclared
     missingDeclarations = []
