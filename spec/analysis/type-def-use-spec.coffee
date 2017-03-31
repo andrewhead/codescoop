@@ -122,6 +122,14 @@ describe "TypeUseFinder", ->
     ].join "\n"
     _checkForOneTypeSymbol parseTree, "IBook", new Range [0, 29], [0, 34]
 
+  it "finds classes in `throws` clauses", ->
+    parseTree = parse [
+      "public class Book {"
+      "  public void method() throws IOException {}"
+      "}"
+    ].join "\n"
+    _checkForOneTypeSymbol parseTree, "IOException", new Range [1, 30], [1, 41]
+
   it "doesn't mark Strings, objects, or primitives as a class use", ->
     parseTree = parse [
       "public class Book {"

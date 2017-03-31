@@ -2,6 +2,7 @@
 { JavaListener } = require "../grammar/Java/JavaListener"
 { Symbol } = require "../model/symbol-set"
 { Range } = require "../model/range-set"
+{ extractCtxRange } = require "./parse-tree"
 ParseTreeWalker = (require "antlr4").tree.ParseTreeWalker.DEFAULT
 
 
@@ -34,19 +35,30 @@ class TypeUseVisitor extends JavaListener
     @file = file
     @typeUses = []
 
+  _saveSymbolIfTypeIsntIgnored: (symbol) ->
+    if symbol.getName() not in @IGNORED_CLASS_NAMES
+      @typeUses.push symbol
+
   enterTypeType: (ctx) ->
     if ctx.children[0].ruleIndex is JavaParser.RULE_classOrInterfaceType
       classOrInterfaceTypeCtx = ctx.children[0]
       classNode = classOrInterfaceTypeCtx.children[0].symbol
       symbol = _symbolFromIdNode @file, classNode
-      if symbol.getName() not in @IGNORED_CLASS_NAMES
-        @typeUses.push symbol
+      @_saveSymbolIfTypeIsntIgnored symbol
 
   enterCreatedName: (ctx) ->
     if "symbol" of ctx.children[0]
       symbol = _symbolFromIdNode @file, ctx.children[0].symbol
-      if symbol.getName() not in @IGNORED_CLASS_NAMES
-        @typeUses.push symbol
+      @_saveSymbolIfTypeIsntIgnored symbol
+
+  enterQualifiedNameList: (ctx) ->
+    for child in ctx.children
+      if child.ruleIndex is JavaParser.RULE_qualifiedName
+        qualifiedNameCtx = child
+        range = extractCtxRange qualifiedNameCtx
+        text = qualifiedNameCtx.getText()
+        symbol = new Symbol @file, text, range, "Class"
+        @_saveSymbolIfTypeIsntIgnored symbol
 
   getTypeUses: ->
     @typeUses
