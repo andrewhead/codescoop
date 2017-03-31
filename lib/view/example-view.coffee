@@ -10,6 +10,7 @@ $ = require "jquery"
 { MissingTypeDefinitionError } = require "../error/missing-type-definition"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
+{ MethodThrowsExtension } = require "../extender/method-throws-extender"
 
 { DefinitionSuggestionBlockView } = require "../view/symbol-suggestion"
 { PrimitiveValueSuggestionBlockView } = require "../view/primitive-value-suggestion"
@@ -19,13 +20,14 @@ $ = require "jquery"
 { InnerClassSuggestionBlockView } = require "../view/inner-class-suggestion"
 { ControlStructureExtensionView } = require "../view/control-structure-extension"
 { MediatingUseExtensionView } = require "../view/mediating-use-extension"
+{ MethodThrowsExtensionView } = require "../view/method-throws-extension"
 
 
 module.exports.ExampleView = class ExampleView
 
   programTemplate:
     mainStart: [
-      "public static void main(String[] args) {"
+      "public static void main(String[] args) <throwsClause>{"
       ""
     ].join "\n"
     mainEnd : [
@@ -413,6 +415,9 @@ module.exports.ExampleView = class ExampleView
     else if extension instanceof MediatingUseExtension
       marker = @_markRange extension.getUse().getRange()
       decoration = new MediatingUseExtensionView extension, @model
+    else if extension instanceof MethodThrowsExtension
+      marker = @_markRange extension.getInnerRange()
+      decoration = new MethodThrowsExtensionView extension, @model
 
     # Create a decoration for deciding whether to accept the extension
     params =
@@ -496,7 +501,12 @@ module.exports.ExampleView = class ExampleView
     @textEditor.setTextInBufferRange range, textAfter
 
   _surroundWithMain: ->
-    @_surroundCurrentText @programTemplate.mainStart, @programTemplate.mainEnd
+    throwablesText = ''
+    if @model.getThrows().length >= 1
+      throwablesText = "throws " + (@model.getThrows().join ", ") + " "
+    mainStart = @programTemplate.mainStart.replace \
+      /<throwsClause>/, throwablesText
+    @_surroundCurrentText mainStart, @programTemplate.mainEnd
 
   _surroundWithClass: ->
     @_surroundCurrentText @programTemplate.classStart, @programTemplate.classEnd

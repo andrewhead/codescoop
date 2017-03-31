@@ -1,5 +1,6 @@
+{ EventDetector } = require "./event-detector"
 { ExampleModelProperty } = require "../model/example-model"
-{ toControlStructure } = require "../analysis/parse-tree"
+{ toControlStructure, getControlStructureRanges } = require "../analysis/parse-tree"
 { Symbol } = require "../model/symbol-set"
 
 
@@ -26,15 +27,13 @@ module.exports.ControlCrossingEvent = class ControlCrossingEvent
 # Detects which contexts (another way of saying node in the parse tree)
 # within the set of active ranges are contained by control logic that is
 # not in the set of active ranges, given the current code example.
-module.exports.ControlCrossingDetector = class ControlCrossingDetector
+module.exports.ControlCrossingDetector = class ControlCrossingDetector extends EventDetector
 
-  constructor: (model) ->
-    @model = model
-    @model.addObserver @
+  detectEvents: (propertyName, oldValue, newValue) ->
 
-  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
+    events = []
 
-    if object is @model and propertyName is ExampleModelProperty.ACTIVE_RANGES
+    if propertyName is ExampleModelProperty.ACTIVE_RANGES
 
       oldActiveRanges = oldValue
       newActiveRanges = newValue
@@ -56,17 +55,10 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector
         # Make an event for all the control structures that were
         # crossed with the most recent range addition
         for controlStructure in crossedControlStructures
-
           event = new ControlCrossingEvent controlStructure, lastRange, newRange
+          events.push event
 
-          # But only add the event if the user hasn't already seen it and if
-          # it has not yet been added to the queue of events.
-          eventWasQueuedBefore = false
-          for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
-            continue if not (pastEvent instanceof ControlCrossingEvent)
-            if pastEvent.hasControlStructure event.getControlStructure()
-              eventWasQueuedBefore = true
-          (@model.getEvents().push event) if not eventWasQueuedBefore
+    events
 
   findCrossedControlStructures: (parseTree, lastRange, newRange) ->
 
@@ -91,3 +83,30 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector
         crossedControlStructures.push controlStructure if controlStructure?
 
     crossedControlStructures
+
+  isEventQueued: (event) ->
+    for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
+      continue if not (pastEvent instanceof ControlCrossingEvent)
+      if pastEvent.hasControlStructure event.getControlStructure()
+        return true
+    false
+
+  isEventObsolete: (event) ->
+
+    return false if event not instanceof ControlCrossingEvent
+
+    # Find the first range for the control structure (the one that
+    # is likely to include a user selection if they wanted to include the
+    # control structure).
+    controlStructureRanges = getControlStructureRanges event.getControlStructure()
+    firstControlStructureRange = controlStructureRanges[0]
+    activeRanges = @model.getRangeSet().getActiveRanges()
+
+    # Search for a range that intersects with the start of the control
+    # structure.  We do an intersection instead of containment in case
+    # the user has made an incomplete selection and is going to go back
+    # to improve it.
+    for activeRange in activeRanges
+      if activeRange.intersectsWith firstControlStructureRange
+        return true
+    false

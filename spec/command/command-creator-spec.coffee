@@ -7,18 +7,10 @@
 { Import } = require "../../lib/model/import"
 { Replacement } = require "../../lib/edit/replacement"
 { Declaration } = require "../../lib/edit/declaration"
+
 { ControlCrossingEvent } = require "../../lib/event/control-crossing"
 { MediatingUseEvent } = require "../../lib/event/mediating-use"
-
-{ AddLineForRange } = require "../../lib/command/add-line-for-range"
-{ AddRange } = require "../../lib/command/add-range"
-{ AddClassRange } = require "../../lib/command/add-class-range"
-{ AddImport } = require "../../lib/command/add-import"
-{ AddEdit } = require "../../lib/command/add-edit"
-{ RemoveUse } = require "../../lib/command/remove-use"
-{ AddDeclaration } = require "../../lib/command/add-declaration"
-{ AddStubSpec } = require "../../lib/command/add-stub-spec"
-{ ArchiveEvent } = require "../../lib/command/archive-event"
+{ MethodThrowsEvent } = require "../../lib/event/method-throws"
 
 { ImportSuggestion } = require "../../lib/suggester/import-suggester"
 { DefinitionSuggestion } = require "../../lib/suggester/definition-suggester"
@@ -29,6 +21,18 @@
 { ExtensionDecision } = require "../../lib/extender/extension-decision"
 { ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
 { MediatingUseExtension } = require "../../lib/extender/mediating-use-extender"
+{ MethodThrowsExtension } = require "../../lib/extender/method-throws-extender"
+
+{ AddLineForRange } = require "../../lib/command/add-line-for-range"
+{ AddRange } = require "../../lib/command/add-range"
+{ AddClassRange } = require "../../lib/command/add-class-range"
+{ AddImport } = require "../../lib/command/add-import"
+{ AddThrows } = require "../../lib/command/add-throws"
+{ AddEdit } = require "../../lib/command/add-edit"
+{ RemoveUse } = require "../../lib/command/remove-use"
+{ AddDeclaration } = require "../../lib/command/add-declaration"
+{ AddStubSpec } = require "../../lib/command/add-stub-spec"
+{ ArchiveEvent } = require "../../lib/command/archive-event"
 
 
 describe "CommandCreator", ->
@@ -225,6 +229,40 @@ describe "CommandCreator", ->
           (new MediatingUseExtension \
             (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),
             (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")),
+          false
+        commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
+        (expect commandGroup.length).toBe 1
+        (expect commandGroup[0] instanceof ArchiveEvent).toBe true
+
+    describe "when given a decision for MethodThrowsExtension", ->
+
+      model = undefined
+      commandGroup = undefined
+      testFile = undefined
+      commandCreator = undefined
+      beforeEach =>
+        model = new ExampleModel()
+        commandCreator = new CommandCreator()
+        testFile = new File "path", "file_name"
+
+      it "on acceptance, creates a command group with a line addition", ->
+        decision = new ExtensionDecision \
+          (new MethodThrowsEvent()),
+          (new MethodThrowsExtension "IOException",
+            (new Range [2, 25], [2, 31]), (new Range [2, 32], [2, 43]),
+            (new Range [2, 2], [2, 45]), (new Range [3, 4], [3, 8]), undefined),
+          true
+        commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
+        (expect commandGroup.length).toBe 2
+        (expect commandGroup[1] instanceof AddThrows).toBe true
+        (expect commandGroup[1].getThrowableName()).toEqual "IOException"
+
+      it "on rejection, creates a command group an event archiving command", ->
+        decision = new ExtensionDecision \
+          (new MethodThrowsEvent()),
+          (new MethodThrowsExtension "IOException",
+            (new Range [2, 25], [2, 31]), (new Range [2, 32], [2, 43]),
+            (new Range [2, 2], [2, 45]), (new Range [3, 4], [3, 8]), undefined),
           false
         commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
         (expect commandGroup.length).toBe 1

@@ -24,8 +24,10 @@ describe "ExampleController", ->
     editor.getBuffer()
 
   _makeDefaultModel = =>
+    parseTree = jasmine.createSpyObj 'parseTree', ['getRoot', 'getCtxForRange']
+    parseTree.getCtxForRange = => null
     new ExampleModel _makeCodeBuffer(), new RangeSet(), new SymbolSet(),
-      (jasmine.createSpyObj 'parseTree', ['getRoot']), new ValueMap()
+      parseTree, new ValueMap()
 
   describe "when in the ANALYSIS state", ->
 
@@ -328,7 +330,7 @@ describe "ExampleController", ->
     beforeEach =>
       extenders = [ extender: { getExtension: (event) => {} } ]
       commandStack = new CommandStack()
-      model = new ExampleModel()
+      model = _makeDefaultModel()
       model.getEvents().reset [ { eventId: 1 } ]
       controller = new ExampleController model, { extenders, commandStack }
       waitsFor =>
@@ -368,7 +370,7 @@ describe "ExampleController", ->
         checker: { detectErrors: -> [] }
         suggesters: [ { getSuggestions: -> [1] } ]
       }]
-      model = new ExampleModel()
+      model = _makeDefaultModel()
       controller = new ExampleController model, { correctors, commandStack }
       model.setState ExampleModelState.RESOLUTION
 
@@ -406,7 +408,7 @@ describe "ExampleController", ->
         checker: { detectErrors: -> [] }
         suggesters: [ { getSuggestions: -> [1] } ]
       }]
-      model = new ExampleModel()
+      model = _makeDefaultModel()
       controller = new ExampleController model, { correctors }
       model.setState ExampleModelState.RESOLUTION
 

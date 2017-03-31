@@ -1,3 +1,4 @@
+{ EventDetector } = require "./event-detector"
 { ExampleModelProperty } = require "../model/example-model"
 { getDefsForUse, getDeclarationScope } = require "../suggester/definition-suggester"
 
@@ -21,14 +22,25 @@ module.exports.MediatingUseEvent = class MediatingUseEvent
 
 # Detects when there's a "use" of a symbol between its def and use
 # in the current example, to recommend its inclusion in the example.
-module.exports.MediatingUseDetector = class MediatingUseDetector
+module.exports.MediatingUseDetector = class MediatingUseDetector extends EventDetector
 
-  constructor: (model) ->
-    @model = model
-    @model.addObserver @
+  detectEvents: (propertyName, oldValue, newValue) ->
+
+    events = []
+
+    if propertyName is ExampleModelProperty.ACTIVE_RANGES
+
+      oldActiveRanges = oldValue
+      newActiveRanges = newValue
+
+      if newActiveRanges.length > oldActiveRanges.length
+        events = @detectMediatedUses()
+
+    events
 
   detectMediatedUses: ->
 
+    events = []
     rangeSet = @model.getRangeSet()
     symbolSet = @model.getSymbols()
     activeUses = rangeSet.getActiveSymbols symbolSet.getVariableUses()
@@ -63,31 +75,24 @@ module.exports.MediatingUseDetector = class MediatingUseDetector
               # Add it to the list of events, but only if this mediating use
               # isn't already in the list of events.
               event = new MediatingUseEvent def, endUse, use
-              eventWasQueuedBefore = false
-              for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
-                if (pastEvent instanceof MediatingUseEvent) and
-                    (pastEvent.getMediatingUse().equals event.getMediatingUse())
-                  eventWasQueuedBefore = true
-              (@model.getEvents().push event) if not eventWasQueuedBefore
+              events.push event
+
+    events
+
+  isEventQueued: (event) ->
+    for pastEvent in (@model.getViewedEvents().concat @model.getEvents())
+      if (pastEvent instanceof MediatingUseEvent) and
+          (pastEvent.getMediatingUse().equals event.getMediatingUse())
+        return true
+    false
 
   # As we add active ranges, some past events will be no longer be relevant,
   # as the user may have added code that defines the use.  For all of these
   # unseen, obsoleted events, just remove them from the queue.
-  removeObsoleteMediatedUseEvents: ->
+  isEventObsolete: (event) ->
     activeRanges = @model.getRangeSet().getActiveRanges()
-    for event in @model.getEvents()
-      if event instanceof MediatingUseEvent
-        for range in activeRanges
-          if (range.containsRange event.getMediatingUse().getRange())
-            @model.getEvents().remove event
-
-  onPropertyChanged: (object, propertyName, oldValue, newValue) ->
-
-    if object is @model and propertyName is ExampleModelProperty.ACTIVE_RANGES
-
-      oldActiveRanges = oldValue
-      newActiveRanges = newValue
-
-      if newActiveRanges.length > oldActiveRanges.length
-        @detectMediatedUses()
-        @removeObsoleteMediatedUseEvents()
+    if event instanceof MediatingUseEvent
+      for range in activeRanges
+        if (range.containsRange event.getMediatingUse().getRange())
+          return true
+    false

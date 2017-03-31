@@ -129,6 +129,13 @@ describe "ExampleView", ->
         "  }"
       ].join "\n").not.toBe -1
 
+  it "adds throwables to the main function's signature", ->
+    model.getThrows().push "IOException"
+    model.getThrows().push "ParseException"
+    view = new ExampleView model, editor
+    exampleText = view.getTextEditor().getText()
+    (expect exampleText.indexOf "throws IOException, ParseException").not.toBe -1
+
   it "adds imports when rendering the text", ->
     model.getImports().push new Import "org.Book", new Range [0, 7], [0, 15]
     view = new ExampleView model, editor

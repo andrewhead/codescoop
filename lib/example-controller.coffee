@@ -7,6 +7,7 @@
 { MissingTypeDefinitionDetector } = require "./error/missing-type-definition"
 { ControlCrossingDetector } = require "./event/control-crossing"
 { MediatingUseDetector } = require "./event/mediating-use"
+{ MethodThrowsDetector } = require "./event/method-throws"
 
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
@@ -17,6 +18,7 @@
 { ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
 { MediatingUseExtender } = require "./extender/mediating-use-extender"
+{ MethodThrowsExtender } = require "./extender/method-throws-extender"
 
 
 module.exports.ExampleController = class ExampleController
@@ -60,6 +62,9 @@ module.exports.ExampleController = class ExampleController
       ,
         listener: new MediatingUseDetector model
         extender: new MediatingUseExtender()
+      ,
+        listender: new MethodThrowsDetector model
+        extender: new MethodThrowsExtender()
     ]
 
     # Before the state can update, the analyses must complete

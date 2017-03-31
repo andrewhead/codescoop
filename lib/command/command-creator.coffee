@@ -7,6 +7,7 @@
 { ExtensionDecision } = require "../extender/extension-decision"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
+{ MethodThrowsExtension } = require "../extender/method-throws-extender"
 
 { ClassRange } = require "../model/range-set"
 { Replacement } = require "../edit/replacement"
@@ -16,6 +17,7 @@
 { AddRange } = require "../command/add-range"
 { AddClassRange } = require "../command/add-class-range"
 { AddImport } = require "../command/add-import"
+{ AddThrows } = require "../command/add-throws"
 { AddEdit } = require "../command/add-edit"
 { RemoveUse } = require "../command/remove-use"
 { AddDeclaration } = require "../command/add-declaration"
@@ -85,5 +87,8 @@ module.exports.CommandCreator = class CommandCreator
       else if extension instanceof MediatingUseExtension
         commandGroup.push new AddLineForRange \
           extension.getMediatingUse().getRange()
+
+      else if extension instanceof MethodThrowsExtension
+        commandGroup.push new AddThrows extension.getThrowableName()
 
     commandGroup

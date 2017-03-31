@@ -26,7 +26,8 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   VIEWED_EVENTS: { value: 18, name: "viewed-events" }
   PROPOSED_EXTENSION: { value: 19, name: "proposed-extension" }
   FOCUSED_EVENT: { value: 20, name: "focused-event" }
-  EXTENSION_DECISION: { value: 21, name: "extension-accpted" }
+  EXTENSION_DECISION: { value: 21, name: "extension-decision-made" }
+  THROWS: { value: 22, name: "throws-changed" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -69,6 +70,9 @@ module.exports.ExampleModel = class ExampleModel
     @imports = makeObservableArray []
     @imports.addObserver @
 
+    @throws = makeObservableArray []
+    @throws.addObserver @
+
     @errorChoice = null
     @resolutionChoice = null
     @activeCorrector = null
@@ -102,6 +106,8 @@ module.exports.ExampleModel = class ExampleModel
       propertyName = ExampleModelProperty.AUXILIARY_DECLARATIONS
     else if object is @imports
       propertyName = ExampleModelProperty.IMPORTS
+    else if object is @throws
+      propertyName = ExampleModelProperty.THROWS
     else if object is @errors
       propertyName = ExampleModelProperty.ERRORS
     else if object is @events
@@ -232,6 +238,9 @@ module.exports.ExampleModel = class ExampleModel
 
   getImports: ->
     @imports
+
+  getThrows: ->
+    @throws
 
   getProposedExtension: ->
     @proposedExtension
