@@ -17,6 +17,7 @@
 { PrimitiveValueSuggestion } = require "../../lib/suggester/primitive-value-suggester"
 { InstanceStubSuggestion } = require '../../lib/suggester/instance-stub-suggester'
 { DeclarationSuggestion } = require "../../lib/suggester/declaration-suggester"
+{ LocalMethodSuggestion } = require "../../lib/suggester/local-method-suggester"
 { InnerClassSuggestion } = require "../../lib/suggester/inner-class-suggester"
 { ExtensionDecision } = require "../../lib/extender/extension-decision"
 { ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
@@ -26,6 +27,7 @@
 { AddLineForRange } = require "../../lib/command/add-line-for-range"
 { AddRange } = require "../../lib/command/add-range"
 { AddClassRange } = require "../../lib/command/add-class-range"
+{ AddMethodRange } = require "../../lib/command/add-method-range"
 { AddImport } = require "../../lib/command/add-import"
 { AddThrows } = require "../../lib/command/add-throws"
 { AddEdit } = require "../../lib/command/add-edit"
@@ -139,6 +141,25 @@ describe "CommandCreator", ->
       (expect commandGroup[1] instanceof AddEdit).toBe true
       (expect commandGroup[2] instanceof RemoveUse).toBe true
       (expect commandGroup[2].getSymbol().getName()).toEqual "book"
+
+  describe "when given a LocalMethodSuggestion", ->
+
+    model = undefined
+    commandGroup = undefined
+
+    beforeEach =>
+      model = new ExampleModel()
+      commandCreator = new CommandCreator()
+      suggestion = new LocalMethodSuggestion \
+        (new Symbol TEST_FILE, "instanceMethod", (new Range [4, 13], [4, 27]), "Method"),
+        (new Range [4, 2], [5, 3]), true
+      commandGroup = commandCreator.createCommandGroupForSuggestion suggestion
+
+    it "creates a command for adding the method range", ->
+      (expect commandGroup.length).toBe 1
+      (expect commandGroup[0] instanceof AddMethodRange).toBe true
+      (expect commandGroup[0].getMethodRange().getRange()).toEqual \
+        new Range [4, 2], [5, 3]
 
   describe "when given an InnerClassSuggestion", ->
 

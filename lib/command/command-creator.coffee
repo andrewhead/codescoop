@@ -3,18 +3,21 @@
 { PrimitiveValueSuggestion } = require "../suggester/primitive-value-suggester"
 { DeclarationSuggestion } = require "../suggester/declaration-suggester"
 { InstanceStubSuggestion } = require "../suggester/instance-stub-suggester"
+{ LocalMethodSuggestion } = require "../suggester/local-method-suggester"
 { InnerClassSuggestion } = require "../suggester/inner-class-suggester"
 { ExtensionDecision } = require "../extender/extension-decision"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
 { MethodThrowsExtension } = require "../extender/method-throws-extender"
 
+{ MethodRange } = require "../model/range-set"
 { ClassRange } = require "../model/range-set"
 { Replacement } = require "../edit/replacement"
 { Declaration } = require "../edit/declaration"
 
 { AddLineForRange } = require "../command/add-line-for-range"
 { AddRange } = require "../command/add-range"
+{ AddMethodRange } = require "../command/add-method-range"
 { AddClassRange } = require "../command/add-class-range"
 { AddImport } = require "../command/add-import"
 { AddThrows } = require "../command/add-throws"
@@ -59,6 +62,11 @@ module.exports.CommandCreator = class CommandCreator
       commandGroup.push new AddEdit new Replacement \
         suggestion.getSymbol(), "(new #{suggestion.getStubSpec().getClassName()}())"
       commandGroup.push new RemoveUse suggestion.getSymbol()
+
+    else if suggestion instanceof LocalMethodSuggestion
+      commandGroup.push new AddMethodRange \
+        new MethodRange suggestion.getRange(),
+          suggestion.getSymbol(), suggestion.isStatic()
 
     else if suggestion instanceof InnerClassSuggestion
       commandGroup.push new AddClassRange \

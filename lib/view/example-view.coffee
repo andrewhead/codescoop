@@ -5,8 +5,9 @@
 { StubPrinter } = require "../view/stub-printer"
 $ = require "jquery"
 
-{ MissingDefinitionError } = require "../error/missing-definition"
 { MissingDeclarationError } = require "../error/missing-declaration"
+{ MissingDefinitionError } = require "../error/missing-definition"
+{ MissingMethodDefinitionError } = require "../error/missing-method-definition"
 { MissingTypeDefinitionError } = require "../error/missing-type-definition"
 { ControlStructureExtension } = require "../extender/control-structure-extender"
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
@@ -18,6 +19,7 @@ $ = require "jquery"
 { InstanceStubSuggestionBlockView } = require "../view/instance-stub-suggestion"
 { ImportSuggestionBlockView } = require "../view/import-suggestion"
 { InnerClassSuggestionBlockView } = require "../view/inner-class-suggestion"
+{ LocalMethodSuggestionBlockView } = require "../view/local-method-suggestion"
 { ControlStructureExtensionView } = require "../view/control-structure-extension"
 { MediatingUseExtensionView } = require "../view/mediating-use-extension"
 { MethodThrowsExtensionView } = require "../view/method-throws-extension"
@@ -88,6 +90,7 @@ module.exports.ExampleView = class ExampleView
     @_applyReplacements()
     @_surroundWithMain()
     @_addClassStubs()
+    @_addLocalMethods()
     @_addInnerClasses()
 
     # Add user interface that marks up the code and accepts user input
@@ -167,17 +170,41 @@ module.exports.ExampleView = class ExampleView
         stubsText += "\n"
     @textEditor.setTextInBufferRange (new Range [0, 0], [0, 0]), stubsText
 
+  _addTextAtEndOfBuffer: (text) =>
+    # Find the end of the buffer, and add text at the end
+    lastLine = @textEditor.getLastBufferRow()
+    lastChar = (@textEditor.lineTextForBufferRow lastLine).length
+    range = new Range [lastLine, lastChar], [lastLine, lastChar]
+    return @textEditor.setTextInBufferRange range, text
+
+  # Follows the same process as @_addInnerClasses.  See that method for
+  # more annotations of the procedure in this method.
+  _addLocalMethods: ->
+    methodRanges = @model.getRangeSet().getMethodRanges()
+    @_addTextAtEndOfBuffer "\n" if methodRanges.length > 0
+
+    for methodRange, i in methodRanges
+
+      rangeInCode = methodRange.getRange()
+      declaration = @model.getCodeBuffer().getTextInRange rangeInCode
+      if not methodRange.isStatic()
+        console.log "Inside static"
+        console.log "Before", declaration
+        declaration = declaration.replace /(\w+\s+\w+\s*\()/, "static $1"
+        console.log "After", declaration
+      declarationRange = @_addTextAtEndOfBuffer declaration
+
+      marker = @textEditor.markBufferRange declarationRange
+      @activeRangeMarkerPairs.push [rangeInCode, marker]
+
+      @_addTextAtEndOfBuffer "\n"
+      if i isnt methodRanges.length - 1
+        @_addTextAtEndOfBuffer "\n"
+
   _addInnerClasses: ->
 
-    _addTextAtEndOfBuffer = (text) =>
-      # Find the end of the buffer, and add text at the end
-      lastLine = @textEditor.getLastBufferRow()
-      lastChar = (@textEditor.lineTextForBufferRow lastLine).length
-      range = new Range [lastLine, lastChar], [lastLine, lastChar]
-      @textEditor.setTextInBufferRange range, text
-
     classRanges = @model.getRangeSet().getClassRanges()
-    _addTextAtEndOfBuffer "\n" if classRanges.length > 0
+    @_addTextAtEndOfBuffer "\n" if classRanges.length > 0
 
     # For each class, print its declaration to file
     for classRange, i in classRanges
@@ -188,12 +215,7 @@ module.exports.ExampleView = class ExampleView
       declaration = @model.getCodeBuffer().getTextInRange rangeInCode
       if not classRange.isStatic()
         declaration = declaration.replace /\bclass\b/, "static class"
-
-      # Find the end of the buffer, and add text at the end
-      lastLine = @textEditor.getLastBufferRow()
-      lastChar = (@textEditor.lineTextForBufferRow lastLine).length
-      insertRange = new Range [lastLine, lastChar], [lastLine, lastChar]
-      declarationRange = @textEditor.setTextInBufferRange insertRange, declaration
+      declarationRange = @_addTextAtEndOfBuffer declaration
 
       # Mark the range of this declaration, so we can annotate it with
       # errors and resolutions at some later time.
@@ -201,9 +223,9 @@ module.exports.ExampleView = class ExampleView
       @activeRangeMarkerPairs.push [rangeInCode, marker]
 
       # White space between class declarations
-      _addTextAtEndOfBuffer "\n"
+      @_addTextAtEndOfBuffer "\n"
       if i isnt classRanges.length - 1
-        _addTextAtEndOfBuffer "\n"
+        @_addTextAtEndOfBuffer "\n"
 
   # Find the location that an active range from the code view maps to in
   # the example view.  There are two steps:
@@ -328,6 +350,7 @@ module.exports.ExampleView = class ExampleView
       label = "???"
       label = "Define" if error instanceof MissingDefinitionError
       label = "Define" if error instanceof MissingTypeDefinitionError
+      label = "Define" if error instanceof MissingMethodDefinitionError
       label = "Declare" if error instanceof MissingDeclarationError
 
       # Add a button for highlighting the undefined use
@@ -382,6 +405,8 @@ module.exports.ExampleView = class ExampleView
         block = new DeclarationSuggestionBlockView suggestions, @model, marker
       else if class_ is "InstanceStubSuggestion"
         block = new InstanceStubSuggestionBlockView suggestions, @model, marker
+      else if class_ is "LocalMethodSuggestion"
+        block = new LocalMethodSuggestionBlockView suggestions, @model, marker
       else if class_ is "ImportSuggestion"
         block = new ImportSuggestionBlockView suggestions, @model, marker
       else if class_ is "InnerClassSuggestion"

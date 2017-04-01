@@ -86,6 +86,8 @@ module.exports.SymbolSet = class SymbolSet
     symbolArrays or= {}
     @variableUses = makeObservableArray (symbolArrays.uses or [])
     @variableDefs = makeObservableArray (symbolArrays.defs or [])
+    @methodUses = makeObservableArray (symbolArrays.methodUses or [])
+    @methodDefs = makeObservableArray (symbolArrays.methodDefs or [])
     @typeUses = makeObservableArray (symbolArrays.typeUses or [])
     @typeDefs = makeObservableArray (symbolArrays.typeDefs or [])
     @observers = []
@@ -112,6 +114,12 @@ module.exports.SymbolSet = class SymbolSet
 
   getVariableDefs: ->
     @variableDefs
+
+  getMethodUses: ->
+    @methodUses
+
+  getMethodDefs: ->
+    @methodDefs
 
   setTypeUses: (typeUses) ->
     @typeUses.reset typeUses

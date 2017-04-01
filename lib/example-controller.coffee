@@ -5,6 +5,7 @@
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
 { MissingTypeDefinitionDetector } = require "./error/missing-type-definition"
+{ MissingMethodDefinitionDetector } = require "./error/missing-method-definition"
 { ControlCrossingDetector } = require "./event/control-crossing"
 { MediatingUseDetector } = require "./event/mediating-use"
 { MethodThrowsDetector } = require "./event/method-throws"
@@ -14,6 +15,7 @@
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
 { ImportSuggester } = require "./suggester/import-suggester"
+{ LocalMethodSuggester } = require "./suggester/local-method-suggester"
 { InnerClassSuggester } = require "./suggester/inner-class-suggester"
 { ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
@@ -35,6 +37,7 @@ module.exports.ExampleController = class ExampleController
     analyses = extras.analyses or {}
     importAnalysis = analyses.importAnalysis
     variableDefUseAnalysis = analyses.variableDefUseAnalysis
+    methodDefUseAnalysis = analyses.methodDefUseAnalysis
     typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
@@ -46,6 +49,9 @@ module.exports.ExampleController = class ExampleController
           new PrimitiveValueSuggester()
           new InstanceStubSuggester()
         ]
+      ,
+        checker: new MissingMethodDefinitionDetector()
+        suggesters: [ new LocalMethodSuggester() ]
       ,
         checker: new MissingTypeDefinitionDetector()
         suggesters: [
@@ -68,11 +74,11 @@ module.exports.ExampleController = class ExampleController
     ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
-      valueAnalysis, stubAnalysis
+    @_startAnalyses importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
+      typeDefUseAnalysis, valueAnalysis, stubAnalysis
 
-  _startAnalyses: (importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
-    valueAnalysis, stubAnalysis) ->
+  _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
+    typeDefUseAnalysis, valueAnalysis, stubAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -86,6 +92,12 @@ module.exports.ExampleController = class ExampleController
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
+        error: console.error
+      methodDefUse:
+        runner: methodDefUseAnalysis
+        callback: (result) =>
+          @model.getSymbols().getMethodDefs().reset result.methodDefs
+          @model.getSymbols().getMethodUses().reset result.methodUses
         error: console.error
       typeDefUse:
         runner: typeDefUseAnalysis

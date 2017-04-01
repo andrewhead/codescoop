@@ -3,6 +3,7 @@
 { JavaListener } = require '../grammar/Java/JavaListener'
 { InputStream, CommonTokenStream } = require 'antlr4'
 { Range } = require "../model/range-set"
+{ Symbol } = require "../model/symbol-set"
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
 
@@ -182,6 +183,13 @@ module.exports.extractCtxRange = extractCtxRange = (ctx) ->
     symbol = node.symbol
     return new Range [symbol.line - 1, symbol.column],
       [symbol.line - 1, symbol.column + (symbol.stop - symbol.start) + 1]
+
+
+module.exports.symbolFromIdNode = symbolFromIdNode = (file, node, type) ->
+  new Symbol file, node.text, (new Range \
+    [node.line - 1, node.column],
+    [node.line - 1, node.column + (node.stop - node.start) + 1]),
+    type
 
 
 class CtxSearcher extends JavaListener

@@ -23,6 +23,9 @@ module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
 
       # We don't need to define any temporary symbols
       continue if use.getName().startsWith "$"
+      # And `this` appears to be an erroneous name Soot gives to some ranges
+      # of expressions that aren't variables.
+      continue if use.getName() is "this"
 
       useDefined = false
       for def in activeDefs

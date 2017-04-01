@@ -2,7 +2,7 @@
 { JavaListener } = require "../grammar/Java/JavaListener"
 { Symbol } = require "../model/symbol-set"
 { Range } = require "../model/range-set"
-{ extractCtxRange } = require "./parse-tree"
+{ extractCtxRange, symbolFromIdNode } = require "./parse-tree"
 ParseTreeWalker = (require "antlr4").tree.ParseTreeWalker.DEFAULT
 
 
@@ -18,13 +18,6 @@ module.exports.TypeDefUseAnalysis = class TypeDefUseAnalysis
     typeDefFinder = new TypeDefFinder @file
     typeDefs = typeDefFinder.findTypeDefs @parseTree
     callback { typeDefs, typeUses }
-
-
-_symbolFromIdNode = (file, idNode) ->
-  new Symbol file, idNode.text, (new Range \
-    [idNode.line - 1, idNode.column],
-    [idNode.line - 1, idNode.column + (idNode.stop - idNode.start) + 1]),
-    "Class"
 
 
 class TypeUseVisitor extends JavaListener
@@ -43,12 +36,12 @@ class TypeUseVisitor extends JavaListener
     if ctx.children[0].ruleIndex is JavaParser.RULE_classOrInterfaceType
       classOrInterfaceTypeCtx = ctx.children[0]
       classNode = classOrInterfaceTypeCtx.children[0].symbol
-      symbol = _symbolFromIdNode @file, classNode
+      symbol = symbolFromIdNode @file, classNode, "Class"
       @_saveSymbolIfTypeIsntIgnored symbol
 
   enterCreatedName: (ctx) ->
     if "symbol" of ctx.children[0]
-      symbol = _symbolFromIdNode @file, ctx.children[0].symbol
+      symbol = symbolFromIdNode @file, ctx.children[0].symbol, "Class"
       @_saveSymbolIfTypeIsntIgnored symbol
 
   enterQualifiedNameList: (ctx) ->
@@ -71,15 +64,15 @@ class TypeDefVisitor extends JavaListener
     @typeDefs = []
 
   enterEnumDeclaration: (ctx) ->
-    symbol = _symbolFromIdNode @file, ctx.children[1].symbol
+    symbol = symbolFromIdNode @file, ctx.children[1].symbol, "Class"
     @typeDefs.push symbol
 
   enterInterfaceDeclaration: (ctx) ->
-    symbol = _symbolFromIdNode @file, ctx.children[1].symbol
+    symbol = symbolFromIdNode @file, ctx.children[1].symbol, "Class"
     @typeDefs.push symbol
 
   enterClassDeclaration: (ctx) ->
-    symbol = _symbolFromIdNode @file, ctx.children[1].symbol
+    symbol = symbolFromIdNode @file, ctx.children[1].symbol, "Class"
     @typeDefs.push symbol
 
   getTypeDefs: ->

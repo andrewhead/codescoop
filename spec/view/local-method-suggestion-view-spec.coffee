@@ -1,15 +1,15 @@
-{ InnerClassSuggestionView } = require "../../lib/view/inner-class-suggestion"
-{ InnerClassSuggestion } = require "../../lib/suggester/inner-class-suggester"
+{ LocalMethodSuggestionView } = require "../../lib/view/local-method-suggestion"
+{ LocalMethodSuggestion } = require "../../lib/suggester/local-method-suggester"
 { ExampleModel } = require "../../lib/model/example-model"
 { Range } = require "../../lib/model/range-set"
 { File, Symbol } = require "../../lib/model/symbol-set"
 
 
-describe "InnerClassSuggestionView", ->
+describe "LocalMethodSuggestionView", ->
 
   testFile = new File "path", "file_name"
-  suggestion = new InnerClassSuggestion \
-    (new Symbol testFile, "InnerClass", (new Range [4, 2], [5, 3]), "Class"),
+  suggestion = new LocalMethodSuggestion \
+    (new Symbol testFile, "method", (new Range [7, 4], [7, 10]), "Method"),
     (new Range [4, 2], [5, 3]), false
   model = undefined
   suggestedRanges = undefined
@@ -17,10 +17,10 @@ describe "InnerClassSuggestionView", ->
 
   beforeEach =>
     model = new ExampleModel()
-    view = new InnerClassSuggestionView suggestion, model
+    view = new LocalMethodSuggestionView suggestion, model
     suggestedRanges = model.getRangeSet().getSuggestedRanges()
 
-  it "adds a suggested range for the inner class when previewing", ->
+  it "adds a suggested range for the method when previewing", ->
     (expect suggestedRanges.length).toBe 0
     view.preview()
     (expect suggestedRanges.length).toBe 1

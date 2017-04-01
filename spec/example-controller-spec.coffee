@@ -1,14 +1,17 @@
 { ExampleModel, ExampleModelState } = require "../lib/model/example-model"
 { ExampleController } = require "../lib/example-controller"
-{ VariableDefUseAnalysis } = require "../lib/analysis/variable-def-use"
 { Range, RangeSet } = require "../lib/model/range-set"
 { File, Symbol, SymbolSet } = require "../lib/model/symbol-set"
-{ ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
-{ CommandStack } = require "../lib/command/command-stack"
-{ StubAnalysis } = require "../lib/analysis/stub-analysis"
-{ TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
+
 { ImportAnalysis } = require "../lib/analysis/import-analysis"
+{ VariableDefUseAnalysis } = require "../lib/analysis/variable-def-use"
+{ MethodDefUseAnalysis } = require "../lib/analysis/method-def-use"
+{ TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
+{ ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
+{ StubAnalysis } = require "../lib/analysis/stub-analysis"
+
 { ArchiveEvent } = require "../lib/command/archive-event"
+{ CommandStack } = require "../lib/command/command-stack"
 { PACKAGE_PATH } = require "../lib/config/paths"
 { parse } = require "../lib/analysis/parse-tree"
 fs = require "fs"
@@ -36,6 +39,7 @@ describe "ExampleController", ->
 
     # Prepare the analyses
     variableDefUseAnalysis = new VariableDefUseAnalysis testFile
+    methodDefUseAnalysis = new MethodDefUseAnalysis testFile, parseTree
     typeDefUseAnalysis = new TypeDefUseAnalysis testFile, parseTree
     importAnalysis = new ImportAnalysis testFile
     valueAnalysis = new ValueAnalysis testFile
@@ -46,8 +50,9 @@ describe "ExampleController", ->
 
     controller = undefined
     importTable = undefined
-    typeDefs = undefined
     variableDefs = undefined
+    methodDefs = undefined
+    typeDefs = undefined
     valueMap = undefined
     stubSpecTable = undefined
 
@@ -56,20 +61,22 @@ describe "ExampleController", ->
       # When the controller starts, it will run the analyses one after another
       runs ->
         controller = new ExampleController model,
-          analyses: { variableDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
-              stubAnalysis, importAnalysis }
+          analyses: { importAnalysis, variableDefUseAnalysis,
+            methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
+            stubAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>
 
         importTable = model.getImportTable()
         variableDefs = model.getSymbols().getVariableDefs()
+        methodDefs = model.getSymbols().getMethodDefs()
         typeDefs = model.getSymbols().getTypeDefs()
         valueMap = model.getValueMap()
         stubSpecTable = model.getStubSpecTable()
 
         ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
-          (typeDefs.length > 0) and
+          (methodDefs.length > 0) and (typeDefs.length > 0) and
           valueMap? and ("Example.java" of valueMap) and
           stubSpecTable? and
           importTable?)
@@ -90,6 +97,7 @@ describe "ExampleController", ->
 
         # Check that the analyses have updated the model with valid symbols
         _expectIn "j", (new Range [5, 8], [5, 9]), variableDefs
+        _expectIn "main", (new Range [2, 21], [2, 25]), methodDefs
         _expectIn "Example", (new Range [0, 13], [0, 20]), typeDefs
 
   _makeMockVariableDefUseAnalysis = =>

@@ -38,6 +38,8 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
 
       # We don't need to declare any temporary symbols
       continue if symbol.getName().startsWith "$"
+      # ...or the symbols that Soot implicitly marked as "this"
+      continue if symbol.getName() is "this"
 
       # Check to see if the symbol was declared in the auxiliary declarations
       for declaration in model.getAuxiliaryDeclarations()
