@@ -1,6 +1,7 @@
 { EventDetector } = require "./event-detector"
 { ExampleModelProperty } = require "../model/example-model"
-{ getDefsForUse, getDeclarationScope } = require "../suggester/definition-suggester"
+{ getDefsForUse } = require "../suggester/definition-suggester"
+{ getDeclarationScope } = require "../error/missing-declaration"
 
 
 module.exports.MediatingUseEvent = class MediatingUseEvent

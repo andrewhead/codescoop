@@ -188,10 +188,7 @@ module.exports.ExampleView = class ExampleView
       rangeInCode = methodRange.getRange()
       declaration = @model.getCodeBuffer().getTextInRange rangeInCode
       if not methodRange.isStatic()
-        console.log "Inside static"
-        console.log "Before", declaration
         declaration = declaration.replace /(\w+\s+\w+\s*\()/, "static $1"
-        console.log "After", declaration
       declarationRange = @_addTextAtEndOfBuffer declaration
 
       marker = @textEditor.markBufferRange declarationRange

@@ -1,4 +1,55 @@
 { ScopeFinder } = require '../analysis/scope'
+{ JavaParser } = require "../grammar/Java/JavaParser"
+
+
+module.exports.getDeclarationScope = getDeclarationScope = (symbol, parseTree) ->
+
+  scopeFinder = new ScopeFinder symbol.getFile(), parseTree
+  scopes = scopeFinder.findSymbolScopes symbol
+
+  # Look for scopes that contain the declaration of this symbol,
+  # from the most specific to the most broad scope the symbol appears in.
+  # We have found the declaration when the symbol was declared in the scope
+  # *and* the symbol appeared after the declaration.
+  for scope in scopes
+    declarations = scope.getDeclarations()
+    for declaration in declarations
+      # By checking for the "compare" result 0 and -1 we get both
+      # ranges that coincide (definition *is* a declaration) and declarations
+      # that appear before the definition.
+      if (declaration.getName() is symbol.getName()) and
+          ((declaration.getRange().compare symbol.getRange()) in [-1, 0])
+        return scope
+
+
+module.exports.isSymbolDeclaredInParameters = \
+    isSymbolDeclaredInParameters = (symbol, parseTree) ->
+
+  node = parseTree.getNodeForSymbol symbol
+
+  # Search for the method that includes this symbol
+  parentCtx = node.parentCtx
+  while parentCtx?
+    if parentCtx.ruleIndex is JavaParser.RULE_methodDeclaration
+
+      # Once we have found the symbol, iterate through the parameters list
+      # to look for the symbol's name.
+      formalParametersCtx = parentCtx.children[2]
+      formalParametersListCtx = formalParametersCtx.children[1]
+      for childCtx in formalParametersListCtx.children
+        if (childCtx.ruleIndex is JavaParser.RULE_formalParameter) or
+            (childCtx.ruleIndex is JavaParser.RULE_lastFormalParameter)
+          variableDeclaratorIdCtx = childCtx.children[childCtx.children.length - 1]
+          identifierNode = variableDeclaratorIdCtx.children[0]
+
+          # If the parameter has the name of the symbol, the symbol is
+          # declared in the parameters list!
+          if identifierNode.getText() is symbol.getName()
+            return true
+
+    parentCtx = parentCtx.parentCtx
+
+  false
 
 
 module.exports.MissingDeclarationError = class MissingDeclarationError

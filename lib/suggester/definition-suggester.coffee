@@ -1,4 +1,5 @@
 { ScopeFinder } = require '../analysis/scope'
+{ getDeclarationScope } = require "../error/missing-declaration"
 
 
 module.exports.DefinitionSuggestion = class DefinitionSuggestion
@@ -8,26 +9,6 @@ module.exports.DefinitionSuggestion = class DefinitionSuggestion
 
   getSymbol: ->
     @symbol
-
-
-module.exports.getDeclarationScope = getDeclarationScope = (symbol, parseTree) ->
-
-  scopeFinder = new ScopeFinder symbol.getFile(), parseTree
-  scopes = scopeFinder.findSymbolScopes symbol
-
-  # Look for scopes that contain the declaration of this symbol,
-  # from the most specific to the most broad scope the symbol appears in.
-  # We have found the declaration when the symbol was declared in the scope
-  # *and* the symbol appeared after the declaration.
-  for scope in scopes
-    declarations = scope.getDeclarations()
-    for declaration in declarations
-      # By checking for the "compare" result 0 and -1 we get both
-      # ranges that coincide (definition *is* a declaration) and declarations
-      # that appear before the definition.
-      if (declaration.getName() is symbol.getName()) and
-          ((declaration.getRange().compare symbol.getRange()) in [-1, 0])
-        return scope
 
 
 # Defs are sorted by proximity to the use, with all defs that appear above
