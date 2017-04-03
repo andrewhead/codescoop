@@ -14,6 +14,7 @@ then made a few changes to the file:
     be accessed from outside of the class
 * We hard-coded the arguments passed in to the `Main` class
     to be [`-ext`, `pao`, `Hello.pao`]
+* We made all statements appear on only one line
 
 The test scenario was pulled from the original Polyglot
 source.  This is the `pao` extension to the Java language,

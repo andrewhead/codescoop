@@ -92,9 +92,7 @@ public class Main
       }
 
       if (eq == null) {
-          eq = new StdErrorQueue(System.err,
-                                 options.error_count,
-                                 ext.compilerName());
+          eq = new StdErrorQueue(System.err, options.error_count, ext.compilerName());
       }
 
       Compiler compiler = new Compiler(ext, eq);
@@ -116,16 +114,13 @@ public class Main
       }
 
       if (Report.should_report(verbose, 1)) {
-          reportTime("Finished compiling Java output files. time=" +
-                  (System.currentTimeMillis() - start_time), 1);
+          reportTime("Finished compiling Java output files. time=" + (System.currentTimeMillis() - start_time), 1);
 
           reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
       }
   }
 
-  protected boolean invokePostCompiler(Options options,
-                                    Compiler compiler,
-                                    ErrorQueue eq) {
+  protected boolean invokePostCompiler(Options options, Compiler compiler, ErrorQueue eq) {
       if (options.post_compiler != null && !options.output_stdout) {
           Runtime runtime = Runtime.getRuntime();
           QuotedStringTokenizer st = new QuotedStringTokenizer(options.post_compiler);
@@ -183,8 +178,7 @@ public class Main
               }
 
               if (proc.exitValue() > 0) {
-                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
-                                 "Non-zero return code: " + proc.exitValue());
+                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, "Non-zero return code: " + proc.exitValue());
                 return false;
               }
           }
@@ -256,24 +250,17 @@ public class Main
         extClass = Class.forName(ext);
       }
       catch (ClassNotFoundException e) {
-          throw new TerminationException(
-            "Extension " + ext +
-            " not found: could not find class " + ext + ".");
+          throw new TerminationException("Extension " + ext + " not found: could not find class " + ext + ".");
       }
 
       try {
         return (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
-          throw new TerminationException(
-	    ext + " is not a valid polyglot extension:" +
-	    " extension class " + ext +
-	    " exists but is not a subclass of ExtensionInfo");
+          throw new TerminationException(ext + " is not a valid polyglot extension:" + " extension class " + ext + " exists but is not a subclass of ExtensionInfo");
       }
       catch (Exception e) {
-          throw new TerminationException(
-	           "Extension " + ext +
-	           " could not be loaded: could not instantiate " + ext + ".");
+          throw new TerminationException("Extension " + ext + " could not be loaded: could not instantiate " + ext + ".");
       }
     }
     return null;
