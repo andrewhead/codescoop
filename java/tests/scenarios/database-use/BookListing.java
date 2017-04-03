@@ -73,7 +73,7 @@ public class BookListing {
 
         booklist.titles = titles;
         return booklist;
-        
+
     }
 
     public boolean isBestseller(int id) {

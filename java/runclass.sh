@@ -6,7 +6,9 @@ REFLECTIONS_JARS=./libs/reflections-0.9.11.jar:./libs/guava-20.0.jar:./libs/java
 SOOT_JARS=`ls -d -1 ./libs/*.jar | tr '\n' ':'`
 JAVA_HOME_JARS=`ls -d -1 $JAVA_HOME/jre/lib/*.jar | tr '\n' ':'`
 JDI_JARS=$JAVA_HOME/lib/tools.jar
-SCENARIO_JARS=./libs/database.jar
+DATABASE_SCENARIO_JARS=./libs/database.jar
+POLYGLOT_SCENARIO_JARS=./libs/polyglot.jar:./libs/java_cup.jar:./libs/pao.jar
+ALL_JARS=$JUNIT_JARS:$REFLECTIONS_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$DATABASE_SCENARIO_JARS:$POLYGLOT_SCENARIO_JARS
 
 # Discover test classes
 TESTS_DIR=tests
@@ -20,8 +22,9 @@ javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:$REFLECTIONS_JARS:. tests/*.java
 # Use `-g` so we get symbol information, for extracting variable names during analysis.
 javac -g tests/analysis_examples/*.java
 javac -g -cp $SOOT_JARS:$JDI_JARS tests/scenarios/examplify/*.java
-javac -g -cp $SCENARIO_JARS tests/scenarios/database-use/*.java
+javac -g -cp $DATABASE_SCENARIO_JARS tests/scenarios/database-use/*.java
+javac -g -cp $POLYGLOT_SCENARIO_JARS tests/scenarios/polyglot-simple/Main.java
 javac -g tests/scenarios/InstallCertFolder/*.java
 
-# Discover and run tests
-java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$REFLECTIONS_JARS:$SCENARIO_JARS $@
+# Run the command
+java -cp $ALL_JARS $@

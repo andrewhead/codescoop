@@ -30,10 +30,10 @@ public class PrimitiveValueAnalysis {
      */
     public static void main(String[] args) {
 
-        String className = args[0];
-        String classpath = "";
+        String classpath = args[0];
+        String className = "";
         if (args.length > 1) {
-            classpath = args[1];
+            className = args[1];
         }
         PrimitiveValueAnalysis tracer = new PrimitiveValueAnalysis();
 
@@ -99,6 +99,8 @@ public class PrimitiveValueAnalysis {
 
         String vmStdout = streamToString(vm.process().getInputStream());
         String vmStderr = streamToString(vm.process().getErrorStream());
+        System.out.println(vmStdout);
+        System.out.println(vmStderr);
 
         if (vmStderr.contains("Error: Could not find or load main class")) {
             throw new ClassNotFoundException("Could not find or load main class");
