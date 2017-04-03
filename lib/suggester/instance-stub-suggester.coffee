@@ -31,7 +31,7 @@ module.exports.InstanceStubSuggester = class InstanceStubSuggester
       def2.getRange().compare def1.getRange()
 
     suggestions = []
-    if defs.length > 0
+    if stubSpecTable? and defs.length > 0
       # Return all stub specs for instances defined at the closest def location
       closestDef = defs[0]
       className = closestDef.getFile().getName().replace /\.java$/, ''
