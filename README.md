@@ -6,6 +6,7 @@ Make useful example code from your existing code.
 
 - InstallCert: Compile code with debug flags, e.g., `calvisitor:java freshaccount$ javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
 - Chat Client: Don't forget to specify the classpath when compiling with debug flages, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
+- Polyglot: ` ./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
 
 ## Annoying, brittle installation requirements
 
