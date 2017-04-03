@@ -14,6 +14,7 @@ public class PrimitiveValueTrackerThread extends Thread {
     private String[] STANDARD_PACKAGES = {"java/", "javax/", "sun/", "com/sun/"};
     private final VirtualMachine vm;
     private boolean connected = true;  // Connected to VM
+    private final String mainClassName;
     private Map<String, Map<Integer, Map<String, List<Value>>>> values;
 
     /**
@@ -21,11 +22,12 @@ public class PrimitiveValueTrackerThread extends Thread {
      *      You can look up a value by indexing on class name, line number, and variable name.
      */
     public PrimitiveValueTrackerThread(VirtualMachine vm, Map<String,
-            Map<Integer, Map<String, List<Value>>>> values) {
+            Map<Integer, Map<String, List<Value>>>> values, String mainClassName) {
 
         super("Stepper");
         this.vm = vm;
         this.values = values;
+        this.mainClassName = mainClassName;
 
         // Just listen for the first method entry.  Then we step the rest of the way
         // through the program (making sure to stop listening for method entries).
@@ -175,16 +177,23 @@ public class PrimitiveValueTrackerThread extends Thread {
         // Gets a path that looks like a package path but with slashes. See:
         // https://docs.oracle.com/javase/7/docs/jdk/api/jpda/jdi/com/sun/jdi/ReferenceType.html#sourcePaths(java.lang.String)
         String sourcePath = null;
+        String sourceName = null;
         try {
             sourcePath = event.location().declaringType().sourcePaths("Java").get(0);
+            sourceName = event.location().sourceName();
         } catch (AbsentInformationException absentInformationException) {}
 
         // Check to see if the source path is one of the standard libraries.
         // If so, we need to step out to keep from stepping in unnecessary code.
+        if (sourceName != null) {
+            if (!sourceName.startsWith(this.mainClassName)) {
+                stepDirection = StepRequest.STEP_OUT;
+            }
+        }
         if (sourcePath != null) {
             for (String standardPackagePrefix: STANDARD_PACKAGES) {
                 if (sourcePath.startsWith(standardPackagePrefix)) {
-                    stepDirection = StepRequest.STEP_OUT;
+                     stepDirection = StepRequest.STEP_OUT;
                 }
             }
         }

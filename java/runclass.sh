@@ -22,9 +22,9 @@ javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:$REFLECTIONS_JARS:. tests/*.java
 # Use `-g` so we get symbol information, for extracting variable names during analysis.
 javac -g tests/analysis_examples/*.java
 javac -g -cp $SOOT_JARS:$JDI_JARS tests/scenarios/examplify/*.java
-javac -g -cp $DATABASE_SCENARIO_JARS tests/scenarios/database-use/*.java
+javac -g -cp $DATABASE_SCENARIO_JARS tests/scenarios/database-use/BookListing.java
 javac -g -cp $POLYGLOT_SCENARIO_JARS tests/scenarios/polyglot-simple/Main.java
-javac -g tests/scenarios/InstallCertFolder/*.java
+javac -g tests/scenarios/InstallCertFolder/InstallCert.java
 
 # Run the command
 java -cp $ALL_JARS $@

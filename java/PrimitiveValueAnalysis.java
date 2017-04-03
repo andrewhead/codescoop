@@ -67,7 +67,7 @@ public class PrimitiveValueAnalysis {
             String className, String classpath) throws ClassNotFoundException {
 
         VirtualMachine vm = launchVirtualMachine(className, classpath);
-        return runCode(vm);
+        return runCode(vm, className);
 
     }
 
@@ -80,14 +80,15 @@ public class PrimitiveValueAnalysis {
 
     }
 
-    public Map<String, Map<Integer, Map<String, List<Value>>>> runCode(VirtualMachine vm)
-            throws ClassNotFoundException {
+    public Map<String, Map<Integer, Map<String, List<Value>>>> runCode(VirtualMachine vm,
+            String mainClassName) throws ClassNotFoundException {
 
         Map<String, Map<Integer, Map<String, List<Value>>>> values = (
                 new HashMap<String, Map<Integer, Map<String, List<Value>>>>());
 
         // This is the thread that will step through the code
-        PrimitiveValueTrackerThread trackerThread = new PrimitiveValueTrackerThread(vm, values);
+        PrimitiveValueTrackerThread trackerThread = 
+                (new PrimitiveValueTrackerThread(vm, values, mainClassName));
         trackerThread.start();
 
         // Shutdown begins when event thread terminates
@@ -99,8 +100,6 @@ public class PrimitiveValueAnalysis {
 
         String vmStdout = streamToString(vm.process().getInputStream());
         String vmStderr = streamToString(vm.process().getErrorStream());
-        System.out.println(vmStdout);
-        System.out.println(vmStderr);
 
         if (vmStderr.contains("Error: Could not find or load main class")) {
             throw new ClassNotFoundException("Could not find or load main class");
