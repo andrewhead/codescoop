@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -48,6 +49,8 @@ public class Client extends JFrame {
 		try {
 			connectToServer();
 			setupStreams();
+			output.writeObject("USER - "+ message);
+			output.flush();
 			whileChatting();
 		} catch (EOFException eofException) {
 			showMessage("\n Client terminated the connection");
@@ -78,6 +81,8 @@ public class Client extends JFrame {
 		ableToType(true);
 		do {
 			try {
+                                sendMessage("O Brave New World!");
+                                closeCrap();
 				message = (String) input.readObject();
 				showMessage("\n" + message);
 
@@ -94,6 +99,7 @@ public class Client extends JFrame {
 			output.close();
 			input.close();
 			connection.close();
+                        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
@@ -124,4 +130,12 @@ public class Client extends JFrame {
 			}
 		});
 	}
+
+	public static void main(String[] args) {
+		Client user;
+		user = new Client("127.0.0.1");
+		user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		user.startRunning();
+	}
+
 }

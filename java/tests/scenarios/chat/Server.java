@@ -42,30 +42,23 @@ public class Server extends JFrame {
 	}
 
 	public void startRunning() {
-		try {
-			server = new ServerSocket(6789, 100);
-			while (true) {
-				try {
-					waitForConnection();
-					setupStreams();
-					whileChatting();
-				} catch (EOFException eofException) {
-					showMessage("\n Server ended the connection!");
-				} finally {
-					closeCrap();
-				}
-			}
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-
-		}
+                try {
+                    server = new ServerSocket(6789, 100);
+                    waitForConnection();
+                    setupStreams();
+                    whileChatting();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                    closeCrap();
+                } finally {
+                    closeCrap();
+                }
 	}
 
 	public void waitForConnection() throws IOException {
 		showMessage("Waiting for someone to connect!");
 		connection = server.accept();
-		showMessage("\nNow connected to"
-				+ connection.getInetAddress().getHostName() + " !");
+		showMessage("\nNow connected to" + connection.getInetAddress().getHostName() + " !");
 
 	}
 
@@ -84,6 +77,7 @@ public class Server extends JFrame {
 			try {
 				message = (String) input.readObject();
 				showMessage("\n" + message);
+                                closeCrap();
 			} catch (ClassNotFoundException classNotFoundException) {
 				showMessage("\n I don't know what user send!");
 			}
@@ -129,4 +123,24 @@ public class Server extends JFrame {
 			}
 		});
 	}
+
+	public static void main(String[] args) {
+
+                new Thread(new ClientThread()).start();
+
+		Server admin = new Server();
+		admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		admin.startRunning();
+                System.out.println("Haven't left");
+
+	}
+
+        private static class ClientThread implements Runnable {
+            public void run() {
+                Client client = new Client("127.0.0.1");
+		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		client.startRunning();
+            }
+        }
+
 }
