@@ -1,7 +1,7 @@
 { ExampleView } = require "../../lib/view/example-view"
 { ExampleModel, ExampleModelState, ExampleModelProperty } = require "../../lib/model/example-model"
 { File, Symbol, SymbolSet } = require "../../lib/model/symbol-set"
-{ Range, ClassRange, RangeSet } = require "../../lib/model/range-set"
+{ Range, MethodRange, ClassRange, RangeSet } = require "../../lib/model/range-set"
 { ValueMap } = require "../../lib/analysis/value-analysis"
 { StubSpec } = require "../../lib/model/stub"
 { Import } = require "../../lib/model/import"
@@ -128,6 +128,51 @@ describe "ExampleView", ->
         "  private static class InnerClass {"
         "  }"
       ].join "\n").not.toBe -1
+
+  describe "when rendering local methods", ->
+
+    beforeEach =>
+      codeBuffer = atom.workspace.buildTextEditor().getBuffer()
+      model = new ExampleModel codeBuffer
+
+    it "doesn't add a static modifier if it's already static", ->
+      model.getCodeBuffer().setText [
+        "public class Example {"
+        "  private static void staticMethod {"
+        "  }"
+        "}"
+      ].join "\n"
+      methodRange = new MethodRange (new Range [1, 2], [2, 3]), undefined, true
+      model.getRangeSet().getMethodRanges().push methodRange
+      view = new ExampleView model, editor
+      exampleText = view.getTextEditor().getText()
+      (expect exampleText.indexOf [
+        "  private static void staticMethod {"
+        "  }"
+      ].join "\n").not.toBe -1
+
+    it "adds a static modifier to the local method if it is not static", ->
+      model.getCodeBuffer().setText [
+        "public class Example {"
+        "  private void instanceMethod() {"
+        "  }"
+        "}"
+      ].join "\n"
+      methodRange = new MethodRange (new Range [1, 2], [2, 3]), undefined, false
+      model.getRangeSet().getMethodRanges().push methodRange
+      view = new ExampleView model, editor
+      exampleText = view.getTextEditor().getText()
+      (expect exampleText.indexOf [
+        "  private static void instanceMethod() {"
+        "  }"
+      ].join "\n").not.toBe -1
+
+  it "adds throwables to the main function's signature", ->
+    model.getThrows().push "IOException"
+    model.getThrows().push "ParseException"
+    view = new ExampleView model, editor
+    exampleText = view.getTextEditor().getText()
+    (expect exampleText.indexOf "throws IOException, ParseException").not.toBe -1
 
   it "adds imports when rendering the text", ->
     model.getImports().push new Import "org.Book", new Range [0, 7], [0, 15]

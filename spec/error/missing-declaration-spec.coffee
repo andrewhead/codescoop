@@ -65,6 +65,35 @@ describe "MissingDeclarationDetector", ->
       errors = detector.detectErrors model
       (expect errors.length).toBe 0
 
+  describe "when called on a program with nested blocks", ->
+
+    parseTree = parse [
+      "public class Example {"
+      "  public static void main(String[] args) {"
+      "    Object o;"
+      "    if (true) {"
+      "      o = null;"
+      "    }"
+      "  }"
+      "}"
+    ].join "\n"
+    TEST_FILE = new File "path", "filename"
+    symbolSet = new SymbolSet {
+      defs: [
+        new Symbol TEST_FILE, "o", (new Range [4, 6], [4, 7]), "int"
+      ]
+      uses: []}
+    rangeSet = new RangeSet()
+    model = new ExampleModel undefined, rangeSet, symbolSet, parseTree
+    detector = new MissingDeclarationDetector()
+
+    it "finds an undeclared variable inside a block", ->
+      rangeSet.getSnippetRanges().reset [
+        (new Range [4, 0], [4, 14])  # use of 'i'
+      ]
+      errors = detector.detectErrors model
+      (expect errors.length).toBe 1
+
   describe "when called on a class with members", ->
 
     # TODO: I included calls to members of 'this' in the example below.

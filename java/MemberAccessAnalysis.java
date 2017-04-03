@@ -24,7 +24,7 @@ public class MemberAccessAnalysis {
     public static void main(String [] args) {
         MemberAccessAnalysis analysis = new MemberAccessAnalysis();
         try {
-            analysis.run(args[0], args[1]);
+            analysis.run(args[1], args[0]);
         } catch (ClassNotFoundException cnfe) {
             System.out.println("Could not find class " + args[1]);
         }

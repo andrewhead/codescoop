@@ -5,18 +5,22 @@
 { MissingDefinitionDetector } = require "./error/missing-definition"
 { MissingDeclarationDetector } = require "./error/missing-declaration"
 { MissingTypeDefinitionDetector } = require "./error/missing-type-definition"
+{ MissingMethodDefinitionDetector } = require "./error/missing-method-definition"
 { ControlCrossingDetector } = require "./event/control-crossing"
 { MediatingUseDetector } = require "./event/mediating-use"
+{ MethodThrowsDetector } = require "./event/method-throws"
 
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
 { PrimitiveValueSuggester } = require "./suggester/primitive-value-suggester"
 { InstanceStubSuggester } = require "./suggester/instance-stub-suggester"
 { ImportSuggester } = require "./suggester/import-suggester"
+{ LocalMethodSuggester } = require "./suggester/local-method-suggester"
 { InnerClassSuggester } = require "./suggester/inner-class-suggester"
 { ExtensionDecision } = require "./extender/extension-decision"
 { ControlStructureExtender } = require "./extender/control-structure-extender"
 { MediatingUseExtender } = require "./extender/mediating-use-extender"
+{ MethodThrowsExtender } = require "./extender/method-throws-extender"
 
 
 module.exports.ExampleController = class ExampleController
@@ -33,6 +37,7 @@ module.exports.ExampleController = class ExampleController
     analyses = extras.analyses or {}
     importAnalysis = analyses.importAnalysis
     variableDefUseAnalysis = analyses.variableDefUseAnalysis
+    methodDefUseAnalysis = analyses.methodDefUseAnalysis
     typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
@@ -44,6 +49,9 @@ module.exports.ExampleController = class ExampleController
           new PrimitiveValueSuggester()
           new InstanceStubSuggester()
         ]
+      ,
+        checker: new MissingMethodDefinitionDetector()
+        suggesters: [ new LocalMethodSuggester() ]
       ,
         checker: new MissingTypeDefinitionDetector()
         suggesters: [
@@ -60,14 +68,17 @@ module.exports.ExampleController = class ExampleController
       ,
         listener: new MediatingUseDetector model
         extender: new MediatingUseExtender()
+      ,
+        listender: new MethodThrowsDetector model
+        extender: new MethodThrowsExtender()
     ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
-      valueAnalysis, stubAnalysis
+    @_startAnalyses importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
+      typeDefUseAnalysis, valueAnalysis, stubAnalysis
 
-  _startAnalyses: (importAnalysis, variableDefUseAnalysis, typeDefUseAnalysis,
-    valueAnalysis, stubAnalysis) ->
+  _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
+    typeDefUseAnalysis, valueAnalysis, stubAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -81,6 +92,12 @@ module.exports.ExampleController = class ExampleController
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
+        error: console.error
+      methodDefUse:
+        runner: methodDefUseAnalysis
+        callback: (result) =>
+          @model.getSymbols().getMethodDefs().reset result.methodDefs
+          @model.getSymbols().getMethodUses().reset result.methodUses
         error: console.error
       typeDefUse:
         runner: typeDefUseAnalysis

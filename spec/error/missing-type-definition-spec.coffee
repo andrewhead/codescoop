@@ -20,6 +20,8 @@ describe "MissingTypeDefinitionDetector", ->
     "  private ImportedClass myImportedClass;"
     "  private Book myBook;"
     "  private InnerClass innerClass;"
+    "  private UnsupportedOperationException exception;"
+    "  private java.lang.UnsupportedOperationException exception;"
     ""
     "}"
   ].join "\n"
@@ -39,6 +41,8 @@ describe "MissingTypeDefinitionDetector", ->
       new Symbol testFile, "ImportedClass", (new Range [6, 10], [6, 23]), "Class"
       new Symbol testFile, "Book", (new Range [7, 10], [7, 14]), "Class"
       new Symbol testFile, "InnerClass", (new Range [8, 10], [8, 20]), "Class"
+      new Symbol testFile, "UnsupportedOperationException", (new Range [9, 10], [9, 39]), "Class"
+      new Symbol testFile, "java.lang.UnsupportedOperationException", (new Range [9, 10], [9, 49]), "Class"
     ]
     model.getSymbols().setTypeDefs [
       new Symbol testFile, "InnerClass", (new Range [4, 16], [4, 26]), "Class"
@@ -87,5 +91,12 @@ describe "MissingTypeDefinitionDetector", ->
     typeDef = new Symbol testFile, "InnerClass", (new Range [8, 10], [8, 20]), "Class"
     model.getRangeSet().getClassRanges().push new ClassRange \
       (new Range [4, 0], [4, 29]), typeDef, false
+    errors = detector.detectErrors model
+    (expect errors.length).toBe 0
+
+  it "doesn't report missing definitions for types imported by default", ->
+    # These two uses include with and without a 'java.lang prefix'
+    model.getRangeSet().getSnippetRanges().push new Range [9, 0], [9, 50]
+    model.getRangeSet().getSnippetRanges().push new Range [10, 0], [10, 60]
     errors = detector.detectErrors model
     (expect errors.length).toBe 0

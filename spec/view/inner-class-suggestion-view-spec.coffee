@@ -20,7 +20,7 @@ describe "InnerClassSuggestionView", ->
     view = new InnerClassSuggestionView suggestion, model
     suggestedRanges = model.getRangeSet().getSuggestedRanges()
 
-  it "adds a suggested range for the import when previewing", ->
+  it "adds a suggested range for the inner class when previewing", ->
     (expect suggestedRanges.length).toBe 0
     view.preview()
     (expect suggestedRanges.length).toBe 1

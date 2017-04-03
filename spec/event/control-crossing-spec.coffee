@@ -81,6 +81,7 @@ describe "ControlCrossingDetector", ->
   describe "when given a model", ->
 
     model = undefined
+    parseTree = undefined
     detector = undefined
 
     beforeEach =>
@@ -131,34 +132,63 @@ describe "ControlCrossingDetector", ->
       model.getRangeSet().getSnippetRanges().push new Range [4, 8], [4, 14]
       (expect model.getEvents().length).toBe 0
 
-    it "does not suggest a control structure that was crossed before and " +
-        "has already enqueued an event", ->
+    describe "if there is a history of control crossings", ->
 
       # Mock a past event with the same control structure as the one that
       # will be triggered by added active ranges
-      pastCrossingEvent = new ControlCrossingEvent \
-        (new IfControlStructure undefined), undefined, undefined
-      (spyOn pastCrossingEvent, "hasControlStructure").andReturn true
-      model.getEvents().push pastCrossingEvent
+      pastCrossingEvent = undefined
+      model = undefined
+      detector = undefined
+      beforeEach =>
 
-      # No new events should be added now when we cross the structure again
-      snippetRanges = model.getRangeSet().getSnippetRanges()
-      snippetRanges.push new Range [4, 8], [4, 14]
-      snippetRanges.push new Range [2, 4], [2, 10]
-      (expect model.getEvents().length).toBe 1
+        # XXX: Hacky way of writing the code so that we can parse it and get the
+        # same ctx positioning as in the reference code.
+        ifCtx = partialParse ([
+          ""
+          ""
+          ""
+          "    if (true) {"
+          "        i = i + 1;"
+          "    }"
+          ""
+          ""
+        ].join "\n"), "statement"
+        pastCrossingEvent = new ControlCrossingEvent \
+          (new IfControlStructure ifCtx), undefined, undefined
 
-    it "does not suggest a control structure that was crossed before and " +
-        "which the user has already decided to accept or reject", ->
+        model = new ExampleModel()
+        model.setParseTree parseTree
+        detector = new ControlCrossingDetector model
 
-      # Mock a past event with the same control structure as the one that
-      # will be triggered by added active ranges
-      pastCrossingEvent = new ControlCrossingEvent \
-        (new IfControlStructure undefined), undefined, undefined
-      (spyOn pastCrossingEvent, "hasControlStructure").andReturn true
-      model.getViewedEvents().push pastCrossingEvent
+      it "does not suggest a control structure that was crossed before and " +
+          "has already enqueued an event", ->
 
-      # No new events should be added now when we cross the structure again
-      snippetRanges = model.getRangeSet().getSnippetRanges()
-      snippetRanges.push new Range [4, 8], [4, 14]
-      snippetRanges.push new Range [2, 4], [2, 10]
-      (expect model.getEvents().length).toBe 0
+        (spyOn pastCrossingEvent, "hasControlStructure").andReturn true
+        model.getEvents().push pastCrossingEvent
+
+        # No new events should be added now when we cross the structure again
+        snippetRanges = model.getRangeSet().getSnippetRanges()
+        snippetRanges.push new Range [4, 8], [4, 14]
+        snippetRanges.push new Range [2, 4], [2, 10]
+        (expect model.getEvents().length).toBe 1
+
+      it "does not suggest a control structure that was crossed before and " +
+          "which the user has already decided to accept or reject", ->
+
+        (spyOn pastCrossingEvent, "hasControlStructure").andReturn true
+        model.getViewedEvents().push pastCrossingEvent
+
+        # No new events should be added now when we cross the structure again
+        snippetRanges = model.getRangeSet().getSnippetRanges()
+        snippetRanges.push new Range [4, 8], [4, 14]
+        snippetRanges.push new Range [2, 4], [2, 10]
+        (expect model.getEvents().length).toBe 0
+
+      it "removes events for control structures that are added manually", ->
+
+        model.getEvents().push pastCrossingEvent
+
+        # When we add a snippet range that contains part of the control
+        # structure in a past event, delete that event.
+        model.getRangeSet().getSnippetRanges().push new Range [3, 4], [3, 13]
+        (expect model.getEvents().length).toBe 0

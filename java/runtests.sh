@@ -6,6 +6,7 @@ REFLECTIONS_JARS=./libs/reflections-0.9.11.jar:./libs/guava-20.0.jar:./libs/java
 SOOT_JARS=`ls -d -1 ./libs/*.jar | tr '\n' ':'`
 JAVA_HOME_JARS=`ls -d -1 $JAVA_HOME/jre/lib/*.jar | tr '\n' ':'`
 JDI_JARS=$JAVA_HOME/lib/tools.jar
+SCENARIO_JARS=./libs/database.jar
 
 # Discover test classes
 TESTS_DIR=tests
@@ -18,6 +19,10 @@ javac -g -cp $JUNIT_JARS:$SOOT_JARS:$JDI_JARS:$REFLECTIONS_JARS:. tests/*.java
 # Compile classes for all of the files we're going to run test analysis on
 # Use `-g` so we get symbol information, for extracting variable names during analysis.
 javac -g tests/analysis_examples/*.java
+javac -g -cp $SOOT_JARS:$JDI_JARS tests/scenarios/examplify/*.java
+javac -g -cp $SCENARIO_JARS tests/scenarios/database-use/*.java
+javac -g tests/scenarios/InstallCertFolder/*.java
 
 # Discover and run tests
-java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$REFLECTIONS_JARS:tests/:. org.junit.runner.JUnitCore $TEST_CLASSES
+java -cp $JUNIT_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$REFLECTIONS_JARS:$SCENARIO_JARS:tests/:. \
+  org.junit.runner.JUnitCore $TEST_CLASSES

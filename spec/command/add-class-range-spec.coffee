@@ -3,7 +3,7 @@
 { AddClassRange } = require "../../lib/command/add-class-range"
 
 
-describe "AddClass", ->
+describe "AddClassRange", ->
 
   model = undefined
   beforeEach =>
