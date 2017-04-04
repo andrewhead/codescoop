@@ -137,12 +137,32 @@ module.exports.ExampleController = class ExampleController
       @model.setState ExampleModelState.IDLE
 
   checkForCorrections: ->
+
     for corrector in @correctors
+
       errors = corrector.checker.detectErrors @model
-      if errors.length > 0
+      unfixedErrors = []
+
+      # Automatically fix all the errors we can
+      for error in errors
+        suggestions = []
+        for suggester in corrector.suggesters
+          suggesterSuggestions = suggester.getSuggestions error, @model
+          suggestions = suggestions.concat suggesterSuggestions
+        if suggestions.length is 1
+          commandGroup = @commandCreator.createCommandGroupForSuggestion suggestions[0]
+          @commandStack.push commandGroup
+          for command in commandGroup
+            command.apply @model
+          @model.setState ExampleModelState.IDLE
+          return
+        else
+          unfixedErrors.push error
+
+      if unfixedErrors.length >= 1
         # It's important that the state gets set last, as it's the
         # state change that the view will be refreshing on
-        @model.setErrors errors
+        @model.setErrors unfixedErrors
         @model.setActiveCorrector corrector
         @model.setState ExampleModelState.ERROR_CHOICE
         break

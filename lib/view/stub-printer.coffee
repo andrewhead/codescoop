@@ -2,6 +2,11 @@
 _ = require "lodash"
 
 
+module.exports.PRINTABLE_TYPE = PRINTABLE_TYPES =
+  [ "byte", "short", "int", "long", "float", "double", "boolean",
+    "char", "String", "void" ]
+
+
 # Currently, a new stub printer needs to be created for every stub that
 # gets printed, due to the printer's internal state.
 module.exports.StubPrinter = class StubPrinter
@@ -109,7 +114,7 @@ module.exports.StubPrinter = class StubPrinter
 
       # If this returns another stub, create a new return type and alter the
       # return values so they all return stub objects.
-      returnsAnonymousClass = (returnType is "instance")
+      returnsAnonymousClass = (returnType not in PRINTABLE_TYPES)
       returnTypeString = undefined
       returnValuesStrings = []
       if returnsAnonymousClass
@@ -134,7 +139,7 @@ module.exports.StubPrinter = class StubPrinter
               returnObjectClassName = anonymousClassName + "_" + (nonNullIndex + 1)
               anonymousSpec = returnValue.copy()
               anonymousSpec.setClassName returnObjectClassName
-              anonymousSpec.setSuperclassName anonymousClassName
+              anonymousSpec.setSuperclassName returnType
               anonymousSpecs.push anonymousSpec
               returnValuesStrings.push "new #{returnObjectClassName}()"
               nonNullIndex += 1
@@ -147,13 +152,18 @@ module.exports.StubPrinter = class StubPrinter
               returnValuesStrings.push "new #{anonymousClassName}()"
               anonymousSpec = returnValues[0].copy()
               anonymousSpec.setClassName anonymousClassName
+              anonymousSpec.setSuperclassName returnType
               anonymousSpecs.push anonymousSpec
 
       else
         returnTypeString = returnType
-        for returnValue in returnValues
-          valueString = @_getLiteralForValue returnValue, returnType
-          returnValuesStrings.push valueString
+        if returnType is "void"
+          returnValues = []
+          returnValueStrings = []
+        else
+          for returnValue in returnValues
+            valueString = @_getLiteralForValue returnValue, returnType
+            returnValuesStrings.push valueString
 
       argumentStrings = []
       for argumentType, i in argumentTypes
@@ -166,8 +176,10 @@ module.exports.StubPrinter = class StubPrinter
       if returnValues.length == 1
         @_addLine "return #{returnValuesStrings[0]};"
       else if returnValues.length > 1
+        @_addLine "#{callCountName} += 1;"
         for returnValue, i in returnValues
-          conditionString = "#{callCountName} == #{i}"
+          printIndex = i + 1
+          conditionString = "#{callCountName} == #{printIndex}"
           if i == 0
             @_addLine "if (#{conditionString}) {"
           else if i == returnValues.length - 1
@@ -179,13 +191,10 @@ module.exports.StubPrinter = class StubPrinter
           @indentLevel -= 1
           if i == returnValues.length - 1
             @_addLine "}"
-        @_addLine "#{callCountName} += 1;"
       @indentLevel -= 1
 
       @_addLine "}"
       @_addPaddingLine()
-
-    # @_addPaddingLine() if hasAtLeastOneMethodCall
 
     anonymousSpecs
 

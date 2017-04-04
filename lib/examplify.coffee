@@ -56,8 +56,8 @@ module.exports.MainController = class MainController
 
   constructor: (codeEditor, exampleEditor) ->
 
-    selectedRange = codeEditor.getSelectedBufferRange()
-    snippetRanges = [ selectedRange ]
+    selectedRanges = codeEditor.getSelectedBufferRanges()
+    snippetRanges = selectedRanges
 
     # Prepare models (data)
     @rangeSet = new RangeSet snippetRanges
