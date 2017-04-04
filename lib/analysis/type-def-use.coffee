@@ -39,6 +39,13 @@ class TypeUseVisitor extends JavaListener
       symbol = symbolFromIdNode @file, classNode, "Class"
       @_saveSymbolIfTypeIsntIgnored symbol
 
+  enterCatchType: (ctx) ->
+    for childCtx in ctx.children
+      if childCtx.ruleIndex is JavaParser.RULE_qualifiedName
+        nameRange = extractCtxRange childCtx
+        symbol = new Symbol @file, childCtx.getText(), nameRange, "Class"
+        @_saveSymbolIfTypeIsntIgnored symbol
+
   enterCreatedName: (ctx) ->
     if "symbol" of ctx.children[0]
       symbol = symbolFromIdNode @file, ctx.children[0].symbol, "Class"
