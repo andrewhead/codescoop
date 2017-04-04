@@ -1,6 +1,6 @@
-import org.acme.database.QueryResult;
 import org.acme.database.Book;
 import org.acme.database.Booklist;
+import org.acme.database.Cursor;
 import org.acme.database.Database;
 import org.acme.database.ConnectionException;
 
@@ -14,36 +14,38 @@ public class BookListing {
 
     public Booklist getBookListing(String genre, int maxBooks) {
 
-        Database database = new Database();
+        Database database = new Database("https://acme-books.com/db");
+        Cursor cursor = database.cursor();
         Booklist booklist = new Booklist();
         List titles = new ArrayList();
 
         try {
 
             String query = "SELECT id, title, year, num_pages FROM table WHERE title LIKE '%" + genre + "%'";
-            QueryResult queryResult = database.query(query);
+            cursor.execute(query);
             boolean finished = false;
 
-            if (queryResult.getSize() > 0) {
+            if (cursor.rowCount() > 0) {
 
                 int rowNumber = 0;
                 while (!finished) {
 
-                    List records = queryResult.getRecords();
+                    int rowCount = cursor.rowCount();
 
-                    for (int i = 0; i < Math.min(records.size(), maxBooks); ++i) {
+                    for (int i = 0; i < Math.min(rowCount, maxBooks); ++i) {
 
-                        Book book = (Book)records.get(i);
-                        int id = book.getId();
-                        String title = book.getTitle();
-                        int year = book.getYear();
-                        int num_pages = book.getNumPages();
+                        cursor.fetchone();
+                        int id = cursor.getInt(0);
+                        String title = cursor.getString(1);
+                        int year = cursor.getInt(2);
+                        int num_pages = cursor.getInt(3);
+                        Book book = new Book(id, title, year, num_pages);
 
                         if (title != null) {
                             titles.add(title);
                         }
                         if (id != -1) {
-                            boolean bestseller = isBestseller(id);
+                            boolean bestseller = isBestseller(book.getId());
                             if (bestseller) {
                                 booklist.hasBestseller = bestseller;
                             }
@@ -55,10 +57,10 @@ public class BookListing {
 
                         rowNumber++;
 
-                        if (queryResult.isDone() || rowNumber >= maxBooks) {
+                        if (cursor.end() || rowNumber >= maxBooks) {
                             finished = true;
-                        } else {
-                            queryResult = database.queryMore(queryResult.getQueryLocator());
+                        } else if (i == rowCount - 1){
+                            cursor.next(id);
                         }
 
                     }

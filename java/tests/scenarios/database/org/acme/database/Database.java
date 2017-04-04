@@ -2,49 +2,37 @@ package org.acme.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 
 public class Database {
 
-    private boolean mQueryDone = false;
-    private int QUERY_RESULT_SIZE = 2;
+    private Cursor cursor;
 
     // Based on "Classic Books" list from
     // https://www.abebooks.com/books/features/50-classic-books.shtml
     // All page numbers are estimates.
-    private Row[] records = {
-        new Book(1, "Lord of the Flies", 1954, 250),
-        new Book(2, "Lorna Doone", 1869, 200),
-        new Book(3, "Daphne de Maurier", 1936, 330)
-    };
+    private Object[][] rows = new Object[3][4];
 
-    private List getRowList(int start, int length) {
-        if (start + length > records.length) {
-            length = 1;
-        }
-        ArrayList rowList = new ArrayList();
-        for (int i = 0; i < length; i++) {
-            rowList.add(records[start + i]);
-        }
-        return rowList;
+    public Database(String url) {
+        rows[0][0] = 0;
+        rows[0][1] = "Lord of the Flies";
+        rows[0][2] = 1954;
+        rows[0][3] = 250;
+        rows[1][0] = 1;
+        rows[1][1] = "Lorna Doone";
+        rows[1][2] = 1869;
+        rows[1][3] = 200;
+        rows[2][0] = 2;
+        rows[2][1] = "Daphne de Maurier";
+        rows[2][2] = 1936;
+        rows[2][3] = 330;
+        cursor = new Cursor();
+        cursor.addRows(Arrays.asList(rows));
     }
 
-    private boolean hasMore(int start, int length) {
-        return (start + length) < records.length;
-    }
-
-    public QueryResult query(String query) throws ConnectionException {
-        return new QueryResult(
-            getRowList(0, QUERY_RESULT_SIZE),
-            hasMore(0, QUERY_RESULT_SIZE)
-        );
-    }
-
-    public QueryResult queryMore(int queryLocator) {
-        return new QueryResult(
-            getRowList(queryLocator, QUERY_RESULT_SIZE),
-            hasMore(queryLocator, QUERY_RESULT_SIZE)
-        );
+    public Cursor cursor() {
+        return this.cursor;
     }
 
 }

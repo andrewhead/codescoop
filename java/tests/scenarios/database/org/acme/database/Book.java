@@ -1,7 +1,7 @@
 package org.acme.database;
 
   
-public class Book extends Row {
+public class Book {
     
     private int id;
     private String title;
