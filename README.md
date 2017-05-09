@@ -2,12 +2,6 @@
 
 Make useful example code from your existing code.
 
-## Running on new code
-
-- InstallCert: Compile code with debug flags, e.g., `calvisitor:java freshaccount$ javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
-- Chat Client: Don't forget to specify the classpath when compiling with debug flages, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
-- Polyglot: ` ./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
-
 ## Annoying, brittle installation requirements
 
 ### Platform requirements
@@ -40,16 +34,9 @@ cd java/libs
 ./fetch_libs.sh
 ```
 
-Then you should also compile the dataflow code:
-
-```bash
-# Assuming you're starting back in the main directory
-SOOT_JARS=`ls -d -1 $PWD/java/libs/*.jar | tr '\n' ':'`
-JAVA_HOME=`/usr/libexec/java_home -v 1.7`
-JAVA_HOME_LIBS=`ls -d -1 $JAVA_HOME/jre/lib/*.jar | tr '\n' ':'`
-cd java/
-javac -cp $SOOT_JARS:$JAVA_HOME_LIBS:. DataflowAnalysis.java
-```
+You will also need to compile all of the Java analyses once
+before the plugin can run correctly.  To do this, you can
+run the `runtests.sh` script (see below).
 
 ## Developing
 
@@ -104,11 +91,14 @@ make comparisons with an equals sign use values that are
 exclusive to each class, instead of comparing just on the
 fields of the object.
 
-<!--
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
--->
-
 ### Troubleshooting
 
 #### When running specs on examplify in Atom
-- If all else fails you need to install your packages and then run `npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49` where 1.3.4 is your electron version and 49 is the abi it's expecting. (Source: https://github.com/electron-userland/electron-builder/issues/453)
+
+* If all else fails you need to install your packages and then run `npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49` where 1.3.4 is your electron version and 49 is the abi it's expecting. (Source: https://github.com/electron-userland/electron-builder/issues/453)
+
+#### Compiling example code
+
+* InstallCert: Compile code with debug flags, e.g., `javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
+* Chat Client: Don't forget to specify the classpath when compiling with debug flags, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
+* Polyglot: `./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
