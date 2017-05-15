@@ -57,3 +57,6 @@ java/libs/*.jar
 
 # Soot generated IR
 sootOutput
+
+# Local cache of saved analysis results
+.cache
