@@ -14,7 +14,7 @@ public class Database {
     // All page numbers are estimates.
     private Object[][] rows = new Object[3][4];
 
-    public Database(String url) {
+    public Database(String username, String password, String url) {
         rows[0][0] = 0;
         rows[0][1] = "Lord of the Flies";
         rows[0][2] = 1954;

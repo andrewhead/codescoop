@@ -27,8 +27,7 @@ atom-text-editor div.line {
     opacity: .5;
     &.suggested {
       opacity: 1;
-      background-color: @syntax-color-renamed;
-      background-opacity: .5;
+      background-color: fade(@syntax-color-renamed, 40%);
     }
   }
 }
