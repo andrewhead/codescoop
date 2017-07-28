@@ -2,7 +2,7 @@
 { StubSpec } = require "../../lib/model/stub"
 
 
-describe "StubPrinter", ->
+fdescribe "StubPrinter", ->
 
   stubPrinter = undefined
   beforeEach =>
@@ -79,14 +79,14 @@ describe "StubPrinter", ->
       "    private int methodCallCount = 0;"
       "    "
       "    public int method() {"
-      "        if (methodCallCount == 0) {"
+      "        methodCallCount += 1;"
+      "        if (methodCallCount == 1) {"
       "            return 42;"
-      "        } else if (methodCallCount == 1) {"
+      "        } else if (methodCallCount == 2) {"
       "            return 43;"
       "        } else {"
       "            return 44;"
       "        }"
-      "        methodCallCount += 1;"
       "    }"
       "    "
       "}"
@@ -117,7 +117,7 @@ describe "StubPrinter", ->
     stubSpec = new StubSpec "Stub",
       fieldAccesses:
         object:
-          type: "instance"
+          type: "Klazz"
           values: [
             new StubSpec undefined,
               fieldAccesses:
@@ -128,7 +128,7 @@ describe "StubPrinter", ->
       methodCalls: [
           signature:
             name: "method"
-            returnType: "instance"
+            returnType: "Klazz"
             argumentTypes: []
           returnValues: [
             new StubSpec undefined,
@@ -156,7 +156,7 @@ describe "StubPrinter", ->
       "    "
       "}"
       ""
-      "private class AnonymousClass2 {"
+      "private class AnonymousClass2 extends Klazz {"
       "    "
       "    public int i = 43;"
       "    "
@@ -168,7 +168,7 @@ describe "StubPrinter", ->
     stubSpec = new StubSpec "Stub",
       fieldAccesses:
         object:
-          type: "instance"
+          type: "Klazz"
           values: [null]
     string = stubPrinter.printToString stubSpec
     (expect string).toEqual [
@@ -217,7 +217,7 @@ describe "StubPrinter", ->
       methodCalls: [
           signature:
             name: "method"
-            returnType: "instance"
+            returnType: "Klazz"
             argumentTypes: []
           returnValues: [
             new StubSpec undefined,
@@ -239,12 +239,12 @@ describe "StubPrinter", ->
       "    private int methodCallCount = 0;"
       "    "
       "    public AnonymousClass1 method() {"
-      "        if (methodCallCount == 0) {"
+      "        methodCallCount += 1;"
+      "        if (methodCallCount == 1) {"
       "            return new AnonymousClass1_1();"
       "        } else {"
       "            return new AnonymousClass1_2();"
       "        }"
-      "        methodCallCount += 1;"
       "    }"
       "    "
       "}"
@@ -271,7 +271,7 @@ describe "StubPrinter", ->
       methodCalls: [
           signature:
             name: "method"
-            returnType: "instance"
+            returnType: "Klazz"
             argumentTypes: []
           returnValues: [
             new StubSpec undefined,
@@ -289,17 +289,17 @@ describe "StubPrinter", ->
       "    private int methodCallCount = 0;"
       "    "
       "    public AnonymousClass1 method() {"
-      "        if (methodCallCount == 0) {"
+      "        methodCallCount += 1;"
+      "        if (methodCallCount == 1) {"
       "            return new AnonymousClass1();"
       "        } else {"
       "            return null;"
       "        }"
-      "        methodCallCount += 1;"
       "    }"
       "    "
       "}"
       ""
-      "private class AnonymousClass1 {"
+      "private class AnonymousClass1 extends Klazz {"
       "    "
       "    public int i = 42;"
       "    "
@@ -333,12 +333,12 @@ describe "StubPrinter", ->
       "    }"
       "    "
       "    public int method(int arg1) {"
-      "        if (method2CallCount == 0) {"
+      "        method2CallCount += 1;"
+      "        if (method2CallCount == 1) {"
       "            return 1;"
       "        } else {"
       "            return 2;"
       "        }"
-      "        method2CallCount += 1;"
       "    }"
       "    "
       "}"
