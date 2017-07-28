@@ -14,15 +14,20 @@ public class BookListing {
 
     public Booklist getBookListing(String genre, int maxBooks) {
 
-        Database database = new Database("https://acme-books.com/db");
+        String QUERY = "SELECT id, title, year, num_pages FROM table WHERE title LIKE '%" + genre + "%'";
+        int COLUMN_INDEX_ID = 0;
+        int COLUMN_INDEX_TITLE = 1;
+        int COLUMN_INDEX_YEAR = 2;
+        int COLUMN_INDEX_NUM_PAGES = 3;
+
+        Database database = new Database("lou", "PA$$W0RD", "https://acme-books.com/db");
         Cursor cursor = database.cursor();
         Booklist booklist = new Booklist();
         List titles = new ArrayList();
 
         try {
 
-            String query = "SELECT id, title, year, num_pages FROM table WHERE title LIKE '%" + genre + "%'";
-            cursor.execute(query);
+            cursor.execute(QUERY);
             boolean finished = false;
 
             if (cursor.rowCount() > 0) {
@@ -35,10 +40,10 @@ public class BookListing {
                     for (int i = 0; i < Math.min(rowCount, maxBooks); ++i) {
 
                         cursor.fetchone();
-                        int id = cursor.getInt(0);
-                        String title = cursor.getString(1);
-                        int year = cursor.getInt(2);
-                        int num_pages = cursor.getInt(3);
+                        int id = cursor.getInt(COLUMN_INDEX_ID);
+                        String title = cursor.getString(COLUMN_INDEX_TITLE);
+                        int year = cursor.getInt(COLUMN_INDEX_YEAR);
+                        int num_pages = cursor.getInt(COLUMN_INDEX_NUM_PAGES);
                         Book book = new Book(id, title, year, num_pages);
 
                         if (title != null) {

@@ -151,6 +151,7 @@ module.exports.ExampleController = class ExampleController
           suggestions = suggestions.concat suggesterSuggestions
         if suggestions.length is 1
           commandGroup = @commandCreator.createCommandGroupForSuggestion suggestions[0]
+          commandGroup.quickAdd = true
           @commandStack.push commandGroup
           for command in commandGroup
             command.apply @model
@@ -267,10 +268,12 @@ module.exports.ExampleController = class ExampleController
   undo: ->
 
     # Revert the last command and remove it from the stack
-    lastCommandGroup = @commandStack.pop()
-    if lastCommandGroup?
+    quickAdd = true
+    while quickAdd?
+      lastCommandGroup = @commandStack.pop()
       for command in lastCommandGroup
         command.revert @model
+      quickAdd = lastCommandGroup.quickAdd
 
     @_resetChoiceState()
 
