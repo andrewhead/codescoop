@@ -74,11 +74,12 @@ describe "StubAnalysis", ->
       (expect objectCalls[0].returnValues.length).toBe 1
 
       # Methods that return an object should be marked as returning "instance"
-      (expect doObjectWorkCalls[0].signature.returnType).toEqual "instance"
+      (expect doObjectWorkCalls[0].signature.returnType).toEqual \
+        "java.util.List"
 
       # Our stub analysis should be able to find null values, too
       # But the method should still be marked as returning an instance
       getNullCalls = methodCalls.filter (call) =>
         call.signature.name is "getNull"
-      (expect getNullCalls[0].signature.returnType).toEqual "instance"
+      (expect getNullCalls[0].signature.returnType).toEqual "java.lang.Object"
       (expect getNullCalls[0].returnValues).toEqual [null]

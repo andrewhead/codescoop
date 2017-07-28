@@ -123,6 +123,7 @@ describe "ExampleController", ->
         correctors = [
             checker:
               detectErrors: (parseTree, rangeSet, symbolSet) => []
+            suggesters: []
         ]
         model = _makeDefaultModel()
         variableDefUseAnalysis = _makeMockVariableDefUseAnalysis()
@@ -164,7 +165,7 @@ describe "ExampleController", ->
         secondCorrector =
           name: "mock-corrector-2"
           checker: { detectErrors: (parseTree, rangeSet, symbolSet) => [] }
-          suggester: { getSuggestions: (error, parseTree, rangeSet, symbolSet) => [] }
+          suggesters: [{ getSuggestions: (error, parseTree, rangeSet, symbolSet) => [] }]
           commandCreator: { applyFixes: (suggestion, rangeSet, symbolSet) => true }
         correctors.push secondCorrector
 
@@ -219,6 +220,7 @@ describe "ExampleController", ->
         beforeEach =>
           correctors = [
               checker: { detectErrors: () => [] }
+              suggesters: []
           ]
           extenders = [
               extender: { getExtension: (event) => { isExtension: true } }
@@ -250,6 +252,7 @@ describe "ExampleController", ->
               # to transition to EXTENSION even when there are errors waiting
               # to be resolved.
               checker: { detectErrors: () => [ "error" ] }
+              suggesters: []
           ]
           extenders = [
               extender: { getExtension: (event) => {} }

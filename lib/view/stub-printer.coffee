@@ -129,7 +129,8 @@ module.exports.StubPrinter = class StubPrinter
         # If there is more than one non-null return value for an anonymous class,
         # each returned stub needs to be a subclass of the anonymous class.
         if nonNullReturnValueCount > 1
-          returnAnonymousSpec = new StubSpec anonymousClassName
+          returnAnonymousSpec = new StubSpec anonymousClassName,
+            { superclass: signature.returnType }
           anonymousSpecs.push returnAnonymousSpec
           nonNullIndex = 0
           for returnValue in returnValues
@@ -139,7 +140,7 @@ module.exports.StubPrinter = class StubPrinter
               returnObjectClassName = anonymousClassName + "_" + (nonNullIndex + 1)
               anonymousSpec = returnValue.copy()
               anonymousSpec.setClassName returnObjectClassName
-              anonymousSpec.setSuperclassName returnType
+              anonymousSpec.setSuperclassName anonymousClassName
               anonymousSpecs.push anonymousSpec
               returnValuesStrings.push "new #{returnObjectClassName}()"
               nonNullIndex += 1

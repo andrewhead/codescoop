@@ -121,7 +121,8 @@ describe "MainController", ->
     # Remember that while the range specifies line 1, this actually corresponds
     # to line 2 as it appears in the text editor
     selectedRange = new Range [1, 0], [1, 2]
-    selection = codeEditor.addSelectionForBufferRange selectedRange
+    codeEditor.clearSelections()
+    selection = codeEditor.setSelectedBufferRange selectedRange
 
     mainController = new MainController codeEditor, exampleEditor
     (expect mainController.getRangeSet().getSnippetRanges()).toEqual \
@@ -145,7 +146,7 @@ describe "MainController", ->
     )
 
     selectedRange = new Range [1, 0], [1, 2]
-    selection = codeEditor.addSelectionForBufferRange selectedRange
+    selection = codeEditor.setSelectedBufferRange selectedRange
     mainController = new MainController codeEditor, exampleEditor
 
     # Check to see that one of the lines was activated based on selectedRange

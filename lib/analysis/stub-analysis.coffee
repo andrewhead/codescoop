@@ -80,7 +80,6 @@ module.exports.StubAnalysis = class StubAnalysis
     methodCalls = []
     for methodIdJ in instanceMethodCallsJ.keySetSync().toArraySync()
       returnType = accessHistoryJ.getMethodReturnTypeSync methodIdJ
-      console.log returnType
       methodCalls.push
         signature:
           name: methodIdJ.getNameSync()
