@@ -10,7 +10,7 @@ The only workable configuration I have found for satisfying
 Soot and the Node `java` packages is to have JDK version 1.7
 as the primary Java VM.
 
-With our version of Java 1.7, we needed to add a few symbolic 
+With our version of Java 1.7, we needed to add a few symbolic
 links so that Soot gets the class definitions it expects. See
 https://github.com/Sable/soot/issues/686 for details on the
 hack we are following.
@@ -18,11 +18,12 @@ hack we are following.
 ### Installation instructions
 
 Start out by installing all of the Node dependencies for the
-package
+package by running
 
 ```bash
 npm install
 ```
+in the `examplify` folder.
 
 This project requires Soot, a static analysis tool, to run.
 The classes for Soot are stored in a pretty large JAR.  It's
