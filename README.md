@@ -10,9 +10,20 @@ The only workable configuration I have found for satisfying
 Soot and the Node `java` packages is to have JDK version 1.7
 as the primary Java VM.
 
+#### Critical
 With our version of Java 1.7, we needed to add a few symbolic
-links so that Soot gets the class definitions it expects. See
-https://github.com/Sable/soot/issues/686 for details on the
+links so that Soot gets the class definitions it expects:
+
+```bash
+cd $JAVA_HOME
+sudo mkdir Classes
+cd Classes/
+sudo ln -s ../jre/lib/rt.jar classes.jr
+sudo ln -s ../jre/lib/rt.jar ui.jar
+```
+
+
+See https://github.com/Sable/soot/issues/686 for details on the
 hack we are following.
 
 ### Installation instructions
