@@ -50,6 +50,12 @@ You will also need to compile all of the Java analyses once
 before the plugin can run correctly.  To do this, you can
 run the `runtests.sh` script (see below).
 
+Install into Atom our local Examplify package by running
+```bash
+apm link
+```
+in examplify folder.
+
 ## Developing
 
 ### Java tests
@@ -60,6 +66,10 @@ To make sure that the static analysis code is working properly:
 cd java/
 ./runtests.sh
 ```
+
+### Coffeescript tests
+
+`Cmd-Shift-p` in Atom, type `specs` into window, and choose `run package specs`
 
 ### Running Soot
 
