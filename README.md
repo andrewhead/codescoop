@@ -105,6 +105,10 @@ fields of the object.
 
 ### Troubleshooting
 
+#### Refresh atom
+
+Ctrl-Option-Command-l (lowercase L)
+
 #### When running specs on examplify in Atom
 
 * If all else fails you need to install your packages and then run `npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49` where 1.3.4 is your electron version and 49 is the abi it's expecting. (Source: https://github.com/electron-userland/electron-builder/issues/453)
@@ -114,3 +118,20 @@ fields of the object.
 * InstallCert: Compile code with debug flags, e.g., `javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
 * Chat Client: Don't forget to specify the classpath when compiling with debug flags, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
 * Polyglot: `./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
+
+#### Dealing with bad VM launch
+
+Try some `/etc/hosts` entries like this:
+```
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost.localdomain   localhost
+::1             Elenas-MacBook-Pro.local
+127.0.0.1	Elenas-MacBook-Pro.local
+```
