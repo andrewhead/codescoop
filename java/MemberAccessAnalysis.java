@@ -80,6 +80,7 @@ public class MemberAccessAnalysis {
 
         String vmStdout = streamToString(vm.process().getInputStream());
         String vmStderr = streamToString(vm.process().getErrorStream());
+        System.out.println(accessHistories.size());
 
         if (vmStderr.contains("Error: Could not find or load main class")) {
             throw new ClassNotFoundException("Could not find or load main class");
