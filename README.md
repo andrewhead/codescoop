@@ -4,9 +4,24 @@ Make useful example code from your existing code.
 
 ## Using Examplify
 
-Select a line or lines of text that you want to create an
-example out of.  Right click in the editor, and choose the
-item "Create example from selection" in the context menu.
+If this is your first time using Examplify, or if you have
+changed the contents of the source code files that you want
+to create examples from, you should rebuild the Java code
+and source code files.
+
+```bash
+cd java/
+./build.sh
+```
+
+If Atom was already open, you should probably reload the
+Examplify plugin (`Cmd-Ctrl-Opt-L`).
+
+Then, open the file you want to create an example from in
+Atom.  Select a line or lines of text that you want to
+create an example out of.  Right click in the editor, and
+choose the item "Create example from selection" in the
+context menu.
 
 You may have to wait up to 30 seconds for the Java analysis
 to complete before you can start finishing the examples.
@@ -94,7 +109,7 @@ cd java/libs
 
 You will also need to compile all of the Java analyses once
 before the plugin can run correctly.  To do this, you can
-run the `runtests.sh` script (see below).
+run the `build.sh` script.
 
 Install into Atom our local Examplify package by running
 ```bash
@@ -135,6 +150,14 @@ running the command.  The options do the following:
 * `-src-prec java`: runs Soot on a `.java` file instead of a
     `.class` file
 * `-f J`: produces a Jimple IR file (instead of a class)
+
+### Editing Java code
+
+If you like to use `vi` to edit the Java code, consider
+using the `editjava` script in the `java/` directory.  This
+sets up the class path to include all of the dependencies
+before starting `vi`, in case you have an integrated Linter
+and want to make sure it notices all your dependencies.
 
 ### Style Guide
 
