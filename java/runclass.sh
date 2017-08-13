@@ -9,7 +9,8 @@ JDI_JARS=$JAVA_HOME/lib/tools.jar
 DATABASE_SCENARIO_JARS=./libs/database.jar
 POLYGLOT_SCENARIO_JARS=./libs/polyglot.jar:./libs/java_cup.jar:./libs/pao.jar
 CHAT_SCENARIO_JARS=./libs/chat-client.jar
-ALL_JARS=$JUNIT_JARS:$REFLECTIONS_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$DATABASE_SCENARIO_JARS:$POLYGLOT_SCENARIO_JARS
+JSOUP_SCENARIO_JARS=./libs/jsoup-jdk-1.4.jar:./libs/javax.mail-1.4.7.jar
+ALL_JARS=$JUNIT_JARS:$REFLECTIONS_JARS:$SOOT_JARS:$JAVA_HOME_JARS:$JDI_JARS:$DATABASE_SCENARIO_JARS:$POLYGLOT_SCENARIO_JARS:$JSOUP_SCENARIO_JARS
 
 # Discover test classes
 TESTS_DIR=tests
@@ -27,6 +28,7 @@ javac -g -cp $CHAT_SCENARIO_JARS tests/scenarios/chat/Server.java
 javac -g -cp $DATABASE_SCENARIO_JARS tests/scenarios/database-use/BookListing.java
 javac -g -cp $POLYGLOT_SCENARIO_JARS tests/scenarios/polyglot-simple/Main.java
 javac -g -cp $CHAT_SCENARIO_JARS tests/scenarios/chat/Server.java
+javac -g -cp $JSOUP_SCENARIO_JARS tests/scenarios/jsoup/CraigslistMonitor.java
 javac -g tests/scenarios/InstallCertFolder/InstallCert.java
 
 # Run the command

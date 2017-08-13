@@ -15,3 +15,7 @@ $WGET http://search.maven.org/remotecontent?filepath=org/hamcrest/hamcrest-core/
 $WGET https://search.maven.org/remotecontent?filepath=org/reflections/reflections/0.9.11/reflections-0.9.11.jar -O reflections-0.9.11.jar
 $WGET https://search.maven.org/remotecontent?filepath=com/google/guava/guava/20.0/guava-20.0.jar -O guava-20.0.jar
 $WGET https://search.maven.org/remotecontent?filepath=org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar -O javassist-3.21.0-GA.jar
+
+# Dependencies for examples
+$WGET https://github.com/andrewhead/jsoup-1.4/raw/jdk-1.4/deps/javax.mail-1.4.7.jar -O javax.mail-1.4.7.jar
+$WGET https://github.com/andrewhead/jsoup-1.4/releases/download/jsoup/jsoup-jdk-1.4.jar -O jsoup-jdk-1.4.jar
