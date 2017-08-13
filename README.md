@@ -2,6 +2,48 @@
 
 Make useful example code from your existing code.
 
+## Using Examplify
+
+Select a line or lines of text that you want to create an
+example out of.  Right click in the editor, and choose the
+item "Create example from selection" in the context menu.
+
+You may have to wait up to 30 seconds for the Java analysis
+to complete before you can start finishing the examples.
+Performance improvements to come soon?
+
+Currently, there are a few files that you can make examples
+out of.
+
+* `tests/scenarios/database-use/BookListing.java`: based on
+    a code example from a formative study.  Uses a fake
+    cursor-based database access API.
+* `tests/scenarios/jsoup/CraigslistMonitor.java`: uses Jsoup
+    to fetch and parse web page content, uses a file reader
+    API to read credentials from a file, and uses a
+    javax.mail to send a digest of the web page contents to
+    an email address.
+
+**For some of these (`CraigslistMonitor.java`), you should
+disable stub analysis**, as it takes prohibitively long to
+run (way longer than a few minutes).  To disable stub
+analysis, comment out this line in `examplify.coffee`.  The
+line to comment looks like:
+
+```coffeescript
+      stubAnalysis: new StubAnalysis codeEditorFile
+```
+
+and after you comment it, it should look like:
+
+```coffeescript
+      # stubAnalysis: new StubAnalysis codeEditorFile
+```
+
+Remember that you should reload Atom (`Cmd-Ctrl-Option-L`)
+after making changes to the `examplify.coffee` file for stub
+analysis to be disabled.
+
 ## Annoying, brittle installation requirements
 
 ### Platform requirements
@@ -10,7 +52,6 @@ The only workable configuration I have found for satisfying
 Soot and the Node `java` packages is to have JDK version 1.7
 as the primary Java VM.
 
-#### Critical
 With our version of Java 1.7, we needed to add a few symbolic
 links so that Soot gets the class definitions it expects:
 
@@ -21,7 +62,6 @@ cd Classes/
 sudo ln -s ../jre/lib/rt.jar classes.jr
 sudo ln -s ../jre/lib/rt.jar ui.jar
 ```
-
 
 See https://github.com/Sable/soot/issues/686 for details on the
 hack we are following.
