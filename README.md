@@ -1,8 +1,80 @@
 # Examplify
 
-Make useful example code from your existing code.
+## Installation
+
+### Java 1.7
+
+The only workable configuration I have found for satisfying
+Soot and the Node `java` packages is to have JDK version 1.7
+as the primary Java VM.  Check out installation instructions
+specific to your OS for getting this version.
+
+Your `JAVA_HOME` environment variable should be set to point
+to Java 1.7.  On OSX, you can add a line like this to your
+`~/.bashrc` set the `JAVA_HOME` to 1.7.
+
+```bash
+export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+```
+
+On OSX, you need to add a few symbolic links so that Soot
+gets the class definitions it expects:
+
+```bash
+cd $JAVA_HOME
+sudo mkdir Classes
+cd Classes/
+sudo ln -s ../jre/lib/rt.jar classes.jr
+sudo ln -s ../jre/lib/rt.jar ui.jar
+```
+
+See https://github.com/Sable/soot/issues/686 for details on the
+hack we are following.
+
+### Adding the Examplify plugin to Atom
+
+First, download and install the GitHub Atom text editor.
+There should be a download link on the Atom home page
+[here](https://atom.io/).
+
+Then clone this repository.  `cd` into the repository's main
+directory, and install all of the Node dependencies for the
+package by running
+
+```bash
+npm install
+```
+
+This project requires Soot, a static analysis tool, to run.
+The classes for Soot are stored in a pretty large JAR.  It's
+not included in the repository, so for right now, you can
+run this helper script to fetch the dependencies.
+
+```bash
+cd java/libs
+./fetch_libs.sh
+```
+
+You will also need to compile all of the Java analyses once
+before the plugin can run correctly.  To do this, you can
+run the `build.sh` script:
+
+```bash
+cd java/  # run this from the main directory
+./build.sh
+```
+
+Last, install the Examplify plugin into Atom by running this
+command in the main folder:
+
+```bash
+apm link
+```
 
 ## Using Examplify
+
+This step assumes that you have already followed all of the
+installation instructions.
 
 If this is your first time using Examplify, or if you have
 changed the contents of the source code files that you want
@@ -64,58 +136,6 @@ and after you comment it, it should look like:
 Remember that you should reload Atom (`Cmd-Ctrl-Option-L`)
 after making changes to the `examplify.coffee` file for stub
 analysis to be disabled.
-
-## Annoying, brittle installation requirements
-
-### Platform requirements
-
-The only workable configuration I have found for satisfying
-Soot and the Node `java` packages is to have JDK version 1.7
-as the primary Java VM.
-
-With our version of Java 1.7, we needed to add a few symbolic
-links so that Soot gets the class definitions it expects:
-
-```bash
-cd $JAVA_HOME
-sudo mkdir Classes
-cd Classes/
-sudo ln -s ../jre/lib/rt.jar classes.jr
-sudo ln -s ../jre/lib/rt.jar ui.jar
-```
-
-See https://github.com/Sable/soot/issues/686 for details on the
-hack we are following.
-
-### Installation instructions
-
-Start out by installing all of the Node dependencies for the
-package by running
-
-```bash
-npm install
-```
-in the `examplify` folder.
-
-This project requires Soot, a static analysis tool, to run.
-The classes for Soot are stored in a pretty large JAR.  It's
-not included in the repository, so for right now, you can
-run this helper script to fetch the dependencies.
-
-```bash
-cd java/libs
-./fetch_libs.sh
-```
-
-You will also need to compile all of the Java analyses once
-before the plugin can run correctly.  To do this, you can
-run the `build.sh` script.
-
-Install into Atom our local Examplify package by running
-```bash
-apm link
-```
-in examplify folder.
 
 ## Developing
 
