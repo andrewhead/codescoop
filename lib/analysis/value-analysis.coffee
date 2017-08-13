@@ -47,7 +47,9 @@ module.exports.ValueAnalysis = class ValueAnalysis
     classPath = (java.classpath.join ':') + ":" + pathToFile
     variableTracer = new PrimitiveValueAnalysis()
     variableTracer.run className, classPath, (error, result) =>
-      err error if error
+      if error?
+        err error
+        return
       callback (@_constructValueMap result)
       @values = result
 

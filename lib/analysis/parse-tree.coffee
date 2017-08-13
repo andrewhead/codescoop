@@ -251,8 +251,12 @@ module.exports.partialParse = partialParse = (codeText, ruleName) ->
   lexer = new JavaLexer inputStream
   tokens = new CommonTokenStream lexer
   parser = new JavaParser tokens
+  # XXX: Don't show error messages from parsing the code.  If it ever becomes
+  # relevant to detect if code correctly parses, replace the `reportError`
+  # method with one that sets a flag, and return null if it's set.
+  parser._errHandler.reportError = =>
   parser.buildParseTrees = true
-  ctx = parser[ruleName]()
+  parser[ruleName]()
 
 
 module.exports.parse = (codeText) ->

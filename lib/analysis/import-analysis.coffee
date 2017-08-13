@@ -81,6 +81,10 @@ module.exports.ImportAnalysis = class ImportAnalysis
 
     fs.readFile @file.getPath(), (fileError, data) =>
 
+      if fileError?
+        err fileError
+        return
+
       importTable = new ImportTable()
 
       # Find all imports in the current code

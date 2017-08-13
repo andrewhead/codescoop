@@ -2,7 +2,7 @@
 { StubSpec } = require "../../lib/model/stub"
 
 
-fdescribe "StubPrinter", ->
+describe "StubPrinter", ->
 
   stubPrinter = undefined
   beforeEach =>

@@ -137,12 +137,13 @@ describe "MainController", ->
 
     # Add some lines to the code editor that can be selected
     codeEditorView = atom.views.getView(codeEditor)
-    ($ (codeEditorView.querySelector 'div.lines')).append $(
-      $("<div class=line data-screen-row=0>Line 1</div>" +
-        "<div class=line data-screen-row=1>Line 2</div>" +
-        "<div class=line data-screen-row=2>Line 3</div>" +
-        "<div class=line data-screen-row=3>Line 4</div>"
-      )
+    ($ (codeEditorView.querySelector "div.scroll-view div:first-child")).append $(
+      "<div class=lines>" +
+          "<div class=line data-screen-row=0>Line 1</div>" +
+          "<div class=line data-screen-row=1>Line 2</div>" +
+          "<div class=line data-screen-row=2>Line 3</div>" +
+          "<div class=line data-screen-row=3>Line 4</div>" +
+        "</div>"
     )
 
     selectedRange = new Range [1, 0], [1, 2]
