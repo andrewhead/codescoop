@@ -24,6 +24,12 @@ out of.
     javax.mail to send a digest of the web page contents to
     an email address.
 
+Each of these files may have specific setup instructions.
+For example, for `CraigslistMonitor.java`, you need to add a
+`/etc/smtp.conf` file to your machine.  If there are special
+setup instructions, they are specified in the `README.md`
+file in the directory with the `.java` file.
+
 **For some of these (`CraigslistMonitor.java`), you should
 disable stub analysis**, as it takes prohibitively long to
 run (way longer than a few minutes).  To disable stub
