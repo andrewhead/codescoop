@@ -162,11 +162,13 @@ following commands:
 ```bash
 CLASSPATH=$JAVA_HOME/jre/lib/rt.jar:libs/*:. java soot.Main Example -src-prec java -f J
 ```
+with the following caveats/substitutions:
+1. Substitute `Example` with the name of your `.java` file
+(though omit the `.java` extension).  
+2. This file will need to be placed in the same directory as the one that you
+are running the command.  
 
-Substitute `Example` with the name of your `.java` file
-(though omit the `.java` extension).  This file will need to
-be placed in the same directory as the one that you are
-running the command.  The options do the following:
+Explanation of those less readable options:
 * `-src-prec java`: runs Soot on a `.java` file instead of a
     `.class` file
 * `-f J`: produces a Jimple IR file (instead of a class)
@@ -217,6 +219,7 @@ Ctrl-Option-Command-l (lowercase L)
 * InstallCert: Compile code with debug flags, e.g., `javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
 * Chat Client: Don't forget to specify the classpath when compiling with debug flags, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
 * Polyglot: `./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
+* BookListing: `Elenas-MacBook-Pro:java elenaglassman$ ./runclass.sh PrimitiveValueAnalysis tests/scenarios/database-use/ BookListing`
 
 #### Dealing with bad VM launch
 
