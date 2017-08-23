@@ -200,9 +200,23 @@ module.exports.ExampleController = class ExampleController
 
   onPropertyChanged: (object, propertyName, oldValue, newValue) ->
 
+    # If the user picked a new range to add, then add it!
+    if propertyName is ExampleModelProperty.CHOSEN_RANGES
+
+      # Make a command for adding a range for each of the chosen ranges.
+      if newValue.length > 0
+        for newRange in newValue
+          commandGroup = @commandCreator.createCommandGroupForChosenRange newRange
+          @commandStack.push commandGroup
+          for command in commandGroup
+            command.apply @model
+
+        # Clear out the list of chosen ranges
+        newValue.reset()
+
     # If the active ranges have changed, stop what is currently happening,
     # and send the controller back to IDLE to check for errors and resolutions
-    if propertyName is ExampleModelProperty.ACTIVE_RANGES
+    else if propertyName is ExampleModelProperty.ACTIVE_RANGES
       @_resetChoiceState()
       @model.setState ExampleModelState.IDLE
 

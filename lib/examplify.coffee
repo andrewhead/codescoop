@@ -54,7 +54,7 @@ module.exports = plugin =
       "examplify:add-selection-to-example": =>
         selectedRange = @codeEditor.getSelectedBufferRange()
         rangeSet = @controller.getModel().getRangeSet()
-        rangeSet.getSnippetRanges().push selectedRange
+        rangeSet.getChosenRanges().push selectedRange
       "examplify:undo": =>
         @controller.exampleController.undo()
     )

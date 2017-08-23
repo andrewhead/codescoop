@@ -6,7 +6,7 @@
 
 module.exports.ExampleModelProperty = ExampleModelProperty =
   UNKNOWN: { value: -1, name: "unknown" }
-  ACTIVE_RANGES: { value: 0, name: "lines-changed" }
+  ACTIVE_RANGES: { value: 0, name: "active-ranges" }
   STATE: { value: 2, name: "state" }
   ERROR_CHOICE: { value: 3, name: "error-choice"}
   RESOLUTION_CHOICE: { value: 4, name: "resolution-choice" }
@@ -28,6 +28,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   FOCUSED_EVENT: { value: 20, name: "focused-event" }
   EXTENSION_DECISION: { value: 21, name: "extension-decision-made" }
   THROWS: { value: 22, name: "throws-changed" }
+  CHOSEN_RANGES: { value: 23, name: "chosen-ranges" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -100,6 +101,8 @@ module.exports.ExampleModel = class ExampleModel
     # For now, it's sufficient to bubble up the event
     if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
       propertyName = ExampleModelProperty.ACTIVE_RANGES
+    else if propertyName is RangeSetProperty.CHOSEN_RANGES_CHANGED
+      propertyName = ExampleModelProperty.CHOSEN_RANGES
     else if object is @edits
       propertyName = ExampleModelProperty.EDITS
     else if object is @auxiliaryDeclarations

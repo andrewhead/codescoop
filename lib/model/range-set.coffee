@@ -3,11 +3,19 @@
 
 module.exports.RangeSetProperty = RangeSetProperty =
   UNKNOWN: { value: -1, name: "unknown" }
+  # Active ranges is the total of all ranges that have currently been added
+  # to the example, from snippets, methods, classes, etc.
   ACTIVE_RANGES_CHANGED: { value: 0, name: "active-ranges-changed" }
+  # Ranges that are "suggested" for a suggested edit.
   SUGGESTED_RANGES_CHANGED: { value: 1, name: "suggested-ranges-changed" }
+  # Ranges that hold an inner class.
   CLASS_RANGES_CHANGED: { value: 2, name: "class-ranges-changed" }
+  # Ranges that include a user-selected snippet.
   SNIPPET_RANGES_CHANGED: { value: 3, name: "snippet-ranges-changed" }
+  # Ranges that hold a full method.
   METHOD_RANGES_CHANGED: { value: 4, name: "method-ranges-changed" }
+  # Lines a user chose that haven't yet been added to the snippet ranges.
+  CHOSEN_RANGES_CHANGED: { value: 5, name: "chosen-ranges-changed" }
 
 
 module.exports.Range = (require 'atom').Range
@@ -52,10 +60,12 @@ module.exports.RangeSet = class RangeSet
   constructor: (snippetRanges, suggestedRanges)->
 
     @snippetRanges = makeObservableArray snippetRanges
+    @chosenRanges = makeObservableArray []
     @methodRanges = makeObservableArray []
     @classRanges = makeObservableArray []
     @suggestedRanges = makeObservableArray suggestedRanges
     @snippetRanges.addObserver @
+    @chosenRanges.addObserver @
     @methodRanges.addObserver @
     @classRanges.addObserver @
     @suggestedRanges.addObserver @
@@ -89,6 +99,8 @@ module.exports.RangeSet = class RangeSet
       propertyName = RangeSetProperty.CLASS_RANGES_CHANGED
     else if object is @suggestedRanges
       propertyName = RangeSetProperty.SUGGESTED_RANGES_CHANGED
+    else if object is @chosenRanges
+      propertyName = RangeSetProperty.CHOSEN_RANGES_CHANGED
     @notifyObservers @, propertyName, oldValue, newValue
 
     # Whenever one of the constituent range lists of active ranges updates,
@@ -121,6 +133,9 @@ module.exports.RangeSet = class RangeSet
 
   getSuggestedRanges: ->
     @suggestedRanges
+
+  getChosenRanges: ->
+    @chosenRanges
 
   getActiveSymbols: (symbols) ->
     activeSymbols = []

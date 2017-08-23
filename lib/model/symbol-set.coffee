@@ -1,4 +1,5 @@
-{ makeObservableArray } = require './observable-array'
+{ makeObservableArray } = require "./observable-array"
+{ Range } = require "./range-set"
 
 
 module.exports.SymbolSetProperty = SymbolSetProperty =
@@ -45,6 +46,12 @@ module.exports.SymbolText = class SymbolText
     (other instanceof SymbolText) and
       (@name is other.getName()) and
       (@range.isEqual other.getRange())
+
+
+module.exports.createSymbol = createSymbol =\
+    (filePath, fileName, name, startPoint, endPoint, type) ->
+  new Symbol (new File filePath, fileName), name,
+    (new Range startPoint, endPoint), type
 
 
 module.exports.Symbol = class Symbol

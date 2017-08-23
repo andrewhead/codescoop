@@ -28,10 +28,16 @@
 { ArchiveEvent } = require "../command/archive-event"
 
 
+# Each of the createCommand* functions returns a group of commands that specify
+# everything needed to revert the fix.  Each function is built to map from
+# a different kind of user suggestion or choice to a command.
 module.exports.CommandCreator = class CommandCreator
 
-  # Return a group of commands that specify everything needed to revert the fix.
-  # This usually means references the commandCreator creates.
+  createCommandGroupForChosenRange: (range) ->
+    commandGroup = []
+    commandGroup.push new AddRange range
+    commandGroup
+
   createCommandGroupForSuggestion: (suggestion) ->
 
     commandGroup = []

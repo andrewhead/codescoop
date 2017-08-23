@@ -41,8 +41,9 @@ module.exports.makeObservableArray = (array = undefined) ->
   array.reset = (elements) ->
     arrayBefore = @.copy()
     @splice 0, @length
-    for element in elements
-      @originalPush element
+    if elements?
+      for element in elements
+        @originalPush element
     @notifyObservers arrayBefore
 
   # Convenience method as we often have to remove things from arrays

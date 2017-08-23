@@ -41,6 +41,20 @@ describe "CommandCreator", ->
 
   TEST_FILE = new File '.', 'test-file.java'
 
+  describe "when a range is chosen", ->
+
+    model = undefined
+    commandGroup = undefined
+    chosenRange = new Range [0, 0], [0, 10]
+    commandCreator = new CommandCreator()
+
+    it "creates a command group with a range addition", ->
+      commandGroup = commandCreator.createCommandGroupForChosenRange chosenRange
+      (expect commandGroup.length).toBe 1
+      command = commandGroup[0]
+      (expect command instanceof AddRange)
+      (expect command.getRange().containsRange new Range [0, 0], [0, 10]).toBe true
+
   describe "when given a DefinitionSuggestion", ->
 
     model = undefined

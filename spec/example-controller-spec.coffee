@@ -10,6 +10,7 @@
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
 
+{ AddRange } = require "../lib/command/add-range"
 { ArchiveEvent } = require "../lib/command/archive-event"
 { CommandStack } = require "../lib/command/command-stack"
 { PACKAGE_PATH } = require "../lib/config/paths"
@@ -438,3 +439,21 @@ describe "ExampleController", ->
       (expect model.getActiveCorrector()).toBe null
       (expect model.getErrorChoice()).toBe null
       (expect model.getSuggestions().length).toBe 0
+
+  describe "when active ranges are added in the middle of another task", ->
+
+    commandStack = new CommandStack()
+    model = _makeDefaultModel()
+    controller = new ExampleController model, { commandStack }
+
+    # Simulate a user choosing a new range
+    model.getRangeSet().getChosenRanges().push new Range [0, 0], [0, 10]
+
+    it "removes the range from the list of chosen ranges", ->
+      (expect model.getRangeSet().getChosenRanges().length).toBe 0
+
+    it "adds the range to the list of snippet ranges", ->
+      (expect commandStack.getHeight()).toBe 1
+      commandGroup = commandStack.peek()
+      (expect commandGroup[0] instanceof AddRange)
+      (expect commandGroup[0].getRange()).toEqual new Range [0, 0], [0, 10]
