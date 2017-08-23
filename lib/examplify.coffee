@@ -36,6 +36,13 @@ module.exports = plugin =
         @codeEditor = atom.workspace.getActiveTextEditor()
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
           (exampleEditor) =>
+            # This editor should be read-only.
+            # Abort any textual changes so user can't type in code.
+            exampleEditor.onWillInsertText (event) => event.cancel()
+            exampleEditorView = atom.views.getView exampleEditor
+            # Set the class, so we can do stylings that hide typical signifiers
+            # of text modifiability, like cursors and highlights.
+            ($ exampleEditorView).addClass 'example-editor'
             @controller = new MainController @codeEditor, exampleEditor
       "examplify:add-selection-to-example": =>
         selectedRange = @codeEditor.getSelectedBufferRange()
@@ -68,8 +75,6 @@ module.exports.MainController = class MainController
 
     # Prepare agents
     @agentRunner = new AgentRunner @exampleModel
-
-    # Prepare views (note that this involves removing *previous* views)
     @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
     @stubPreview = new StubPreview @exampleModel
