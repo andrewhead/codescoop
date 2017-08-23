@@ -19,11 +19,11 @@
 
 }
 
-atom-text-editor div.line {
+atom-text-editor.source-editor div.line {
   &.active {
     opacity: 1;
   }
-  &.inactive {
+  &:not(.active) {
     opacity: .5;
     &.suggested {
       opacity: 1;

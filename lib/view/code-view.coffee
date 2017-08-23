@@ -58,6 +58,8 @@ module.exports.CodeView = class CodeView
       # the 'screen-row' data property to work
       screenRowNumber = Number(line[0].dataset.screenRow)
       line.addClass (
+        # XXX: sometimes when the cursor is moved to a line, it overwrites the
+        # class assignments that we set here.
         if (screenRowNumber in activeRows)\
         then 'active' else 'inactive'
         )

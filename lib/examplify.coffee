@@ -33,7 +33,13 @@ module.exports = plugin =
     @subscriptions = new CompositeDisposable()
     @subscriptions.add (atom.commands.add "atom-workspace",
       "examplify:make-example-code": =>
+
+        # Mark the current code editor as the source editor
         @codeEditor = atom.workspace.getActiveTextEditor()
+        codeEditorView = atom.views.getView @codeEditor
+        ($ codeEditorView).addClass 'source-editor'
+
+        # Launch a new editor to hold the example code.
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
           (exampleEditor) =>
             # This editor should be read-only.
@@ -44,6 +50,7 @@ module.exports = plugin =
             # of text modifiability, like cursors and highlights.
             ($ exampleEditorView).addClass 'example-editor'
             @controller = new MainController @codeEditor, exampleEditor
+
       "examplify:add-selection-to-example": =>
         selectedRange = @codeEditor.getSelectedBufferRange()
         rangeSet = @controller.getModel().getRangeSet()
