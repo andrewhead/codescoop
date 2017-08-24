@@ -109,4 +109,11 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector extends E
     for activeRange in activeRanges
       if activeRange.intersectsWith firstControlStructureRange
         return true
-    false
+
+    # The inner range for the event still needs to be in the active ranges.
+    # If it's removed through an undo, this event is obsolete.
+    for activeRange in activeRanges
+      if activeRange.isEqual event.getInsideRange()
+        return false
+
+    true
