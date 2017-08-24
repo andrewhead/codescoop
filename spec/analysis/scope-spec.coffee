@@ -1,5 +1,4 @@
 { InputStream, CommonTokenStream } = require "antlr4"
-{ JavaLexer } = require "../../lib/grammar/Java/JavaLexer"
 { JavaParser } = require "../../lib/grammar/Java/JavaParser"
 { ScopeFinder } = require "../../lib/analysis/scope"
 { BlockScope, ForLoopScope, MethodScope, ClassScope } = require "../../lib/analysis/scope"

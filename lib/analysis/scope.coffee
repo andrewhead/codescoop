@@ -113,6 +113,8 @@ module.exports.Scope = class Scope
 
     # Find all nested scopes.  We want to ignore any
     # declarations from within these scopes.
+    # TODO(andrew): find a better solution to this that doesn't require a
+    # ScopeFinder.  One option is to skip nested blocks based on ctx type.
     scopeFinder = new ScopeFinder @file, new ParseTree @ctx
     allScopes = scopeFinder.findAllScopes()
     nestedScopes = []
