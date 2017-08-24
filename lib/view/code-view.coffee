@@ -14,6 +14,7 @@ module.exports.CodeView = class CodeView
     @textEditor = textEditor
     @rangeSet = rangeSet
     @rangeSet.addObserver @
+    @listenForLineClick()
     @listenForRefocus()
     @updateHighlights()
 
@@ -72,6 +73,14 @@ module.exports.CodeView = class CodeView
     suggestedRange = @rangeSet.getSuggestedRanges()[0]
     @textEditor.scrollToBufferPosition \
       [suggestedRange.start.row, suggestedRange.start.column]
+
+  listenForLineClick: ->
+    editorView = (atom.views.getView @textEditor)
+    (($ editorView).find '.gutter').on 'click', '.line-number', (event) =>
+      rowNumber = Number(event.target.dataset.screenRow)
+      lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
+      newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
+      @rangeSet.getChosenRanges().push newRange
 
   listenForRefocus: ->
 

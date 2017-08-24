@@ -25,6 +25,16 @@ describe "CodeView", () ->
         "</div>"
     )
 
+  _addGutter = (editorView) ->
+    ($ (editorView.querySelector "div.gutter.line-numbers")).append $(
+      "<div>" +
+          "<div class='line-number' data-screen-row='0'></div>" +
+          "<div id='second' class='line-number' data-screen-row='1'></div>" +
+          "<div class='line-number' data-screen-row='2'></div>" +
+          "<div class='line-number' data-screen-row='3'></div>" +
+      "</div>"
+    )
+
   it "highlights the chosen lines and dims the rest", ->
 
     rangeSet = new RangeSet [ new Range [1, 0], [1, 5] ]
@@ -59,6 +69,21 @@ describe "CodeView", () ->
     (expect ($ (editorView.querySelectorAll "div.lines .active")).length).toBe 0
     rangeSet.getSnippetRanges().push new Range [1, 0], [1, 5]
     (expect ($ (editorView.querySelectorAll "div.lines .active")).length).toBe 1
+
+  it "adds a chosen range when a line number is clicked in the gutter", ->
+
+    rangeSet = new RangeSet []
+    editor = _makeEditor()
+    codeView = new CodeView editor, rangeSet
+    editorView = atom.views.getView editor
+    console.log editorView
+    _addLines editorView
+    _addGutter editorView
+
+    (expect rangeSet.getChosenRanges().length).toBe 0
+    ($(($ editorView).find '.line-number#second')).click()
+    (expect rangeSet.getChosenRanges().length).toBe 1
+    (expect rangeSet.getChosenRanges()[0]).toEqual new Range [1, 0], [1, 6]
 
   it "adds an extra highlight to suggested lines", ->
 
