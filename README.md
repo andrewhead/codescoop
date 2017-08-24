@@ -71,6 +71,21 @@ command in the main folder:
 apm link
 ```
 
+### Adding the Script package to Atom
+
+This lets you compile and run Java from Atom.  We made a fork
+of the `script` package with the right text sizing and with a
+tweaks to the Java classpath argument.
+
+To clone the repository and install the package, do this:
+
+```bash
+git clone https://github.com/andrewhead/atom-script
+cd atom-script
+npm install
+apm link
+```
+
 ## Using Examplify
 
 This step assumes that you have already followed all of the
