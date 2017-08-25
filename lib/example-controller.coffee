@@ -37,6 +37,7 @@ module.exports.ExampleController = class ExampleController
     analyses = extras.analyses or {}
     importAnalysis = analyses.importAnalysis
     variableDefUseAnalysis = analyses.variableDefUseAnalysis
+    forLoopVariableDefAnalysis = analyses.forLoopVariableDefAnalysis
     methodDefUseAnalysis = analyses.methodDefUseAnalysis
     typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
@@ -75,11 +76,13 @@ module.exports.ExampleController = class ExampleController
     ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-      typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis
+    @_startAnalyses importAnalysis, variableDefUseAnalysis,
+      forLoopVariableDefAnalysis,methodDefUseAnalysis, typeDefUseAnalysis,
+      valueAnalysis, stubAnalysis, declarationsAnalysis
 
-  _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-    typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis) ->
+  _startAnalyses: (importAnalysis, variableDefUseAnalysis,
+    forLoopVariableDefAnalysis, methodDefUseAnalysis, typeDefUseAnalysis,
+    valueAnalysis, stubAnalysis, declarationsAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -93,6 +96,14 @@ module.exports.ExampleController = class ExampleController
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
+        error: console.error
+      forLoopVariableDef:
+        runner: forLoopVariableDefAnalysis
+        callback: (definitions) =>
+          for def in definitions
+            # console.log "Found def", def
+            # @model.getSymbols().getVariableDefs().push def
+            console.log "lup"
         error: console.error
       methodDefUse:
         runner: methodDefUseAnalysis

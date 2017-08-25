@@ -5,6 +5,7 @@
 
 { ImportAnalysis } = require "../lib/analysis/import-analysis"
 { VariableDefUseAnalysis } = require "../lib/analysis/variable-def-use"
+{ ForLoopVariableDefAnalysis } = require "../lib/analysis/for-loop-variable-def"
 { MethodDefUseAnalysis } = require "../lib/analysis/method-def-use"
 { TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
@@ -52,6 +53,7 @@ describe "ExampleController", ->
     valueAnalysis = new ValueAnalysis testFile
     stubAnalysis = new StubAnalysis testFile
     declarationsAnalysis = new DeclarationsAnalysis symbolSet, testFile, parseTree
+    forLoopVariableDefAnalysis = new ForLoopVariableDefAnalysis testFile, parseTree
 
     controller = undefined
     importTable = undefined

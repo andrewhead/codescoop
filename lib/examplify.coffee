@@ -9,6 +9,7 @@
 { ExampleController } = require "./example-controller"
 { ImportAnalysis } = require "./analysis/import-analysis"
 { VariableDefUseAnalysis } = require "./analysis/variable-def-use"
+{ ForLoopVariableDefAnalysis } = require "../lib/analysis/for-loop-variable-def"
 { MethodDefUseAnalysis } = require "./analysis/method-def-use"
 { TypeDefUseAnalysis } = require "./analysis/type-def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
@@ -97,6 +98,7 @@ module.exports.MainController = class MainController
     @analyses =
       importAnalysis: new ImportAnalysis codeEditorFile
       variableDefUseAnalysis: new VariableDefUseAnalysis codeEditorFile
+      # forLoopVariableDefAnalysis: new ForLoopVariableDefAnalysis codeEditorFile, @parseTree
       methodDefUseAnalysis: new MethodDefUseAnalysis codeEditorFile, @parseTree
       typeDefUseAnalysis: new TypeDefUseAnalysis codeEditorFile, @parseTree
       valueAnalysis: new ValueAnalysis codeEditorFile
