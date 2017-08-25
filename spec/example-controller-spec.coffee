@@ -9,6 +9,7 @@
 { TypeDefUseAnalysis } = require "../lib/analysis/type-def-use"
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
+{ DeclarationsAnalysis } = require "../lib/analysis/declarations"
 
 { AddRange } = require "../lib/command/add-range"
 { ArchiveEvent } = require "../lib/command/archive-event"
@@ -38,6 +39,11 @@ describe "ExampleController", ->
     code = (fs.readFileSync testFile.getPath()).toString()
     parseTree = parse code
 
+    symbolSet = new SymbolSet()
+    model = new ExampleModel _makeCodeBuffer(),
+      (new RangeSet [ new Range [5, 0], [5, 10] ]), symbolSet,
+      parseTree, new ValueMap()
+
     # Prepare the analyses
     variableDefUseAnalysis = new VariableDefUseAnalysis testFile
     methodDefUseAnalysis = new MethodDefUseAnalysis testFile, parseTree
@@ -45,9 +51,7 @@ describe "ExampleController", ->
     importAnalysis = new ImportAnalysis testFile
     valueAnalysis = new ValueAnalysis testFile
     stubAnalysis = new StubAnalysis testFile
-    model = new ExampleModel _makeCodeBuffer(),
-      (new RangeSet [ new Range [5, 0], [5, 10] ]), new SymbolSet(),
-      parseTree, new ValueMap()
+    declarationsAnalysis = new DeclarationsAnalysis symbolSet, testFile, parseTree
 
     controller = undefined
     importTable = undefined
@@ -56,6 +60,7 @@ describe "ExampleController", ->
     typeDefs = undefined
     valueMap = undefined
     stubSpecTable = undefined
+    symbolTable = undefined
 
     it "enters the IDLE state when initial analyses finish", ->
 
@@ -64,7 +69,7 @@ describe "ExampleController", ->
         controller = new ExampleController model,
           analyses: { importAnalysis, variableDefUseAnalysis,
             methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
-            stubAnalysis }
+            stubAnalysis, declarationsAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>
@@ -75,12 +80,14 @@ describe "ExampleController", ->
         typeDefs = model.getSymbols().getTypeDefs()
         valueMap = model.getValueMap()
         stubSpecTable = model.getStubSpecTable()
+        symbolTable = model.getSymbolTable()
 
         ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
           (methodDefs.length > 0) and (typeDefs.length > 0) and
           valueMap? and ("Example.java" of valueMap) and
           stubSpecTable? and
-          importTable?)
+          importTable? and
+          symbolTable?)
 
       # Once analyses complete, we wait for a transition into the IDLE state
       waitsFor =>

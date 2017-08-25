@@ -372,8 +372,6 @@ module.exports.ExampleView = class ExampleView
         class: "error-choice-highlight"
       decoration = @textEditor.decorateMarker marker, params
 
-    ($ '.error-choice-highlight').mouseover => console.log "Heya"
-
   _addResolutionWidget: (suggestions) ->
 
     # Make a marker for the target use

@@ -13,6 +13,7 @@
 { TypeDefUseAnalysis } = require "./analysis/type-def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
 { StubAnalysis } = require "./analysis/stub-analysis"
+{ DeclarationsAnalysis } = require "./analysis/declarations"
 
 { AgentRunner } = require "./agent/agent-runner"
 
@@ -99,7 +100,8 @@ module.exports.MainController = class MainController
       methodDefUseAnalysis: new MethodDefUseAnalysis codeEditorFile, @parseTree
       typeDefUseAnalysis: new TypeDefUseAnalysis codeEditorFile, @parseTree
       valueAnalysis: new ValueAnalysis codeEditorFile
-      stubAnalysis: new StubAnalysis codeEditorFile
+      # stubAnalysis: new StubAnalysis codeEditorFile
+      declarationsAnalysis: new DeclarationsAnalysis @symbols, codeEditorFile, @parseTree
 
     # Prepare controllers
     @exampleController = new ExampleController \

@@ -41,6 +41,7 @@ module.exports.ExampleController = class ExampleController
     typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
+    declarationsAnalysis = analyses.declarationsAnalysis
 
     @correctors = extras.correctors or [
         checker: new MissingDefinitionDetector()
@@ -75,10 +76,10 @@ module.exports.ExampleController = class ExampleController
 
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-      typeDefUseAnalysis, valueAnalysis, stubAnalysis
+      typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis
 
   _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-    typeDefUseAnalysis, valueAnalysis, stubAnalysis) ->
+    typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -114,6 +115,11 @@ module.exports.ExampleController = class ExampleController
         runner: stubAnalysis or= null
         callback: (stubSpecTable) =>
           @model.setStubSpecTable stubSpecTable
+        error: console.error
+      declarations:
+        runner: declarationsAnalysis or= null
+        callback: (symbolTable) =>
+          @model.setSymbolTable symbolTable
         error: console.error
 
     # Run analyses sequentially.  Soot can't handle when more than one

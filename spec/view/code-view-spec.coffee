@@ -76,7 +76,6 @@ describe "CodeView", () ->
     editor = _makeEditor()
     codeView = new CodeView editor, rangeSet
     editorView = atom.views.getView editor
-    console.log editorView
     _addLines editorView
     _addGutter editorView
 

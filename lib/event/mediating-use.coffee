@@ -1,7 +1,6 @@
 { EventDetector } = require "./event-detector"
 { ExampleModelProperty } = require "../model/example-model"
 { getDefsForUse } = require "../suggester/definition-suggester"
-{ getDeclarationScope } = require "../error/missing-declaration"
 
 
 module.exports.MediatingUseEvent = class MediatingUseEvent
@@ -46,6 +45,7 @@ module.exports.MediatingUseDetector = class MediatingUseDetector extends EventDe
     symbolSet = @model.getSymbols()
     activeUses = rangeSet.getActiveSymbols symbolSet.getVariableUses()
     activeDefs = rangeSet.getActiveSymbols symbolSet.getVariableDefs()
+    symbolTable = @model.getSymbolTable()
 
     for endUse in activeUses
 
@@ -57,8 +57,6 @@ module.exports.MediatingUseDetector = class MediatingUseDetector extends EventDe
       # in the set of active symbols
       if def in activeDefs
 
-        defScope = getDeclarationScope def, @model.getParseTree()
-
         # Inspect all uses to see if they are a mediating use
         for use in symbolSet.getVariableUses()
 
@@ -69,8 +67,7 @@ module.exports.MediatingUseDetector = class MediatingUseDetector extends EventDe
               ((use.getRange().compare endUse.getRange()) is -1)
 
             # It also has to refer to the same variable as the def
-            useScope = getDeclarationScope use, @model.getParseTree()
-            if useScope.equals defScope
+            if symbolTable.areTheSameVariable use, def
 
               # If all of these conditions hold, it's a mediating use.
               # Add it to the list of events, but only if this mediating use

@@ -1,6 +1,7 @@
 { parse } = require "../../lib/analysis/parse-tree"
 { ExampleModel } = require "../../lib/model/example-model"
-{ File, Symbol } = require "../../lib/model/symbol-set"
+{ SymbolTable } = require "../../lib/model/symbol-table"
+{ File, Symbol, createSymbol } = require "../../lib/model/symbol-set"
 { Range } = require "../../lib/model/range-set"
 { MediatingUseEvent, MediatingUseDetector } = require "../../lib/event/mediating-use"
 
@@ -9,45 +10,50 @@ describe "MediatingUseDetector", ->
 
   model = undefined
   detector = undefined
-  testFile = undefined
   beforeEach =>
-    parseTree = parse [
-      "public class Example {"
-      "  public static void main(String[] args) {"
-      "    int i = 1;"
-      "    int j = 2;"
-      "    System.out.println(i);"
-      "    System.out.println(i);"
-      "    System.out.println(j);  // Ignored, it isn't i"
-      "    i + 1;"
-      "  }"
-      "  public static void anotherMethod() {"
-      "    int i = 1;"
-      "    System.out.println(i);"
-      "  }"
-      "}"
-    ].join "\n"
-    testFile = new File "path", "file_name"
-    defs = [
-      # In the 'main' function: this is where most tests will focus
-      new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"
-      new Symbol testFile, "j", (new Range [3, 8], [3, 9]), "int"
-      # In 'anotherMethod'.  This is for more specialized tests
-      new Symbol testFile, "i", (new Range [10, 8], [10, 9]), "int"
-    ]
-    uses = [
-      # In the 'main' function
-      new Symbol testFile, "i", (new Range [4, 23], [4, 24]), "int"
-      new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int"
-      new Symbol testFile, "j", (new Range [6, 23], [6, 24]), "int"
-      new Symbol testFile, "i", (new Range [7, 4], [7, 5]), "int"
-      # In 'anotherMethod'
-      new Symbol testFile, "i", (new Range [11, 23], [11, 24]), "int"
-    ]
+    # This test is based on the following example:
+    # public class Example {
+    #   public static void main(String[] args) {
+    #     int i = 1;
+    #     int j = 2;
+    #     System.out.println(i);
+    #     System.out.println(i);
+    #     System.out.println(j);  // Ignored, it isn't i
+    #     i + 1;
+    #   }
+    #   public static void anotherMethod() {
+    #     int i = 1;
+    #     System.out.println(i);
+    #   }
+    # }
+
+    # In the 'main' function: this is where most tests will focus
+    iDef = createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"
+    jDef = createSymbol "path", "filename", "j", [3, 8], [3, 9], "int"
+    # In 'anotherMethod'.  This is for more specialized tests
+    iDef2 = createSymbol "path", "filename", "i", [10, 8], [10, 9], "int"
+
+    # In the 'main' function
+    iUse = createSymbol "path", "filename", "i", [4, 23], [4, 24], "int"
+    iUse2 = createSymbol "path", "filename", "i", [5, 23], [5, 24], "int"
+    jUse = createSymbol "path", "filename", "j", [6, 23], [6, 24], "int"
+    iUse3 = createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"
+    # In 'anotherMethod'
+    iUse4 = createSymbol "path", "filename", "i", [11, 23], [11, 24], "int"
+
     model = new ExampleModel()
-    model.setParseTree parseTree
-    model.getSymbols().getVariableUses().reset uses
-    model.getSymbols().getVariableDefs().reset defs
+    model.getSymbols().getVariableUses().reset [iUse, iUse2, jUse, iUse3, iUse4]
+    model.getSymbols().getVariableDefs().reset [iDef, jDef, iDef2]
+    symbolTable = new SymbolTable()
+    symbolTable.putDeclaration iDef, iDef.getSymbolText()
+    symbolTable.putDeclaration iUse, iDef.getSymbolText()
+    symbolTable.putDeclaration iUse2, iDef.getSymbolText()
+    symbolTable.putDeclaration iUse3, iDef.getSymbolText()
+    symbolTable.putDeclaration iDef2, iDef2.getSymbolText()
+    symbolTable.putDeclaration iUse4, iDef2.getSymbolText()
+    symbolTable.putDeclaration jDef, jDef.getSymbolText()
+    symbolTable.putDeclaration jUse, jDef.getSymbolText()
+    model.setSymbolTable symbolTable
     detector = new MediatingUseDetector model
 
   it "finds uses between a def and use and returns them in line order", ->
@@ -88,9 +94,9 @@ describe "MediatingUseDetector", ->
 
   it "doesn't detect an intervening use that was already queued", ->
     model.getEvents().push new MediatingUseEvent \
-      (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),    # 'i' def
-      (new Symbol testFile, "i", (new Range [7, 4], [7, 5]), "int"),    # 'i' final use
-      (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")   # 'i' mediating use
+      (createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"),    # 'i' def
+      (createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"),    # 'i' final use
+      (createSymbol "path", "filename", "i", [5, 23], [5, 24], "int")   # 'i' mediating use
     # This set of active ranges will produce exactly the same mediating
     # event as the one that is already enqueued in the model's events
     snippetRanges = [
@@ -102,9 +108,9 @@ describe "MediatingUseDetector", ->
 
   it "doesn't detect an intervening use that was already viewed", ->
     model.getViewedEvents().push new MediatingUseEvent \
-      (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),    # 'i' def
-      (new Symbol testFile, "i", (new Range [7, 4], [7, 5]), "int"),    # 'i' final use
-      (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")   # 'i' mediating use
+      (createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"),    # 'i' def
+      (createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"),    # 'i' final use
+      (createSymbol "path", "filename", "i", [5, 23], [5, 24], "int")   # 'i' mediating use
     # This set of active ranges will produce exactly the same mediating
     # event as the one that is already enqueued in the model's events
     snippetRanges = [
@@ -119,31 +125,32 @@ describe "MediatingUseDetector", ->
     model = undefined
     detector = undefined
     beforeEach =>
-      parseTree = parse [
-        "public class Example {"
-        "  public static void main(String[] args) {"
-        "    int i = 1;"
-        "    {"
-        "        int i = 2;"
-        "        System.out.println(i);"
-        "    }"
-        "    i + 1;"
-        "  }"
-        "}"
-      ].join "\n"
-      testFile = new File "path", "file_name"
-      defs = [
-        new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"
-        new Symbol testFile, "j", (new Range [4, 12], [4, 13]), "int"
-      ]
-      uses = [
-        new Symbol testFile, "i", (new Range [5, 27], [5, 28]), "int"
-        new Symbol testFile, "i", (new Range [7, 4], [7, 5]), "int"
-      ]
+      # This test case is based on the following example:
+      # public class Example {
+      #   public static void main(String[] args) {
+      #     int i = 1;
+      #     {
+      #         int i = 2;
+      #         System.out.println(i);
+      #     }
+      #     i + 1;
+      #   }
+      # }
+
+      iDef = createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"
+      iDef2 = createSymbol "path", "filename", "i", [4, 12], [4, 13], "int"
+      iUse = createSymbol "path", "filename", "i", [5, 27], [5, 28], "int"
+      iUse2 = createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"
+
       model = new ExampleModel()
-      model.setParseTree parseTree
-      model.getSymbols().getVariableUses().reset uses
-      model.getSymbols().getVariableDefs().reset defs
+      model.getSymbols().getVariableUses().reset [iUse, iUse2]
+      model.getSymbols().getVariableDefs().reset [iDef, iDef2]
+      symbolTable = new SymbolTable()
+      symbolTable.putDeclaration iDef, iDef.getSymbolText()
+      symbolTable.putDeclaration iDef2, iDef2.getSymbolText()
+      symbolTable.putDeclaration iUse, iDef2.getSymbolText()
+      symbolTable.putDeclaration iUse2, iDef.getSymbolText()
+      model.setSymbolTable symbolTable
       detector = new MediatingUseDetector model
 
     it "only detects uses that correspond to the declaration of the def", ->

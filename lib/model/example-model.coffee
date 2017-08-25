@@ -17,7 +17,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   ACTIVE_CORRECTOR: { value: 9, name: "active-corrector" }
   AUXILIARY_DECLARATIONS: { value: 10, name: "auxiliary-declarations" }
   STUB_OPTION: { value: 11, name: "stub-option" }
-  STUB_SPEC_TABLE: {value: 12, name: "stub-table" }
+  STUB_SPEC_TABLE: { value: 12, name: "stub-table" }
   STUB_SPECS: { value: 13, name: "stub-specs" }
   PARSE_TREE: { value: 14, name: "parse-tree" }
   IMPORT_TABLE: { value: 15, name: "import-table" }
@@ -29,6 +29,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   EXTENSION_DECISION: { value: 21, name: "extension-decision-made" }
   THROWS: { value: 22, name: "throws-changed" }
   CHOSEN_RANGES: { value: 23, name: "chosen-ranges" }
+  SYMBOL_TABLE: { value: 24, name: "symbol-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -84,6 +85,7 @@ module.exports.ExampleModel = class ExampleModel
     @stubOption = null
     @stubSpecTable = null
     @stubSpecs = makeObservableArray []
+    @symbolTable = null
 
     @focusedEvent = null
     @proposedExtension = null
@@ -238,6 +240,15 @@ module.exports.ExampleModel = class ExampleModel
 
   getImportTable: ->
     @importTable
+
+  setSymbolTable: (symbolTable) ->
+    oldSymbolTable = symbolTable
+    @symbolTable = symbolTable
+    @notifyObservers @, ExampleModelProperty.SYMBOL_TABLE, oldSymbolTable,
+      @symbolTable
+
+  getSymbolTable: ->
+    @symbolTable
 
   getImports: ->
     @imports

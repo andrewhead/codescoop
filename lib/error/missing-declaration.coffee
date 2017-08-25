@@ -2,26 +2,7 @@
 { JavaParser } = require "../grammar/Java/JavaParser"
 
 
-module.exports.getDeclarationScope = getDeclarationScope = (symbol, parseTree) ->
-
-  scopeFinder = new ScopeFinder symbol.getFile(), parseTree
-  scopes = scopeFinder.findSymbolScopes symbol
-
-  # Look for scopes that contain the declaration of this symbol,
-  # from the most specific to the most broad scope the symbol appears in.
-  # We have found the declaration when the symbol was declared in the scope
-  # *and* the symbol appeared after the declaration.
-  for scope in scopes
-    declarations = scope.getDeclarations()
-    for declaration in declarations
-      # By checking for the "compare" result 0 and -1 we get both
-      # ranges that coincide (definition *is* a declaration) and declarations
-      # that appear before the definition.
-      if (declaration.getName() is symbol.getName()) and
-          ((declaration.getRange().compare symbol.getRange()) in [-1, 0])
-        return scope
-
-
+###
 module.exports.isSymbolDeclaredInParameters = \
     isSymbolDeclaredInParameters = (symbol, parseTree) ->
 
@@ -50,6 +31,7 @@ module.exports.isSymbolDeclaredInParameters = \
     parentCtx = parentCtx.parentCtx
 
   false
+###
 
 
 module.exports.MissingDeclarationError = class MissingDeclarationError
@@ -67,9 +49,9 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
 
   detectErrors: (model) ->
 
-    parseTree = model.getParseTree()
     rangeSet = model.getRangeSet()
     symbolSet = model.getSymbols()
+    symbolTable = model.getSymbolTable()
 
     # First, just look for all symbols that used in the example editor
     activeSymbols = []
@@ -83,8 +65,6 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
     missingDeclarations = []
     for symbol in activeSymbols
 
-      scopeFinder = new ScopeFinder symbol.getFile(), parseTree
-      symbolScopes = scopeFinder.findSymbolScopes symbol
       foundDeclaration = false
 
       # We don't need to declare any temporary symbols
@@ -102,12 +82,11 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
 
       # Look for a declaration in all scopes that the symbol appears in.  Only
       # report a declaration as "found" if it is in one of the active ranges.
-      for scope in symbolScopes
-        for declaredSymbolText in scope.getDeclarations()
-          for activeRange in rangeSet.getActiveRanges()
-            if (activeRange.containsRange declaredSymbolText.getRange()) and
-               (declaredSymbolText.getName() is symbol.getName())
-              foundDeclaration = true
+      declaredSymbolText = symbolTable.getDeclaration symbol
+      for activeRange in rangeSet.getActiveRanges()
+        if (activeRange.containsRange declaredSymbolText.getRange()) and
+           (declaredSymbolText.getName() is symbol.getName())
+          foundDeclaration = true
 
       if not foundDeclaration
         missingDeclarations.push new MissingDeclarationError symbol

@@ -26,6 +26,11 @@ module.exports.File = class File
       (other.getName() is @fileName)
 
 
+module.exports.createSymbolText = createSymbolText = \
+    (name, startPoint, endPoint) ->
+  new SymbolText name, (new Range startPoint, endPoint)
+
+
 # This is a 'lite' version of Symbol, where all that is known is the
 # range in a buffer where it appeared, and its name.  This can be useful,
 # for instance, when we don't have the type, but still want to compare
@@ -85,6 +90,9 @@ module.exports.Symbol = class Symbol
 
   getType: ->
     @type
+
+  getSymbolText: ->
+    new SymbolText @name, @range
 
 
 module.exports.SymbolSet = class SymbolSet
