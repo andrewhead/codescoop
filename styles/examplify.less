@@ -28,8 +28,16 @@ atom-text-editor.source-editor div.line {
     &.suggested {
       opacity: 1;
       background-color: fade(@syntax-color-renamed, 40%);
+      animation: pulsate 1.5s ease-in-out;
+      animation-iteration-count: infinite;
     }
   }
+}
+
+@keyframes pulsate {
+  0%   { background-color: fade(@syntax-color-renamed, 20%); }
+  50%  { background-color: fade(@syntax-color-renamed, 40%); }
+  100% { background-color: fade(@syntax-color-renamed, 20%); }
 }
 
 atom-text-editor div.line.definition span {
