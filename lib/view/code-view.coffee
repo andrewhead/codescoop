@@ -22,7 +22,6 @@ module.exports.CodeView = class CodeView
     @editor
 
   onPropertyChanged: (object, propertyName, oldValue, newValue) ->
-    console.log "Heard property changed"
     @updateHighlights() if (
       propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED or
       propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED
