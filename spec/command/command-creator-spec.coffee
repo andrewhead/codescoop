@@ -1,6 +1,6 @@
 { CommandCreator } = require "../../lib/command/command-creator"
 { ExampleModel } = require "../../lib/model/example-model"
-{ Symbol, SymbolSet, File } = require "../../lib/model/symbol-set"
+{ Symbol, SymbolSet, File, createSymbol } = require "../../lib/model/symbol-set"
 { Range, RangeSet } = require "../../lib/model/range-set"
 { TextBuffer } = require "atom"
 { StubSpec } = require "../../lib/model/stub"
@@ -246,27 +246,25 @@ describe "CommandCreator", ->
         commandCreator = new CommandCreator()
         testFile = new File "path", "file_name"
 
-      it "on acceptance, creates a command group with a line addition", ->
-        decision = new ExtensionDecision \
-          (new MediatingUseEvent()),
-          (new MediatingUseExtension \
-            (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),
-            (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")),
-          true
-        commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
-        (expect commandGroup.length).toBe 2
-        (expect commandGroup[1] instanceof AddLineForRange).toBe true
-        (expect commandGroup[1].getRange()).toEqual new Range [5, 23], [5, 24]
+      # There is no longer an "acceptance" criteria for mediating uses.
+      # it "on acceptance, creates a command group with a line addition", ->
 
       it "on rejection, creates a command group an event archiving command", ->
         decision = new ExtensionDecision \
           (new MediatingUseEvent()),
           (new MediatingUseExtension \
-            (new Symbol testFile, "i", (new Range [2, 8], [2, 9]), "int"),
-            (new Symbol testFile, "i", (new Range [5, 23], [5, 24]), "int")),
+            (createSymbol "path", "filename", "i", [5, 23], [5, 24], "int"),
+            [
+              (createSymbol "path", "filename", "i", [2, 8], [2, 9], "int")
+              (createSymbol "path", "filename", "i", [3, 12], [3, 13], "int")
+            ],
+            [
+              new MediatingUseEvent(),
+              new MediatingUseEvent()
+            ]),
           false
         commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
-        (expect commandGroup.length).toBe 1
+        (expect commandGroup.length).toBe 2
         (expect commandGroup[0] instanceof ArchiveEvent).toBe true
 
     describe "when given a decision for MethodThrowsExtension", ->

@@ -25,8 +25,5 @@ module.exports.ControlStructureExtensionView = \
     # for later elements as we remove items.
     suggestedRanges = @model.getRangeSet().getSuggestedRanges()
     return if suggestedRanges.length is 0
-    for suggestedRangeIndex in [(suggestedRanges.length - 1)..0]
-      suggestedRange = suggestedRanges[suggestedRangeIndex]
-      for range in @extension.getRanges()
-        if range is suggestedRange
-          suggestedRanges.splice suggestedRangeIndex, 1
+    for range in @extension.getRanges()
+      suggestedRanges.remove range

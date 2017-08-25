@@ -83,16 +83,22 @@ module.exports.CommandCreator = class CommandCreator
 
   createCommandGroupForExtensionDecision: (extensionDecision) ->
 
+    extension = extensionDecision.getExtension()
     commandGroup = []
 
     # Regardless of whether the extension was accepted, store a record
-    # that the event has been addressed
-    commandGroup.push new ArchiveEvent extensionDecision.getEvent()
+    # that the event has been addressed.
+    # Some extension have multiple associated events (e.g., if they ask
+    # the user to review multiple choices at once).  For these, all of the
+    # associated events should be archived.
+    if extension instanceof MediatingUseExtension
+      for event in extension.getEvents()
+        commandGroup.push new ArchiveEvent event
+    else
+      commandGroup.push new ArchiveEvent extensionDecision.getEvent()
 
     # Don't create a fix from the extension if it wasn't accepted
     if extensionDecision.getDecision()
-
-      extension = extensionDecision.getExtension()
 
       if extension instanceof ControlStructureExtension
         for range in extension.getRanges()

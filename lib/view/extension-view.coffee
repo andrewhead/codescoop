@@ -24,7 +24,7 @@ module.exports.ExtensionView = class ExtensionView extends $
 
     # When the accept button is hovered over, we show a preview.
     # When it's clicked, we tell the model the extension was accepted.
-    acceptButton = $ "<div></div>"
+    @acceptButton = $ "<div></div>"
       .attr "id", "accept_button"
       .text "Accept"
       .click (event) => @revert(); @model.setExtensionDecision true
@@ -32,7 +32,7 @@ module.exports.ExtensionView = class ExtensionView extends $
       .mouseout (event) => @revert()
       .appendTo element
 
-    rejectButton = $ "<div></div>"
+    @rejectButton = $ "<div></div>"
       .attr "id", "reject_button"
       .text "Reject"
       .click (event) => @revert(); @model.setExtensionDecision false

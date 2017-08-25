@@ -176,12 +176,13 @@ module.exports.ExampleController = class ExampleController
 
   checkForExtensions: ->
 
-    event = @model.getEvents()[0]
+    events = @model.getEvents()
+    event = events[0]
 
     # Try to apply each extender to the event, returning once a viable
     # extension is found for the event.
     for extender in @extenders
-      extension = extender.extender.getExtension event
+      extension = extender.extender.getExtension event, events
       if extension?
         @model.setFocusedEvent event
         @model.setProposedExtension extension
