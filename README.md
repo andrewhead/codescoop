@@ -86,6 +86,14 @@ npm install
 apm link
 ```
 
+### Adding the Atom clock to Atom
+
+This is important for being able to trace study video back
+to log data.  Install the `atom-clock` package in Atom
+(go to Preferences->Install->type in query "atom-clock").  In
+the preferences for the package, set the format to 
+`MMMM Do, dddd, h:mm:ss a`.
+
 ## Using Examplify
 
 This step assumes that you have already followed all of the
