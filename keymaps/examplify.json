@@ -1,6 +1,5 @@
 {
   "atom-workspace": {
-    "ctrl-alt-o": "examplify:toggle",
-    "ctrl-z": "examplify:undo"
+    "cmd-z": "examplify:undo"
   }
 }

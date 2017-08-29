@@ -1,4 +1,5 @@
 { Range, RangeSetProperty } = require '../model/range-set'
+log = require 'examplify-log'
 $ = require 'jquery'
 
 CodeViewerState =
@@ -78,6 +79,7 @@ module.exports.CodeView = class CodeView
     editorView = (atom.views.getView @textEditor)
     (($ editorView).find '.gutter').on 'click', '.line-number', (event) =>
       rowNumber = Number(event.target.dataset.screenRow)
+      log.debug "Clicked on line number", { lineNumber: rowNumber }
       lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
       newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
       @rangeSet.getChosenRanges().push newRange

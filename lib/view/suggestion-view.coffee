@@ -1,4 +1,5 @@
 $ = require 'jquery'
+log = require 'examplify-log'
 
 
 # This is an extension to a jQuery object for a code modification suggestion.
@@ -21,9 +22,17 @@ module.exports.SuggestionView = class SuggestionView extends $
       .click (event) =>
         @revert()
         @cleanup() if @cleanup?
+        log.debug "Picked a correction",
+          { type: suggestion.constructor.name, suggestion }
         @model.setResolutionChoice suggestion
-      .mouseover (event) => @preview()
-      .mouseout (event) => @revert()
+      .mouseover (event) =>
+        log.debug "Previewing a correction",
+          { type: suggestion.constructor.name, suggestion }
+        @preview()
+      .mouseout (event) =>
+        log.debug "Un-previewing a correction",
+          { type: suggestion.constructor.name, suggestion }
+        @revert()
 
     # Make this object one and the same with the div we just created
     @.extend @, element

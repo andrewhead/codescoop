@@ -1,4 +1,5 @@
 $ = require 'jquery'
+log = require 'examplify-log'
 
 
 # This is an extension to a jQuery object for a code extension suggestion.
@@ -27,16 +28,32 @@ module.exports.ExtensionView = class ExtensionView extends $
     @acceptButton = $ "<div></div>"
       .attr "id", "accept_button"
       .text "Accept"
-      .click (event) => @revert(); @model.setExtensionDecision true
-      .mouseover (event) => @preview()
-      .mouseout (event) => @revert()
+      .click (event) =>
+        @revert()
+        log.debug "Accepted extension", { type: @extension.constructor.name }
+        (@onAccept @extension) if @onAccept?
+        @model.setExtensionDecision true
+      .mouseover (event) =>
+        log.debug "Previewing an extension",
+          { type: @extension.constructor.name }
+        @preview()
+      .mouseout (event) =>
+        log.debug "Un-previewing an extension",
+          { type: @extension.constructor.name }
+        @revert()
       .appendTo element
 
     @rejectButton = $ "<div></div>"
       .attr "id", "reject_button"
       .text "Reject"
-      .click (event) => @revert(); @model.setExtensionDecision false
+      .click (event) =>
+        @revert()
+        log.debug "Rejected extension", { type: @extension.constructor.name }
+        (@onReject @extension) if @onAccept?
+        @model.setExtensionDecision false
       .appendTo element
+
+    log.debug "Proposing extension", { type: @extension.constructor.name }
 
     # Make this object one and the same with the div we just created
     @.extend @, element

@@ -2,6 +2,7 @@
 { ControlStructureExtension } = require "../../lib/extender/control-structure-extender"
 { ControlStructureExtensionView } = require "../../lib/view/control-structure-extension"
 { Range } = require "../../lib/model/range-set"
+{ IfControlStructure } = require "../../lib/analysis/parse-tree"
 
 
 describe "ControlStructureExtensionView", ->
@@ -14,7 +15,8 @@ describe "ControlStructureExtensionView", ->
   suggestedRanges = undefined
 
   beforeEach =>
-    extension = new ControlStructureExtension undefined,
+    extension = new ControlStructureExtension \
+      (new IfControlStructure null),
       [(new Range [0, 1], [0, 2]), new Range [1, 2], [2, 3]]
     model = new ExampleModel()
     suggestedRanges = model.getRangeSet().getSuggestedRanges()

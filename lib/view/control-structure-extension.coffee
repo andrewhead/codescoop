@@ -1,5 +1,6 @@
 { IfControlStructure, ForControlStructure, WhileControlStructure, DoWhileControlStructure, TryCatchControlStructure } = require "../analysis/parse-tree"
-{ ExtensionView } = require './extension-view'
+{ ExtensionView } = require "./extension-view"
+log = require "examplify-log"
 
 
 module.exports.ControlStructureExtensionView = \
@@ -27,3 +28,15 @@ module.exports.ControlStructureExtensionView = \
     return if suggestedRanges.length is 0
     for range in @extension.getRanges()
       suggestedRanges.remove range
+
+  onAccept: (extension) ->
+    log.debug "Accepted control structure", {
+      controlType: extension.getControlStructure().constructor.name
+      ranges: extension.getRanges()
+    }
+
+  onReject: (extension) ->
+    log.debug "Rejected control structure", {
+      controlType: extension.getControlStructure().constructor.name
+      ranges: extension.getRanges()
+    }

@@ -4,8 +4,6 @@
 { StubPreview } = require "./view/stub-preview"
 { AgentRunnerView } = require "./view/agent-runner-view"
 
-{ ExampleModel } = require "./model/example-model"
-
 { ExampleController } = require "./example-controller"
 { ImportAnalysis } = require "./analysis/import-analysis"
 { VariableDefUseAnalysis } = require "./analysis/variable-def-use"
@@ -14,15 +12,19 @@
 { ValueAnalysis } = require "./analysis/value-analysis"
 { StubAnalysis } = require "./analysis/stub-analysis"
 { DeclarationsAnalysis } = require "./analysis/declarations"
+{ parse } = require "./analysis/parse-tree"
 
 { AgentRunner } = require "./agent/agent-runner"
 
+{ ExampleModel } = require "./model/example-model"
 { RangeSet } = require "./model/range-set"
 { File, SymbolSet } = require "./model/symbol-set"
-{ parse } = require "./analysis/parse-tree"
+
 $ = require "jquery"
+log = require "examplify-log"
 
 
+# This constant determines the name of the output example.
 EXAMPLE_FILE_NAME = "SmallScoop.java"
 
 
@@ -31,6 +33,7 @@ module.exports = plugin =
   subscriptions: null
 
   activate: (state) ->
+
     @subscriptions = new CompositeDisposable()
     @subscriptions.add (atom.commands.add "atom-workspace",
       "examplify:make-example-code": =>
@@ -57,6 +60,7 @@ module.exports = plugin =
         rangeSet = @controller.getModel().getRangeSet()
         rangeSet.getChosenRanges().push selectedRange
       "examplify:undo": =>
+        log.debug "Pressed undo"
         @controller.exampleController.undo()
     )
 
@@ -73,6 +77,7 @@ module.exports.MainController = class MainController
 
     selectedRanges = codeEditor.getSelectedBufferRanges()
     snippetRanges = selectedRanges
+    log.debug "Started example with ranges", { ranges: selectedRanges }
 
     # Prepare models (data)
     @rangeSet = new RangeSet snippetRanges

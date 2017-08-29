@@ -2,12 +2,8 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Create example from selection",
+        "label": "Make example",
         "command": "examplify:make-example-code"
-      },
-      {
-        "label": "Add selection to example",
-        "command": "examplify:add-selection-to-example"
       }
     ]
   },
@@ -19,7 +15,7 @@
           "label": "Examplify",
           "submenu": [
             {
-              "label": "Create example from selection",
+              "label": "Make example",
               "command": "examplify:make-example-code"
             }
           ]

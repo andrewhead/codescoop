@@ -1,4 +1,5 @@
-{ ExtensionView } = require './extension-view'
+{ ExtensionView } = require "./extension-view"
+log = require "examplify-log"
 
 
 module.exports.MethodThrowsExtensionView = \
@@ -17,3 +18,15 @@ module.exports.MethodThrowsExtensionView = \
   revert: ->
     @model.getRangeSet().getSuggestedRanges().remove @throwsRange
     @model.getRangeSet().getSuggestedRanges().remove @throwableRange
+
+  onAccept: (extension) ->
+    log.debug "Accepted throws", {
+      throwsName: extension.getThrowableName()
+      selectionRange: extension.getInnerRange()
+    }
+
+  onReject: (extension) ->
+    log.debug "Rejected throws", {
+      throwsName: extension.getThrowableName()
+      selectionRange: extension.getInnerRange()
+    }

@@ -1,4 +1,5 @@
-{ ExtensionView } = require './extension-view'
+{ ExtensionView } = require "./extension-view"
+log = require "examplify-log"
 
 
 module.exports.MediatingUseExtensionView = \
@@ -17,6 +18,11 @@ module.exports.MediatingUseExtensionView = \
     # Change the message on the reject button.
     @rejectButton.text "No"
 
+    log.debug "Showing mediating uses", {
+      use: extension.getUse()
+      countOtherUses: extension.getMediatingUses().length
+    }
+
     # Suggest all ranges that are mediating uses, and let the user decide
     # which of them to accept, or which to ignore.
     @preview()
@@ -33,3 +39,9 @@ module.exports.MediatingUseExtensionView = \
   revert: ->
     for mediatingUse in @mediatingUses
       @model.getRangeSet().getSuggestedRanges().remove mediatingUse.getRange()
+
+  onReject: (extension) ->
+    log.debug "Rejected control structure", {
+      type: extension.getControlStructure().constructor.name
+      ranges: extension.getRanges()
+    }

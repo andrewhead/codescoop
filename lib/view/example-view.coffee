@@ -3,7 +3,6 @@
 { Point } = require "atom"
 { Replacement } = require "../edit/replacement"
 { StubPrinter } = require "../view/stub-printer"
-$ = require "jquery"
 
 { MissingDeclarationError } = require "../error/missing-declaration"
 { MissingDefinitionError } = require "../error/missing-definition"
@@ -23,6 +22,9 @@ $ = require "jquery"
 { ControlStructureExtensionView } = require "../view/control-structure-extension"
 { MediatingUseExtensionView } = require "../view/mediating-use-extension"
 { MethodThrowsExtensionView } = require "../view/method-throws-extension"
+
+$ = require "jquery"
+log = require "examplify-log"
 
 
 module.exports.ExampleView = class ExampleView
@@ -358,6 +360,8 @@ module.exports.ExampleView = class ExampleView
         .data "error", error
         .click (event) =>
           error = ($ (event.target)).data "error"
+          log.debug "Chose issue to resolve",
+            { type: error.constructor.name, error }
           @model.setErrorChoice error
       params =
         type: "overlay"
