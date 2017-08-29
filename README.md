@@ -86,6 +86,18 @@ npm install
 apm link
 ```
 
+### Adding an event logger to Atom
+
+You don't need this to run examplify, but you might need it if
+you're running a study and want to log typical interactions.
+
+```bash
+git clone https://github.com/andrewhead/atom-event-logger
+cd atom-event-logger
+npm install
+apm link
+```
+
 ### Adding the Atom clock to Atom
 
 This is important for being able to trace study video back
