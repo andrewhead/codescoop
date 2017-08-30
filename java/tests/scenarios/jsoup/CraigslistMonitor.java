@@ -34,7 +34,7 @@ public class CraigslistMonitor {
     public static void main(String[] args) throws IOException, MessagingException, AddressException {
 
         if (args.length < 2) {
-          args = new String[]{"electric bike", "head.andrewm@gmail.com"};
+          args = new String[]{"electric bike", "openairandrew@gmail.com"};
         }
 
         List titles = new ArrayList();
