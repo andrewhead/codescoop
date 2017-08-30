@@ -10,6 +10,7 @@
 { ValueAnalysis, ValueMap } = require "../lib/analysis/value-analysis"
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
 { DeclarationsAnalysis } = require "../lib/analysis/declarations"
+{ RangeGroupsAnalysis } = require "../lib/analysis/range-groups"
 
 { AddRange } = require "../lib/command/add-range"
 { ArchiveEvent } = require "../lib/command/archive-event"
@@ -52,6 +53,7 @@ describe "ExampleController", ->
     valueAnalysis = new ValueAnalysis testFile
     stubAnalysis = new StubAnalysis testFile
     declarationsAnalysis = new DeclarationsAnalysis symbolSet, testFile, parseTree
+    rangeGroupsAnalysis = new RangeGroupsAnalysis parseTree
 
     controller = undefined
     importTable = undefined
@@ -61,6 +63,7 @@ describe "ExampleController", ->
     valueMap = undefined
     stubSpecTable = undefined
     symbolTable = undefined
+    rangeGroupTable = undefined
 
     it "enters the IDLE state when initial analyses finish", ->
 
@@ -69,7 +72,7 @@ describe "ExampleController", ->
         controller = new ExampleController model,
           analyses: { importAnalysis, variableDefUseAnalysis,
             methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
-            stubAnalysis, declarationsAnalysis }
+            stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>
@@ -81,13 +84,15 @@ describe "ExampleController", ->
         valueMap = model.getValueMap()
         stubSpecTable = model.getStubSpecTable()
         symbolTable = model.getSymbolTable()
+        rangeGroupTable = model.getRangeGroupTable()
 
         ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
           (methodDefs.length > 0) and (typeDefs.length > 0) and
           valueMap? and ("Example.java" of valueMap) and
           stubSpecTable? and
           importTable? and
-          symbolTable?)
+          symbolTable? and
+          rangeGroupTable?)
 
       # Once analyses complete, we wait for a transition into the IDLE state
       waitsFor =>

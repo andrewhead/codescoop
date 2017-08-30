@@ -12,6 +12,7 @@
 { ValueAnalysis } = require "./analysis/value-analysis"
 { StubAnalysis } = require "./analysis/stub-analysis"
 { DeclarationsAnalysis } = require "./analysis/declarations"
+{ RangeGroupsAnalysis } = require "./analysis/range-groups"
 { parse } = require "./analysis/parse-tree"
 
 { AgentRunner } = require "./agent/agent-runner"
@@ -107,6 +108,7 @@ module.exports.MainController = class MainController
       valueAnalysis: new ValueAnalysis codeEditorFile
       # stubAnalysis: new StubAnalysis codeEditorFile
       declarationsAnalysis: new DeclarationsAnalysis @symbols, codeEditorFile, @parseTree
+      rangeGroupsAnalysis: new RangeGroupsAnalysis @parseTree
 
     # Prepare controllers
     @exampleController = new ExampleController \

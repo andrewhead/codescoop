@@ -30,6 +30,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   THROWS: { value: 22, name: "throws-changed" }
   CHOSEN_RANGES: { value: 23, name: "chosen-ranges" }
   SYMBOL_TABLE: { value: 24, name: "symbol-table" }
+  RANGE_GROUP_TABLE: { value: 25, name: "range-group-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -86,6 +87,7 @@ module.exports.ExampleModel = class ExampleModel
     @stubSpecTable = null
     @stubSpecs = makeObservableArray []
     @symbolTable = null
+    @rangeGroupTable = null
 
     @focusedEvent = null
     @proposedExtension = null
@@ -233,7 +235,7 @@ module.exports.ExampleModel = class ExampleModel
     @stubSpecs
 
   setImportTable: (importTable) ->
-    oldImportTable = importTable
+    oldImportTable = @importTable
     @importTable = importTable
     @notifyObservers @, ExampleModelProperty.IMPORT_TABLE, oldImportTable,
       @importTable
@@ -242,13 +244,22 @@ module.exports.ExampleModel = class ExampleModel
     @importTable
 
   setSymbolTable: (symbolTable) ->
-    oldSymbolTable = symbolTable
+    oldSymbolTable = @symbolTable
     @symbolTable = symbolTable
     @notifyObservers @, ExampleModelProperty.SYMBOL_TABLE, oldSymbolTable,
       @symbolTable
 
   getSymbolTable: ->
     @symbolTable
+
+  setRangeGroupTable: (rangeGroupTable) ->
+    oldRangeGroupTable = @rangeGroupTable
+    @rangeGroupTable = rangeGroupTable
+    @notifyObservers @, ExampleModelProperty.RANGE_GROUP_TABLE,
+      oldRangeGroupTable, @rangeGroupTable
+
+  getRangeGroupTable: ->
+    @rangeGroupTable
 
   getImports: ->
     @imports

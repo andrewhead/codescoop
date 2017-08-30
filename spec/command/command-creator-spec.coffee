@@ -2,9 +2,11 @@
 { ExampleModel } = require "../../lib/model/example-model"
 { Symbol, SymbolSet, File, createSymbol } = require "../../lib/model/symbol-set"
 { Range, RangeSet } = require "../../lib/model/range-set"
-{ TextBuffer } = require "atom"
+{ RangeGroupTable } = require "../../lib/analysis/range-groups"
 { StubSpec } = require "../../lib/model/stub"
 { Import } = require "../../lib/model/import"
+{ TextBuffer } = require "atom"
+
 { Replacement } = require "../../lib/edit/replacement"
 { Declaration } = require "../../lib/edit/declaration"
 
@@ -55,6 +57,19 @@ describe "CommandCreator", ->
       (expect command instanceof AddRange)
       (expect command.getRange().containsRange new Range [0, 0], [0, 10]).toBe true
 
+    it "adds related ranges for that line", ->
+      rangeGroupTable = new RangeGroupTable()
+      rangeGroupTable.putGroup [
+        new Range [0, 1], [0, 10]
+        new Range [1, 1], [1, 10]
+      ]
+      model = new ExampleModel()
+      model.setRangeGroupTable rangeGroupTable
+      commandGroup = commandCreator.createCommandGroupForChosenRange chosenRange, model
+      (expect commandGroup.length).toBe 2
+      (expect commandGroup[0].getRange().containsRange new Range [0, 0], [0, 10]).toBe true
+      (expect commandGroup[1].getRange().containsRange new Range [1, 1], [1, 10]).toBe true
+
   describe "when given a DefinitionSuggestion", ->
 
     model = undefined
@@ -77,6 +92,20 @@ describe "CommandCreator", ->
       command = commandGroup[0]
       (expect command instanceof AddLineForRange)
       (expect command.getRange().containsRange new Range [0, 4], [0, 5]).toBe true
+
+    it "adds related ranges for that line", ->
+      rangeGroupTable = new RangeGroupTable()
+      rangeGroupTable.putGroup [
+        new Range [0, 1], [0, 10]
+        new Range [1, 1], [1, 10]
+      ]
+      model.setRangeGroupTable rangeGroupTable
+      commandCreator = new CommandCreator
+      commandGroup = commandCreator.createCommandGroupForSuggestion suggestion, model
+      (expect commandGroup.length).toBe 2
+      (expect commandGroup[0].getRange().containsRange new Range [0, 4], [0, 5]).toBe true
+      (expect commandGroup[1].getRange().containsRange new Range [1, 4], [1, 5]).toBe true
+
 
   describe "when given an ImportSuggestion", ->
 

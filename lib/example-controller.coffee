@@ -44,6 +44,7 @@ module.exports.ExampleController = class ExampleController
     valueAnalysis = analyses.valueAnalysis
     stubAnalysis = analyses.stubAnalysis
     declarationsAnalysis = analyses.declarationsAnalysis
+    rangeGroupsAnalysis = analyses.rangeGroupsAnalysis
 
     @correctors = extras.correctors or [
         checker: new MissingDefinitionDetector()
@@ -77,11 +78,13 @@ module.exports.ExampleController = class ExampleController
     ]
 
     # Before the state can update, the analyses must complete
-    @_startAnalyses importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-      typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis
+    @_startAnalyses importAnalysis, variableDefUseAnalysis,
+      methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis, stubAnalysis,
+      declarationsAnalysis, rangeGroupsAnalysis
 
   _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-    typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis) ->
+    typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis,
+    rangeGroupsAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -123,6 +126,11 @@ module.exports.ExampleController = class ExampleController
         callback: (symbolTable) =>
           @model.setSymbolTable symbolTable
         error: console.error
+      rangeGroups:
+        runner: rangeGroupsAnalysis or= null
+        callback: (rangeGroupTable) =>
+          @model.setRangeGroupTable rangeGroupTable
+        error: console.error
 
     # Run analyses sequentially.  Soot can't handle when more than one
     # analysis is running at a time.  Pattern reference for chaining promises:
@@ -159,7 +167,7 @@ module.exports.ExampleController = class ExampleController
           suggestions = suggestions.concat suggesterSuggestions
         if suggestions.length is 1
           suggestion = suggestions[0]
-          commandGroup = @commandCreator.createCommandGroupForSuggestion suggestion
+          commandGroup = @commandCreator.createCommandGroupForSuggestion suggestion, @model
           commandGroup.quickAdd = true
           log.debug "Found an automatic correction",
             { type: suggestion.constructor.name, suggestion }
@@ -218,7 +226,7 @@ module.exports.ExampleController = class ExampleController
       # Make a command for adding a range for each of the chosen ranges.
       if newValue.length > 0
         for newRange in newValue
-          commandGroup = @commandCreator.createCommandGroupForChosenRange newRange
+          commandGroup = @commandCreator.createCommandGroupForChosenRange newRange, @model
           @commandStack.push commandGroup
           for command in commandGroup
             command.apply @model
@@ -260,7 +268,7 @@ module.exports.ExampleController = class ExampleController
       if (propertyName is ExampleModelProperty.RESOLUTION_CHOICE) and newValue?
 
         # Look up commands for this suggestion, execute and save them
-        commandGroup = @commandCreator.createCommandGroupForSuggestion newValue
+        commandGroup = @commandCreator.createCommandGroupForSuggestion newValue, @model
         @commandStack.push commandGroup
         for command in commandGroup
           command.apply @model
@@ -280,7 +288,7 @@ module.exports.ExampleController = class ExampleController
 
         # Look up commands for this decision for this extension.
         # Then execute and save them to the stack.
-        commandGroup = @commandCreator.createCommandGroupForExtensionDecision extensionDecision
+        commandGroup = @commandCreator.createCommandGroupForExtensionDecision extensionDecision, @model
         @commandStack.push commandGroup
         for command in commandGroup
           command.apply @model

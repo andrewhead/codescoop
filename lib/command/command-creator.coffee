@@ -10,6 +10,7 @@
 { MediatingUseExtension } = require "../extender/mediating-use-extender"
 { MethodThrowsExtension } = require "../extender/method-throws-extender"
 
+{ Range } = require "../model/range-set"
 { MethodRange } = require "../model/range-set"
 { ClassRange } = require "../model/range-set"
 { Replacement } = require "../edit/replacement"
@@ -33,17 +34,33 @@
 # a different kind of user suggestion or choice to a command.
 module.exports.CommandCreator = class CommandCreator
 
-  createCommandGroupForChosenRange: (range) ->
+  createCommandGroupForChosenRange: (range, model) ->
     commandGroup = []
     commandGroup.push new AddRange range
+    if model? and model.getRangeGroupTable()?
+      relatedRanges = model.getRangeGroupTable().getRelatedRanges range
+      for relatedRange in relatedRanges
+        commandGroup.push new AddRange relatedRange
     commandGroup
 
-  createCommandGroupForSuggestion: (suggestion) ->
+  # The model is an optional parameter, but it's needed for intepreting some
+  # suggestions, like adding ranges and incorporating all related ranges.
+  createCommandGroupForSuggestion: (suggestion, model) ->
 
     commandGroup = []
 
     if suggestion instanceof DefinitionSuggestion
-      commandGroup.push new AddLineForRange suggestion.getSymbol().getRange()
+
+      definitionRange = suggestion.getSymbol().getRange()
+      commandGroup.push new AddLineForRange definitionRange
+
+      if model? and model.getRangeGroupTable()?
+        roughLineRange = new Range [definitionRange.start.row, 0],
+          [definitionRange.start.row + 1, 0]
+        rangeGroupTable = model.getRangeGroupTable()
+        relatedRanges = rangeGroupTable.getRelatedRanges roughLineRange
+        for range in relatedRanges
+          commandGroup.push new AddLineForRange range
 
     else if suggestion instanceof ImportSuggestion
       commandGroup.push new AddImport suggestion.getImport()
