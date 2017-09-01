@@ -1,5 +1,6 @@
 # Test files
 SmallScoop.java
+ExtractedExample.java
 
 # Developer-specific configuration
 lib/config/java-home.coffee

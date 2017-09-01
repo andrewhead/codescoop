@@ -26,7 +26,7 @@ log = require "examplify-log"
 
 
 # This constant determines the name of the output example.
-EXAMPLE_FILE_NAME = "SmallScoop.java"
+EXAMPLE_FILE_NAME = "ExtractedExample.java"
 
 
 module.exports = plugin =
@@ -96,7 +96,6 @@ module.exports.MainController = class MainController
       bottomPanel.destroy() if bottomPanel.item instanceof AgentRunner
     atom.views.addViewProvider AgentRunner, (agentRunner) =>
       (new AgentRunnerView @exampleModel, agentRunner).getNode()
-    atom.workspace.addBottomPanel { item: @agentRunner }
 
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()

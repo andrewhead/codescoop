@@ -67,24 +67,6 @@ describe "The Examplify Plugin", ->
       atom.commands.dispatch workspaceElement, "examplify:add-selection-to-example"
       (expect controller.getModel().getRangeSet().getSnippetRanges().length).toBe 2
 
-  it "creates a bottom panel for running agents", ->
-
-    editor = atom.workspace.getActiveTextEditor()
-    editor.setSelectedBufferRange new Range [5, 0], [5, 43]
-    atom.commands.dispatch workspaceElement, "examplify:make-example-code"
-
-    waitsForPromise =>
-      activationPromise
-
-    waitsFor =>
-      atom.workspace.getBottomPanels().length is 1
-
-    runs =>
-      bottomPanels = atom.workspace.getBottomPanels()
-      (expect bottomPanels.length).toBe 1
-      agentPanel = bottomPanels[0]
-      (expect agentPanel.item instanceof AgentRunner).toBe true
-
   it "calls \"undo\" to the controller when \"undo\" command is run", ->
 
     editor = atom.workspace.getActiveTextEditor()

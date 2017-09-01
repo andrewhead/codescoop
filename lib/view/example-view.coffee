@@ -40,7 +40,7 @@ module.exports.ExampleView = class ExampleView
       ""
     ].join "\n"
     classStart: [
-      "public class SmallScoop {"
+      "public class ExtractedExample {"
       ""
       ""
     ].join "\n"
