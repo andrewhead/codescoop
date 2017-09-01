@@ -22,4 +22,5 @@ javac -g -cp $POLYGLOT_SCENARIO_JARS tests/scenarios/polyglot-simple/Main.java
 javac -g -cp $CHAT_SCENARIO_JARS tests/scenarios/chat/Server.java
 javac -g -cp $JSOUP_SCENARIO_JARS tests/scenarios/jsoup/CraigslistMonitor.java
 javac -g tests/scenarios/tutorial/RandomExponents.java
+javac -g tests/scenarios/tutorial/SillyDictionaryBuilder.java
 javac -g tests/scenarios/InstallCertFolder/InstallCert.java

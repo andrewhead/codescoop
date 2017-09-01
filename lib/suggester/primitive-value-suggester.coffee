@@ -23,8 +23,9 @@ module.exports.PrimitiveValueSuggester = class PrimitiveValueSuggester
 
     # Search through the variable value map for the value of this symbol
     # on a particular line of code.  Return if any stage of lookup fails.
+    return [] if not variableValuesMap?
+    return [] if (symbol.getFile().getName() not of variableValuesMap)
     fileValues = variableValuesMap[symbol.getFile().getName()]
-    return [] if not fileValues?
     lineValues = fileValues[symbol.getRange().start.row]
     return [] if not lineValues?
     variableValues = lineValues[symbol.getName()]
