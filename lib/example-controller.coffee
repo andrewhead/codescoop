@@ -317,7 +317,10 @@ module.exports.ExampleController = class ExampleController
     @model.setState ExampleModelState.IDLE
 
   addPrintedSymbol: (symbolName) ->
-    @model.getPrintedSymbols().push symbolName
+    commandGroup = @commandCreator.createCommandGroupForPrintedSymbol symbolName
+    @commandStack.push commandGroup
+    for command in commandGroup
+      command.apply @model
 
   _resetChoiceState: ->
 

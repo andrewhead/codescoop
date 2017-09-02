@@ -13,6 +13,7 @@
 { RangeGroupsAnalysis } = require "../lib/analysis/range-groups"
 
 { AddRange } = require "../lib/command/add-range"
+{ AddPrintedSymbol } = require "../lib/command/add-printed-symbol"
 { ArchiveEvent } = require "../lib/command/archive-event"
 { CommandStack } = require "../lib/command/command-stack"
 { PACKAGE_PATH } = require "../lib/config/paths"
@@ -469,3 +470,23 @@ describe "ExampleController", ->
       commandGroup = commandStack.peek()
       (expect commandGroup[0] instanceof AddRange)
       (expect commandGroup[0].getRange()).toEqual new Range [0, 0], [0, 10]
+
+  describe "when a print request is added in the middle of another task", ->
+
+    commandStack = undefined
+    model = undefined
+    controller = undefined
+    beforeEach =>
+      commandStack = new CommandStack()
+      model = _makeDefaultModel()
+      controller = new ExampleController model, { commandStack }
+
+    it "adds the print request to the command stack", ->
+      controller.addPrintedSymbol "temp"
+      (expect commandStack.getHeight()).toBe 1
+      (expect (commandStack.peek()[0] instanceof AddPrintedSymbol)).toBe true
+
+    it "applies the print request to the model", ->
+      controller.addPrintedSymbol "temp"
+      (expect model.getPrintedSymbols().length).toBe 1
+      (expect model.getPrintedSymbols()[0]).toBe "temp"

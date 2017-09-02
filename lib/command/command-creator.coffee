@@ -17,6 +17,7 @@
 { Declaration } = require "../edit/declaration"
 
 { AddLineForRange } = require "../command/add-line-for-range"
+{ AddPrintedSymbol } = require "../command/add-printed-symbol"
 { AddRange } = require "../command/add-range"
 { AddMethodRange } = require "../command/add-method-range"
 { AddClassRange } = require "../command/add-class-range"
@@ -42,6 +43,9 @@ module.exports.CommandCreator = class CommandCreator
       for relatedRange in relatedRanges
         commandGroup.push new AddRange relatedRange
     commandGroup
+
+  createCommandGroupForPrintedSymbol: (symbolName) ->
+    [ new AddPrintedSymbol symbolName ]
 
   # The model is an optional parameter, but it's needed for intepreting some
   # suggestions, like adding ranges and incorporating all related ranges.
