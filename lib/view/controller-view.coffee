@@ -1,11 +1,13 @@
+{ ExampleModelState, ExampleModelProperty } = require "../model/example-model"
 { PACKAGE_PATH } = require "../config/paths"
 $ = require 'jquery'
 
 
 module.exports.ControllerView = class ControllerView extends $
 
-  constructor: (controller, exampleEditor) ->
+  constructor: (controller, model, exampleEditor) ->
     @controller = controller
+    @model = model
     @exampleEditor = exampleEditor
 
     element = $ "<div></div>"
@@ -30,6 +32,15 @@ module.exports.ControllerView = class ControllerView extends $
       .click => controller.undo()
       .appendTo element
 
+    @runButton = $ "<button></button>"
+      .attr "id", "run-button"
+      .attr "disabled", (model.getState() == ExampleModelState.ANALYSIS)
+      .append @_svgForIcon "play-circle"
+      .append "Run"
+      .click =>
+        atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
+      .appendTo element
+
     # Enable the undo button based on whether there are commands on the stack
     controller.getCommandStack().addListener {
       onStackChanged: (stack) => @undoButton.attr "disabled", (stack.getHeight() == 0)
@@ -40,7 +51,19 @@ module.exports.ControllerView = class ControllerView extends $
       newRange = event.newBufferRange
       @printButton.attr "disabled", (newRange.start.isEqual newRange.end)
 
+    model.addObserver {
+      onPropertyChanged: (target, propertyName, oldValue, newValue) =>
+        if propertyName == ExampleModelProperty.STATE
+          @_updateRunButton()
+    }
+    atom.workspace.onDidChangeActiveTextEditor (@_updateRunButton.bind @)
+
     @.extend @, element
+
+  _updateRunButton: ->
+    @runButton.attr "disabled",
+      ((@model.getState() == ExampleModelState.ANALYSIS) or
+       (atom.workspace.getActiveTextEditor() != @exampleEditor))
 
   _svgForIcon: (iconName )->
     use = $ "<use></use>"

@@ -1,5 +1,5 @@
 { ExampleController } = require "../../lib/example-controller"
-{ ExampleModel } = require "../../lib/model/example-model"
+{ ExampleModel, ExampleModelState } = require "../../lib/model/example-model"
 { ControllerView } = require "../../lib/view/controller-view"
 { CommandStack } = require "../../lib/command/command-stack"
 { Range } = require "../../lib/model/range-set"
@@ -7,6 +7,7 @@
 
 describe "ControllerView", ->
 
+  model = undefined
   exampleController = undefined
   controllerView = undefined
   exampleEditor = undefined
@@ -15,12 +16,15 @@ describe "ControllerView", ->
   beforeEach =>
     model = new ExampleModel()
     commandStack = new CommandStack()
-    exampleEditor = atom.workspace.buildTextEditor()
-    exampleEditor.setText [
-      "int temp = 1;"
-    ].join "\n"
-    exampleController = new ExampleController model, { commandStack }
-    controllerView = new ControllerView exampleController, exampleEditor
+    waitsForPromise =>
+      atom.workspace.open "ExampleFile"
+    runs =>
+      exampleEditor = atom.workspace.getActiveTextEditor()
+      exampleEditor.setText [
+        "int temp = 1;"
+      ].join "\n"
+      exampleController = new ExampleController model, { commandStack }
+      controllerView = new ControllerView exampleController, model, exampleEditor
 
   it "passes on an undo event when the undo button is clicked", ->
     undoButton = controllerView.find "#undo-button"
@@ -68,3 +72,43 @@ describe "ControllerView", ->
     printButton.click()
 
     (expect exampleController.addPrintedSymbol).toHaveBeenCalledWith "temp"
+
+  it "issues a run-script command when the run button is clicked", ->
+    runButton = controllerView.find "#run-button"
+    issuedRunCommand = false
+    atom.commands.onDidDispatch (event) =>
+      if event.type == "script:run"
+        issuedRunCommand = true
+    runButton.click()
+    waitsFor =>
+      issuedRunCommand
+
+  it "disables the run button when the model is analyzing", ->
+    runButton = controllerView.find "#run-button"
+    model.setState ExampleModelState.ANALYSIS
+    (expect runButton.attr "disabled").toBe "disabled"
+
+  it "enables the run button when the model leaves the analysis state", ->
+    runButton = controllerView.find "#run-button"
+    model.setState ExampleModelState.IDLE
+    (expect runButton.attr "disabled").toBe undefined
+
+  it "disables the run button when focus leaves the example editor", ->
+    runButton = controllerView.find "#run-button"
+    model.setState ExampleModelState.IDLE
+    (expect runButton.attr "disabled").toBe undefined
+    # This should activate another item that isn't the example editor
+    waitsForPromise =>
+      atom.workspace.open "OtherFile"
+    runs =>
+      (expect runButton.attr "disabled").toBe "disabled"
+
+  it "disables the run button when focus returns to the example editor", ->
+    runButton = controllerView.find "#run-button"
+    model.setState ExampleModelState.IDLE
+    waitsForPromise =>
+      atom.workspace.open "OtherFile"
+    waitsForPromise =>
+      atom.workspace.open "ExampleFile"
+    runs =>
+      (expect runButton.attr "disabled").toBe undefined

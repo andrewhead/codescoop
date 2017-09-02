@@ -93,7 +93,7 @@ module.exports.MainController = class MainController
     # for bottomPanel in atom.workspace.getBottomPanels()
     #   bottomPanel.destroy() if bottomPanel.item instanceof ExampleController
     atom.views.addViewProvider ExampleController, (controller) =>
-      (new ControllerView controller, exampleEditor).getNode()
+      (new ControllerView controller, @exampleModel, exampleEditor).getNode()
 
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
