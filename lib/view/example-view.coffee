@@ -66,6 +66,7 @@ module.exports.ExampleView = class ExampleView
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.AUXILIARY_DECLARATIONS
+      ExampleModelProperty.PRINTED_SYMBOLS
     ]
     if (propertyName is ExampleModelProperty.ACTIVE_RANGES) and
         (newValue.length > oldValue.length)
@@ -89,6 +90,7 @@ module.exports.ExampleView = class ExampleView
     # example editor, instead of using their positions in the original code.
     @_addCodeLines()
     @_addAuxiliaryDeclarations()
+    @_addPrintStatements()
     @_applyReplacements()
     @_surroundWithMain()
     @_addClassStubs()
@@ -160,6 +162,14 @@ module.exports.ExampleView = class ExampleView
         (declaration.getType() + " " + declaration.getName() + ";\n")
     @textEditor.setTextInBufferRange \
       (new Range [0, 0], [0, 0]), declarationText
+
+  _addPrintStatements: ->
+    printableSymbols = @model.getPrintedSymbols()
+    return if printableSymbols.length is 0
+    printText = "\n"
+    for symbolName in printableSymbols
+      printText += "System.out.println(#{symbolName});\n"
+    @_addTextAtEndOfBuffer printText
 
   _addClassStubs: ->
     stubSpecs = @model.getStubSpecs()

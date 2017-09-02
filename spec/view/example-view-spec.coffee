@@ -82,6 +82,13 @@ describe "ExampleView", ->
     (expect exampleText.indexOf "int k;").not.toBe -1
     (expect (exampleText.indexOf "int k;") < (exampleText.indexOf "int i = 0;")).toBe true
 
+  it "updates text when printed symbols are added", ->
+    model.getPrintedSymbols().push "temp"
+    exampleText = view.getTextEditor().getText()
+    PRINT_STRING = "System.out.println(temp);"
+    (expect exampleText.indexOf PRINT_STRING).not.toBe -1
+    (expect (exampleText.indexOf PRINT_STRING) > (exampleText.indexOf "j = j + 1;")).toBe true
+
   it "adds stubs when rendering the text", ->
     model.getStubSpecs().push new StubSpec "Book"
     view = new ExampleView model, editor

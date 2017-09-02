@@ -2,7 +2,7 @@
 { CodeView } = require "./view/code-view"
 { ExampleView } = require "./view/example-view"
 { StubPreview } = require "./view/stub-preview"
-{ AgentRunnerView } = require "./view/agent-runner-view"
+{ ControllerView } = require "./view/controller-view"
 
 { ExampleController } = require "./example-controller"
 { ImportAnalysis } = require "./analysis/import-analysis"
@@ -14,8 +14,6 @@
 { DeclarationsAnalysis } = require "./analysis/declarations"
 { RangeGroupsAnalysis } = require "./analysis/range-groups"
 { parse } = require "./analysis/parse-tree"
-
-{ AgentRunner } = require "./agent/agent-runner"
 
 { ExampleModel } = require "./model/example-model"
 { RangeSet } = require "./model/range-set"
@@ -78,7 +76,6 @@ module.exports.MainController = class MainController
 
     selectedRanges = codeEditor.getSelectedBufferRanges()
     snippetRanges = selectedRanges
-    log.debug "Started example with ranges", { ranges: selectedRanges }
 
     # Prepare models (data)
     @rangeSet = new RangeSet snippetRanges
@@ -88,14 +85,15 @@ module.exports.MainController = class MainController
       @symbols, @parseTree
 
     # Prepare agents
-    @agentRunner = new AgentRunner @exampleModel
     @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
     @stubPreview = new StubPreview @exampleModel
-    for bottomPanel in atom.workspace.getBottomPanels()
-      bottomPanel.destroy() if bottomPanel.item instanceof AgentRunner
-    atom.views.addViewProvider AgentRunner, (agentRunner) =>
-      (new AgentRunnerView @exampleModel, agentRunner).getNode()
+
+    # Prepare user interface panels
+    # for bottomPanel in atom.workspace.getBottomPanels()
+    #   bottomPanel.destroy() if bottomPanel.item instanceof ExampleController
+    atom.views.addViewProvider ExampleController, (controller) =>
+      (new ControllerView controller, exampleEditor).getNode()
 
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
@@ -112,6 +110,8 @@ module.exports.MainController = class MainController
     # Prepare controllers
     @exampleController = new ExampleController \
       @exampleModel, { analyses: @analyses }
+
+    atom.workspace.addRightPanel { item: @exampleController }
 
   # These accessors are here to let us test the controller
   getRangeSet: ->

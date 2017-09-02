@@ -302,18 +302,22 @@ module.exports.ExampleController = class ExampleController
   undo: ->
 
     # Revert the last command and remove it from the stack
-    quickAdd = true
-    while quickAdd?
-      lastCommandGroup = @commandStack.pop()
-      for command in lastCommandGroup
-        log.debug "Reverting command", { type: command.constructor.name }
-        command.revert @model
-      quickAdd = lastCommandGroup.quickAdd
+    if @commandStack.getHeight() > 0
+      quickAdd = true
+      while quickAdd and @commandStack.peek()?
+        lastCommandGroup = @commandStack.pop()
+        for command in lastCommandGroup
+          log.debug "Reverting command", { type: command.constructor.name }
+          command.revert @model
+        quickAdd = lastCommandGroup.quickAdd
 
     @_resetChoiceState()
 
     # Reset the example editor to IDLE
     @model.setState ExampleModelState.IDLE
+
+  addPrintedSymbol: (symbolName) ->
+    @model.getPrintedSymbols().push symbolName
 
   _resetChoiceState: ->
 
@@ -330,3 +334,6 @@ module.exports.ExampleController = class ExampleController
     @model.setFocusedEvent null
     @model.setProposedExtension null
     @model.setExtensionDecision null
+
+  getCommandStack: ->
+    @commandStack

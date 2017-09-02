@@ -147,6 +147,49 @@ atom-overlay {
 
 }
 
+div.controller {
+
+  margin: @component-padding;
+
+  button {
+
+    svg.icon {
+      margin: @component-padding;
+      width: 32px;
+      height: 32px;
+      display: block;
+      fill: #fff;
+    }
+
+    border-radius: @component-border-radius;
+    padding: @component-padding;
+    display: block;
+    width: 100%;
+
+    background-color: @button-background-color;
+    border-color: @button-border-color;
+    color: @text-color-highlight;
+    font-family: @font-family;
+
+    &:disabled {
+      opacity: .3;
+    }
+
+    &:enabled {
+      &:hover {
+        background-color: fade(@button-background-color-selected, 50%);
+      }
+      &:active {
+        background-color: @button-background-color-selected;
+      }
+    }
+
+    font-size: 16px;
+    margin-top: @component-padding;
+    margin-bottom: 0;
+  }
+
+}
 
 div.agent-runner {
 

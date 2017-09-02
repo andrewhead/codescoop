@@ -1,7 +1,7 @@
 { Range } = require '../lib/model/range-set'
 { MainController } = require '../lib/examplify'
 { PACKAGE_PATH } = require '../lib/config/paths'
-{ AgentRunner } = require "../lib/agent/agent-runner"
+{ ExampleController } = require "../lib/example-controller.coffee"
 $ = require 'jquery'
 
 
@@ -66,6 +66,24 @@ describe "The Examplify Plugin", ->
       editor.setSelectedBufferRange new Range [4, 0], [4, 35]
       atom.commands.dispatch workspaceElement, "examplify:add-selection-to-example"
       (expect controller.getModel().getRangeSet().getSnippetRanges().length).toBe 2
+
+  it "creates a top panel for controls", ->
+
+    editor = atom.workspace.getActiveTextEditor()
+    editor.setSelectedBufferRange new Range [5, 0], [5, 43]
+    atom.commands.dispatch workspaceElement, "examplify:make-example-code"
+
+    waitsForPromise =>
+      activationPromise
+
+    waitsFor =>
+      atom.workspace.getRightPanels().length is 1
+
+    runs =>
+      panels = atom.workspace.getRightPanels()
+      (expect panels.length).toBe 1
+      panel = panels[0]
+      (expect panel.item instanceof ExampleController).toBe true
 
   it "calls \"undo\" to the controller when \"undo\" command is run", ->
 

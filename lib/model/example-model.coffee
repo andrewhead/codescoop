@@ -31,6 +31,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   CHOSEN_RANGES: { value: 23, name: "chosen-ranges" }
   SYMBOL_TABLE: { value: 24, name: "symbol-table" }
   RANGE_GROUP_TABLE: { value: 25, name: "range-group-table" }
+  PRINTED_SYMBOLS: { value: 26, name: "printed-symbols" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -69,6 +70,9 @@ module.exports.ExampleModel = class ExampleModel
 
     @auxiliaryDeclarations = makeObservableArray []
     @auxiliaryDeclarations.addObserver @
+
+    @printedSymbols = makeObservableArray []
+    @printedSymbols.addObserver @
 
     @imports = makeObservableArray []
     @imports.addObserver @
@@ -121,6 +125,8 @@ module.exports.ExampleModel = class ExampleModel
       propertyName = ExampleModelProperty.EVENTS
     else if object is @viewedEvents
       propertyName = ExampleModelProperty.VIEWED_EVENTS
+    else if object is @printedSymbols
+      propertyName = ExampleModelProperty.PRINTED_SYMBOLS
     else if object is @
       proprtyName = propertyName
     else
@@ -257,6 +263,9 @@ module.exports.ExampleModel = class ExampleModel
     @rangeGroupTable = rangeGroupTable
     @notifyObservers @, ExampleModelProperty.RANGE_GROUP_TABLE,
       oldRangeGroupTable, @rangeGroupTable
+
+  getPrintedSymbols: () ->
+    @printedSymbols
 
   getRangeGroupTable: ->
     @rangeGroupTable
