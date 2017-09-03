@@ -1,6 +1,7 @@
 { getControlStructureRanges } = require "../../lib/analysis/parse-tree"
 { ControlCrossingEvent } = require "../event/control-crossing"
 { Range } = require "../model/range-set"
+{ Extender } = require "./extender"
 
 
 module.exports.ControlStructureExtension = class ControlStructureExtension
@@ -20,7 +21,7 @@ module.exports.ControlStructureExtension = class ControlStructureExtension
     @event
 
 
-module.exports.ControlStructureExtender = class ControlStructureExtender
+module.exports.ControlStructureExtender = class ControlStructureExtender extends Extender
 
   getExtension: (event) ->
 

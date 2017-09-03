@@ -2,7 +2,6 @@
 { Range } = require '../model/range-set'
 { Symbol } = require '../model/symbol-set'
 DataflowAnalysis = java.import "DataflowAnalysis"
-SymbolAppearance = java.import "SymbolAppearance"
 
 
 # The naming convention differs slightly for this file.

@@ -11,6 +11,7 @@
 { StubAnalysis } = require "../lib/analysis/stub-analysis"
 { DeclarationsAnalysis } = require "../lib/analysis/declarations"
 { RangeGroupsAnalysis } = require "../lib/analysis/range-groups"
+{ ThrowsAnalysis } = require "../lib/analysis/throws-analysis"
 
 { AddRange } = require "../lib/command/add-range"
 { AddPrintedSymbol } = require "../lib/command/add-printed-symbol"
@@ -55,6 +56,7 @@ describe "ExampleController", ->
     stubAnalysis = new StubAnalysis testFile
     declarationsAnalysis = new DeclarationsAnalysis symbolSet, testFile, parseTree
     rangeGroupsAnalysis = new RangeGroupsAnalysis parseTree
+    throwsAnalysis = new ThrowsAnalysis testFile
 
     controller = undefined
     importTable = undefined
@@ -65,6 +67,7 @@ describe "ExampleController", ->
     stubSpecTable = undefined
     symbolTable = undefined
     rangeGroupTable = undefined
+    throwsTable = undefined
 
     it "enters the IDLE state when initial analyses finish", ->
 
@@ -73,7 +76,8 @@ describe "ExampleController", ->
         controller = new ExampleController model,
           analyses: { importAnalysis, variableDefUseAnalysis,
             methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
-            stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis }
+            stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis,
+            throwsAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>
@@ -86,6 +90,7 @@ describe "ExampleController", ->
         stubSpecTable = model.getStubSpecTable()
         symbolTable = model.getSymbolTable()
         rangeGroupTable = model.getRangeGroupTable()
+        throwsTable = model.getThrowsTable()
 
         ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
           (methodDefs.length > 0) and (typeDefs.length > 0) and
@@ -93,7 +98,8 @@ describe "ExampleController", ->
           stubSpecTable? and
           importTable? and
           symbolTable? and
-          rangeGroupTable?)
+          rangeGroupTable? and
+          throwsTable?)
 
       # Once analyses complete, we wait for a transition into the IDLE state
       waitsFor =>

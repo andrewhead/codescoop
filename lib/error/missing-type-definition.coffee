@@ -1,3 +1,6 @@
+{ Symbol } = require "../model/symbol-set"
+
+
 # For Java 1.8, imported from java.lang.*
 AUTOMATICALLY_IMPORTED_TYPES = [
   "Object", "Boolean", "Comparable", "Serializable", "Character",
@@ -70,6 +73,8 @@ module.exports.MissingTypeDefinitionDetector = class MissingTypeDefinitionDetect
         return false
 
     usesInActiveRanges = _getActiveSymbols typeUses
+    for throws in model.getThrows()
+      usesInActiveRanges.push new Symbol undefined, throws, undefined, undefined
     defsInActiveRanges = _getActiveSymbols typeDefs
 
     errors = []

@@ -12,7 +12,7 @@
 
 { ControlCrossingEvent } = require "../../lib/event/control-crossing"
 { MediatingUseEvent } = require "../../lib/event/mediating-use"
-{ MethodThrowsEvent } = require "../../lib/event/method-throws"
+{ MissingThrowsEvent } = require "../../lib/event/missing-throws"
 
 { ImportSuggestion } = require "../../lib/suggester/import-suggester"
 { DefinitionSuggestion } = require "../../lib/suggester/definition-suggester"
@@ -307,12 +307,10 @@ describe "CommandCreator", ->
         commandCreator = new CommandCreator()
         testFile = new File "path", "file_name"
 
-      it "on acceptance, creates a command group with a line addition", ->
+      it "on acceptance, creates a command group with a new throws", ->
         decision = new ExtensionDecision \
-          (new MethodThrowsEvent()),
-          (new MethodThrowsExtension "IOException",
-            (new Range [2, 25], [2, 31]), (new Range [2, 32], [2, 43]),
-            (new Range [2, 2], [2, 45]), (new Range [3, 4], [3, 8]), undefined),
+          (new MissingThrowsEvent()),
+          (new MethodThrowsExtension "IOException", undefined),
           true
         commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
         (expect commandGroup.length).toBe 2
@@ -321,10 +319,8 @@ describe "CommandCreator", ->
 
       it "on rejection, creates a command group an event archiving command", ->
         decision = new ExtensionDecision \
-          (new MethodThrowsEvent()),
-          (new MethodThrowsExtension "IOException",
-            (new Range [2, 25], [2, 31]), (new Range [2, 32], [2, 43]),
-            (new Range [2, 2], [2, 45]), (new Range [3, 4], [3, 8]), undefined),
+          (new MissingThrowsEvent()),
+          (new MethodThrowsExtension "IOException", undefined),
           false
         commandGroup = commandCreator.createCommandGroupForExtensionDecision decision
         (expect commandGroup.length).toBe 1

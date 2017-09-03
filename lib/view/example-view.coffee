@@ -452,7 +452,7 @@ module.exports.ExampleView = class ExampleView
       marker = @_markRange extension.getUse().getRange()
       decoration = new MediatingUseExtensionView extension, @model
     else if extension instanceof MethodThrowsExtension
-      marker = @_markRange extension.getInnerRange()
+      marker = @_markRange extension.getThrowingRange()
       decoration = new MethodThrowsExtensionView extension, @model
 
     # Create a decoration for deciding whether to accept the extension

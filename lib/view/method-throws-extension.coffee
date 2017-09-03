@@ -6,27 +6,25 @@ module.exports.MethodThrowsExtensionView = \
     class MethodThrowsExtensionView extends ExtensionView
 
   constructor: (extension, model) ->
-    throwableName = extension.getThrowableName()
-    @throwsRange = extension.getThrowsRange()
-    @throwableRange = extension.getThrowableRange()
-    super extension, model, "Should the example throw '#{throwableName}' too?"
+    throwableName = extension.getSuggestedThrows()
+    @throwingRange = extension.getThrowingRange()
+    super extension, model,
+      "This function can cause an '#{throwableName}'. Add it to the throws?"
 
   preview: ->
-    @model.getRangeSet().getSuggestedRanges().push @throwsRange
-    @model.getRangeSet().getSuggestedRanges().push @throwableRange
+    @model.getRangeSet().getSuggestedRanges().push @throwingRange
 
   revert: ->
-    @model.getRangeSet().getSuggestedRanges().remove @throwsRange
-    @model.getRangeSet().getSuggestedRanges().remove @throwableRange
+    @model.getRangeSet().getSuggestedRanges().remove @throwingRange
 
   onAccept: (extension) ->
     log.debug "Accepted throws", {
-      throwsName: extension.getThrowableName()
-      selectionRange: extension.getInnerRange()
+      throwsName: extension.getSuggestedThrows()
+      selectionRange: extension.getThrowingRange()
     }
 
   onReject: (extension) ->
     log.debug "Rejected throws", {
-      throwsName: extension.getThrowableName()
-      selectionRange: extension.getInnerRange()
+      throwsName: extension.getSuggestedThrows()
+      selectionRange: extension.getThrowingRange()
     }

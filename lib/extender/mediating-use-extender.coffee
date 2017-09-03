@@ -1,4 +1,5 @@
 { MediatingUseEvent } = require "../event/mediating-use"
+{ Extender } = require "./extender"
 
 
 module.exports.MediatingUseExtension = class MediatingUseExtension
@@ -18,7 +19,7 @@ module.exports.MediatingUseExtension = class MediatingUseExtension
     @events
 
 
-module.exports.MediatingUseExtender = class MediatingUseExtender
+module.exports.MediatingUseExtender = class MediatingUseExtender extends Extender
 
   getExtension: (event, events) ->
     return null if not (event instanceof MediatingUseEvent)

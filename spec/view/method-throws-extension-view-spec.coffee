@@ -14,9 +14,8 @@ describe "MethodThrowsExtensionView", ->
   suggestedRanges = undefined
 
   beforeEach =>
-    extension = new MethodThrowsExtension "IOException",
-      (new Range [2, 25], [2, 31]), (new Range [2, 32], [2, 43]),
-      (new Range [2, 2], [2, 45]), (new Range [3, 4], [3, 8]), undefined
+    extension = new MethodThrowsExtension \
+      "IOException", (new Range [2, 25], [2, 31])
     model = new ExampleModel()
     suggestedRanges = model.getRangeSet().getSuggestedRanges()
     view = new MethodThrowsExtensionView extension, model
@@ -27,9 +26,8 @@ describe "MethodThrowsExtensionView", ->
       "hovering over accept button", ->
     (expect suggestedRanges.length).toBe 0
     acceptButton.mouseover()
-    (expect suggestedRanges.length).toBe 2
+    (expect suggestedRanges.length).toBe 1
     (expect suggestedRanges[0]).toEqual new Range [2, 25], [2, 31]
-    (expect suggestedRanges[1]).toEqual new Range [2, 32], [2, 43]
 
   it "removes from the suggested ranges when leaving the accept button", ->
     acceptButton.mouseover()

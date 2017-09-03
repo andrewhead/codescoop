@@ -8,7 +8,7 @@
 { MissingMethodDefinitionDetector } = require "./error/missing-method-definition"
 { ControlCrossingDetector } = require "./event/control-crossing"
 { MediatingUseDetector } = require "./event/mediating-use"
-{ MethodThrowsDetector } = require "./event/method-throws"
+{ MissingThrowsDetector } = require "./event/missing-throws"
 
 { DefinitionSuggester } = require "./suggester/definition-suggester"
 { DeclarationSuggester } = require "./suggester/declaration-suggester"
@@ -45,6 +45,7 @@ module.exports.ExampleController = class ExampleController
     stubAnalysis = analyses.stubAnalysis
     declarationsAnalysis = analyses.declarationsAnalysis
     rangeGroupsAnalysis = analyses.rangeGroupsAnalysis
+    throwsAnalysis = analyses.throwsAnalysis
 
     @correctors = extras.correctors or [
         checker: new MissingDefinitionDetector()
@@ -68,23 +69,23 @@ module.exports.ExampleController = class ExampleController
     ]
     @extenders = extras.extenders or [
         listener: new ControlCrossingDetector model
-        extender: new ControlStructureExtender()
+        extender: new ControlStructureExtender model
       ,
         listener: new MediatingUseDetector model
-        extender: new MediatingUseExtender()
+        extender: new MediatingUseExtender model
       ,
-        listender: new MethodThrowsDetector model
-        extender: new MethodThrowsExtender()
+        listender: new MissingThrowsDetector model
+        extender: new MethodThrowsExtender model
     ]
 
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis,
       methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis, stubAnalysis,
-      declarationsAnalysis, rangeGroupsAnalysis
+      declarationsAnalysis, rangeGroupsAnalysis, throwsAnalysis
 
   _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
     typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis,
-    rangeGroupsAnalysis) ->
+    rangeGroupsAnalysis, throwsAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -130,6 +131,11 @@ module.exports.ExampleController = class ExampleController
         runner: rangeGroupsAnalysis or= null
         callback: (rangeGroupTable) =>
           @model.setRangeGroupTable rangeGroupTable
+        error: console.error
+      throws:
+        runner: throwsAnalysis or= null
+        callback: (throwsTable) =>
+          @model.setThrowsTable throwsTable
         error: console.error
 
     # Run analyses sequentially.  Soot can't handle when more than one

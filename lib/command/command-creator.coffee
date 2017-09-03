@@ -130,6 +130,6 @@ module.exports.CommandCreator = class CommandCreator
           extension.getMediatingUse().getRange()
 
       else if extension instanceof MethodThrowsExtension
-        commandGroup.push new AddThrows extension.getThrowableName()
+        commandGroup.push new AddThrows extension.getSuggestedThrows()
 
     commandGroup

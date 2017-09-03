@@ -44,7 +44,8 @@ module.exports.RangeGroupTable = class RangeGroupTable
   _toRange: (rangeKey) ->
     regexp = /\[\(([0-9]+), ([0-9]+)\) - \(([0-9]+), ([0-9]+)\)\]/
     match = regexp.exec rangeKey
-    new Range [match[1], match[2]], [match[3], match[4]]
+    new Range [Number(match[1]), Number(match[2])],
+      [Number(match[3]), Number(match[4])]
 
   putGroup: (ranges) ->
     # Every range in a group points to every other range in its group.

@@ -240,7 +240,7 @@ public class ThrowsAnalysis {
         ThrowsAnalysis analysis = new ThrowsAnalysis(args[0]);
         analysis.analyze(args[1]);
 
-        System.out.println("");
+        System.out.println(analysis.getThrowableExceptions());
 
     }
 

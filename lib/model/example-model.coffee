@@ -32,6 +32,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   SYMBOL_TABLE: { value: 24, name: "symbol-table" }
   RANGE_GROUP_TABLE: { value: 25, name: "range-group-table" }
   PRINTED_SYMBOLS: { value: 26, name: "printed-symbols" }
+  THROWS_TABLE: { value: 27, name: "throws-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -92,6 +93,7 @@ module.exports.ExampleModel = class ExampleModel
     @stubSpecs = makeObservableArray []
     @symbolTable = null
     @rangeGroupTable = null
+    @throwsTable = null
 
     @focusedEvent = null
     @proposedExtension = null
@@ -264,11 +266,20 @@ module.exports.ExampleModel = class ExampleModel
     @notifyObservers @, ExampleModelProperty.RANGE_GROUP_TABLE,
       oldRangeGroupTable, @rangeGroupTable
 
-  getPrintedSymbols: () ->
-    @printedSymbols
-
   getRangeGroupTable: ->
     @rangeGroupTable
+
+  getPrintedSymbols: ->
+    @printedSymbols
+
+  setThrowsTable: (throwsTable) ->
+    oldThrowsTable = @throwsTable
+    @throwsTable = throwsTable
+    @notifyObservers @, ExampleModelProperty.THROWS_TABLE,
+      oldThrowsTable, @throwsTable
+
+  getThrowsTable: ->
+    @throwsTable
 
   getImports: ->
     @imports

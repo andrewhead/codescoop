@@ -14,6 +14,9 @@ JAVA_CLASSPATH = []
 JAVA_LIBS_DIR = PACKAGE_PATH + "/java/libs"
 javaLibs = fs.readdirSync JAVA_LIBS_DIR
 JAVA_CLASSPATH.push (PACKAGE_PATH + "/java")
+JAVA_CLASSPATH.push (PACKAGE_PATH + "/java/tests/analysis_examples/")
+JAVA_CLASSPATH.push (PACKAGE_PATH + "/java/tests/scenarios/database-use/")
+JAVA_CLASSPATH.push (PACKAGE_PATH + "/java/tests/scenarios/jsoup/")
 JAVA_CLASSPATH.push()
 javaLibs.forEach (libName) =>
   if (libName.endsWith ".jar")

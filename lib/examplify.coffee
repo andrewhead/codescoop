@@ -4,6 +4,7 @@
 { StubPreview } = require "./view/stub-preview"
 { ControllerView } = require "./view/controller-view"
 
+{ parse } = require "./analysis/parse-tree"
 { ExampleController } = require "./example-controller"
 { ImportAnalysis } = require "./analysis/import-analysis"
 { VariableDefUseAnalysis } = require "./analysis/variable-def-use"
@@ -13,7 +14,7 @@
 { StubAnalysis } = require "./analysis/stub-analysis"
 { DeclarationsAnalysis } = require "./analysis/declarations"
 { RangeGroupsAnalysis } = require "./analysis/range-groups"
-{ parse } = require "./analysis/parse-tree"
+{ ThrowsAnalysis } = require "./analysis/throws-analysis"
 
 { ExampleModel } = require "./model/example-model"
 { RangeSet } = require "./model/range-set"
@@ -90,8 +91,8 @@ module.exports.MainController = class MainController
     @stubPreview = new StubPreview @exampleModel
 
     # Prepare user interface panels
-    # for bottomPanel in atom.workspace.getBottomPanels()
-    #   bottomPanel.destroy() if bottomPanel.item instanceof ExampleController
+    for panel in atom.workspace.getRightPanels()
+      panel.destroy() if panel.item instanceof ExampleController
     atom.views.addViewProvider ExampleController, (controller) =>
       (new ControllerView controller, @exampleModel, exampleEditor).getNode()
 
@@ -106,6 +107,7 @@ module.exports.MainController = class MainController
       # stubAnalysis: new StubAnalysis codeEditorFile
       declarationsAnalysis: new DeclarationsAnalysis @symbols, codeEditorFile, @parseTree
       rangeGroupsAnalysis: new RangeGroupsAnalysis @parseTree
+      throwsAnalysis: new ThrowsAnalysis codeEditorFile
 
     # Prepare controllers
     @exampleController = new ExampleController \

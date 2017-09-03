@@ -1,72 +1,40 @@
-{ MethodThrowsEvent } = require "../event/method-throws"
+{ MissingThrowsEvent } = require "../event/missing-throws"
 { extractCtxRange } = require "../analysis/parse-tree"
+{ Extender } = require "./extender"
 
 
 module.exports.MethodThrowsExtension = class MethodThrowsExtension
 
-  constructor: (throwableName, throwsRange, throwableRange, methodHeaderRange,
-      innerRange, event) ->
-    @throwableName = throwableName
-    @throwsRange = throwsRange
-    @throwableRange = throwableRange
-    @methodHeaderRange = methodHeaderRange
-    @innerRange = innerRange
+  constructor: (suggestedThrows, throwingRange, event) ->
+    @suggestedThrows = suggestedThrows
+    @throwingRange = throwingRange
     @event = event
 
-  getThrowableName: ->
-    @throwableName
+  getSuggestedThrows: ->
+    @suggestedThrows
 
-  getThrowsRange: ->
-    @throwsRange
-
-  getThrowableRange: ->
-    @throwableRange
-
-  getMethodHeaderRange: ->
-    @methodHeaderRange
-
-  getInnerRange: ->
-    @innerRange
+  getThrowingRange: ->
+    @throwingRange
 
   getEvent: ->
-    @evetn
+    @event
 
 
-module.exports.MethodThrowsExtender = class MethodThrowsExtender
+module.exports.MethodThrowsExtender = class MethodThrowsExtender extends Extender
 
   getExtension: (event) ->
 
-    return null if event not instanceof MethodThrowsEvent
+    return null if event not instanceof MissingThrowsEvent
 
-    methodCtx = event.getMethodCtx()
-    methodCtxRange = extractCtxRange methodCtx
-    methodLastChildCtx = methodCtx.children[methodCtx.children.length - 1]
-    methodDeclarationCtx = methodLastChildCtx.children[0]
+    # The default suggested throw message is the fully-qualified exception name
+    suggestedThrows = event.getException().getName()
 
-    # Compute the method header range as the range that goes from the
-    # beginning of the method declaration to the end of the last symbol
-    # that's a part of the header (in this case, the last throwable)
-    firstMethodHeaderCtx = methodDeclarationCtx.children[0]
-    lastMethodHeaderCtx = methodDeclarationCtx.children[ \
-      methodDeclarationCtx.children.length - 2]
-    lastHeaderCtxRange = extractCtxRange lastMethodHeaderCtx
-    methodHeaderRange = [ methodCtxRange.start, lastHeaderCtxRange.end ]
+    # However, if the exception or one of its super-classes has been imported,
+    # suggest the short name for one of those exceptions.
+    exception = event.getException()
+    while exception?
+      if (@model.getImportTable().getImports exception.getName()).length > 0
+        suggestedThrows = exception.getName().replace /.*\./, ""
+      exception = exception.getSuperclass()
 
-    throwsFound = false
-    throwsRange = undefined
-    throwableRange = undefined
-    for childCtx in methodDeclarationCtx.children
-      if childCtx.getText() is "throws"
-        throwsRange = extractCtxRange childCtx
-        throwsFound = true
-        continue
-      else if throwsFound
-        qualifiedNameListCtx = childCtx
-        for qualifiedNameListChildCtx in qualifiedNameListCtx.children
-          if qualifiedNameListChildCtx.getText() is event.getThrowableName()
-            throwableRange = extractCtxRange qualifiedNameListChildCtx
-            break
-        break if throwableRange?
-
-    return new MethodThrowsExtension event.getThrowableName(), throwsRange,
-      throwableRange, methodHeaderRange, event.getInnerRange(), event
+    new MethodThrowsExtension suggestedThrows, event.getRange(), event
