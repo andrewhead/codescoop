@@ -69,6 +69,8 @@ public class CraigslistMonitor {
 
             String title = row.select("a.result-title.hdrlnk").text();
             titles.add(title);
+
+            if (titles.size() >= 5) break;
         }
 
         int maxTitleLength = 0;
@@ -89,7 +91,7 @@ public class CraigslistMonitor {
             }
         }
 
-        String messageHtml = "<pre>";
+        String messageHtml = "<code>";
         for (int i = 0; i < titles.size(); i++) {
             String title = (String) titles.get(i);
             String priceString = ((Integer) prices.get(i)).toString();
@@ -97,9 +99,9 @@ public class CraigslistMonitor {
             String titlePadded = title + StringUtils.repeat(" ", maxTitleLength - title.length());
             String pricePadded = priceString + StringUtils.repeat(" ", maxPriceLength - priceString.length());
             String linkPadded = link + StringUtils.repeat(" ", maxLinkLength - link.length());
-            messageHtml += ("( $" + pricePadded + " ) " + titlePadded + "\n" + linkPadded + "\n\n");
+            messageHtml += ("( $" + pricePadded + " ) " + titlePadded + "<br/>" + linkPadded + "<br/><br/>");
         }
-        messageHtml += "</pre>";
+        messageHtml += "</code>";
 
         BufferedReader confReader = new BufferedReader(new FileReader("/etc/smtp.conf"));
         String username = confReader.readLine();
