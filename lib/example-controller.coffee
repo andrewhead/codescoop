@@ -46,6 +46,7 @@ module.exports.ExampleController = class ExampleController
     declarationsAnalysis = analyses.declarationsAnalysis
     rangeGroupsAnalysis = analyses.rangeGroupsAnalysis
     throwsAnalysis = analyses.throwsAnalysis
+    catchAnalysis = analyses.catchAnalysis
 
     @correctors = extras.correctors or [
         checker: new MissingDefinitionDetector()
@@ -81,11 +82,11 @@ module.exports.ExampleController = class ExampleController
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis,
       methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis, stubAnalysis,
-      declarationsAnalysis, rangeGroupsAnalysis, throwsAnalysis
+      declarationsAnalysis, rangeGroupsAnalysis, throwsAnalysis, catchAnalysis
 
   _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
     typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis,
-    rangeGroupsAnalysis, throwsAnalysis) ->
+    rangeGroupsAnalysis, throwsAnalysis, catchAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -136,6 +137,11 @@ module.exports.ExampleController = class ExampleController
         runner: throwsAnalysis or= null
         callback: (throwsTable) =>
           @model.setThrowsTable throwsTable
+        error: console.error
+      catch:
+        runner: catchAnalysis or= null
+        callback: (catchTable) =>
+          @model.setCatchTable catchTable
         error: console.error
 
     # Run analyses sequentially.  Soot can't handle when more than one

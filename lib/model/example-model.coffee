@@ -33,6 +33,7 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   RANGE_GROUP_TABLE: { value: 25, name: "range-group-table" }
   PRINTED_SYMBOLS: { value: 26, name: "printed-symbols" }
   THROWS_TABLE: { value: 27, name: "throws-table" }
+  CATCH_TABLE: { value: 28, name: "catch-table" }
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -280,6 +281,15 @@ module.exports.ExampleModel = class ExampleModel
 
   getThrowsTable: ->
     @throwsTable
+
+  setCatchTable: (catchTable) ->
+    oldCatchTable = @catchTable
+    @catchTable = catchTable
+    @notifyObservers @, ExampleModelProperty.CATCH_TABLE,
+      oldCatchTable, @catchTable
+
+  getCatchTable: ->
+    @catchTable
 
   getImports: ->
     @imports

@@ -1,5 +1,5 @@
 { toControlStructure, getControlStructureRanges } = require "./parse-tree"
-{ Range } = require "../model/range-set"
+{ Range, RangeSet, RangeTable } = require "../model/range-set"
 { JavaListener } = require "../grammar/Java/JavaListener"
 ParseTreeWalker = (require 'antlr4').tree.ParseTreeWalker.DEFAULT
 
@@ -33,46 +33,31 @@ module.exports.buildRangeGroupTable = buildRangeGroupTable = (parseTree) ->
   rangeGroupTable
 
 
-module.exports.RangeGroupTable = class RangeGroupTable
-
-  constructor: () ->
-    @relatedRanges = {}
-
-  _getRangeKey: (range) ->
-    String(range)
-
-  _toRange: (rangeKey) ->
-    regexp = /\[\(([0-9]+), ([0-9]+)\) - \(([0-9]+), ([0-9]+)\)\]/
-    match = regexp.exec rangeKey
-    new Range [Number(match[1]), Number(match[2])],
-      [Number(match[3]), Number(match[4])]
+module.exports.RangeGroupTable = class RangeGroupTable extends RangeTable
 
   putGroup: (ranges) ->
     # Every range in a group points to every other range in its group.
     for range in ranges
-      rangeKey = @_getRangeKey range
       for otherRange in ranges
         if not (otherRange.isEqual range)
-          if rangeKey not of @relatedRanges
-            @relatedRanges[rangeKey] = []
-          @relatedRanges[rangeKey].push otherRange
+          if not @containsRange range
+            @put range, []
+          (@get range).push otherRange
 
   getRelatedRanges: (range) ->
 
     relatedRanges = []
 
     # If this range is in the table, just get the related ranges
-    rangeKey = @_getRangeKey range
-    if rangeKey of @relatedRanges
-      relatedRanges = @relatedRanges[rangeKey]
+    if @containsRange range
+      relatedRanges = @get range
 
     # Otherwise, look for the first range that this one contains.  If one
     # exists, return the related range for that range.
     else
-      for rangeKey of @relatedRanges
-        otherRange = @_toRange rangeKey
+      for otherRange in @getRanges()
         if range.containsRange otherRange
-          relatedRanges = @relatedRanges[rangeKey]
+          relatedRanges = (@get otherRange) or []
 
     # Only return ranges that aren't *within* the input range
     newRelatedRanges = []

@@ -1,4 +1,4 @@
-{ Range } = require "./range-set"
+{ Range, RangeTable } = require "./range-set"
 { Point } = require "atom"
 
 
@@ -20,34 +20,15 @@ module.exports.Exception = class Exception
      (other.getSuperclass()? and other.getSuperclass().equals @superclass))
 
 
-module.exports.ThrowsTable = class ThrowsTable
-
-  constructor: ->
-    @table = {}
-
-  _getRangeKey: (range) ->
-    range.toString()
-
-  _toRange: (rangeKey) ->
-    regexp = /\[\(([0-9]+), ([0-9]+)\) - \(([0-9]+), ([0-9]+)\)\]/
-    match = regexp.exec rangeKey
-    new Range [Number(match[1]), Number(match[2])],
-      [Number(match[3]), Number(match[4])]
-
-  addException: (range, exception) ->
-    rangeKey = @_getRangeKey range
-    if rangeKey not of @table
-      @table[rangeKey] = []
-    @table[rangeKey].push exception
+module.exports.ThrowsTable = class ThrowsTable extends RangeTable
 
   getExceptions: (range) ->
-    rangeKey = @_getRangeKey range
-    if rangeKey not of @table
-      return []
-    @table[rangeKey]
+    (@get range) or []
+
+  addException: (range, exception) ->
+    if not @containsRange range
+      @put range, []
+    (@get range).push exception
 
   getRangesWithThrows: ->
-    ranges = []
-    for rangeKey of @table
-      ranges.push @_toRange rangeKey
-    ranges
+    @getRanges()

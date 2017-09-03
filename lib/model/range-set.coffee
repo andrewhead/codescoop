@@ -1,4 +1,5 @@
-{ makeObservableArray } = require './observable-array'
+{ makeObservableArray } = require "./observable-array"
+{ Range } = require "atom"
 
 
 module.exports.RangeSetProperty = RangeSetProperty =
@@ -18,7 +19,7 @@ module.exports.RangeSetProperty = RangeSetProperty =
   CHOSEN_RANGES_CHANGED: { value: 5, name: "chosen-ranges-changed" }
 
 
-module.exports.Range = (require 'atom').Range
+module.exports.Range = Range
 
 
 module.exports.MethodRange = class MethodRange
@@ -53,6 +54,39 @@ module.exports.ClassRange = class ClassRange
 
   isStatic: ->
     @static
+
+
+# One common data structure is looking up information by range.  This table
+# provides a standard interface to a table where the range is the key.
+module.exports.RangeTable = class RangeTable
+
+  constructor: ->
+    @table = {}
+
+  get: (range) ->
+    @table[@_getRangeKey range]
+
+  put: (range, item) ->
+    rangeKey = @_getRangeKey range
+    @table[rangeKey] = item
+
+  containsRange: (range) ->
+    (@_getRangeKey range) of @table
+
+  getRanges: ->
+    ranges = []
+    for rangeKey of @table
+      ranges.push @_toRange rangeKey
+    ranges
+
+  _getRangeKey: (range) ->
+    range.toString()
+
+  _toRange: (rangeKey) ->
+    regexp = /\[\(([0-9]+), ([0-9]+)\) - \(([0-9]+), ([0-9]+)\)\]/
+    match = regexp.exec rangeKey
+    new Range [Number(match[1]), Number(match[2])],
+      [Number(match[3]), Number(match[4])]
 
 
 module.exports.RangeSet = class RangeSet

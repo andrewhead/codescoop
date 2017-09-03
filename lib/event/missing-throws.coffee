@@ -1,7 +1,5 @@
 { EventDetector } = require "./event-detector"
 { ExampleModelProperty } = require "../model/example-model"
-{ toControlStructure, TryCatchControlStructure, extractCtxRange, getControlStructureRanges } = require "../analysis/parse-tree"
-{ JavaParser } = require "../../lib/grammar/Java/JavaParser"
 
 
 module.exports.MissingThrowsEvent = class MissingThrowsEvent
@@ -24,7 +22,8 @@ module.exports.MissingThrowsEvent = class MissingThrowsEvent
 
 # The input exception can have a superclass.  The list of exceptions can
 # either be fully-qualified names or not.
-_isExceptionInList = (exception, exceptionNameList) =>
+module.exports.isExceptionInList = isExceptionInList = \
+    (exception, exceptionNameList) =>
 
   # Recursively look through the names of the supertypes of the exception
   superclass = exception
@@ -50,55 +49,15 @@ _isExceptionInList = (exception, exceptionNameList) =>
 module.exports.MissingThrowsDetector = class MissingThrowsDetector extends EventDetector
 
   _isExceptionAlreadyThrown: (exception, model) ->
-    return _isExceptionInList exception, model.getThrows()
+    return isExceptionInList exception, model.getThrows()
 
-  _isExceptionAlreadyCaught: (exception, throwsRange, activeRanges, parseTree) ->
-
-    statementCtx = parseTree.getCtxForRange throwsRange
-    parentCtx = statementCtx
-    alreadyHandled = false
-
-    # Starting at this range, look to see if a try-catch block has been
-    # included that already handles the exception.
-    while parentCtx?
-
-      # Check to see if this node is actually a try-catch block
-      tryCatch = toControlStructure parentCtx
-      if tryCatch instanceof TryCatchControlStructure
-
-        # Check to see if this try-catch block is active
-        tryCatchRanges = getControlStructureRanges tryCatch
-        tryCatchActive = false
-        for tryCatchRange in tryCatchRanges
-          for activeRange in activeRanges
-            if tryCatchRange.intersectsWith activeRange
-              tryCatchActive = true
-
-        if tryCatchActive
-
-          # Traverse down to the exception names...
-          catchClauseCtx = tryCatch.getCtx().children[2]
-          for catchClauseChildCtx in catchClauseCtx.children
-
-            if catchClauseChildCtx.ruleIndex == JavaParser.RULE_catchType
-              catchTypeCtx = catchClauseChildCtx
-              exceptionsCaught = []
-              # Save all of the names of the exceptions thrown
-              for catchTypeChildCtx in catchTypeCtx.children
-                if (catchTypeChildCtx.ruleIndex == JavaParser.RULE_qualifiedName)
-                  exceptionsCaught.push catchTypeChildCtx.getText()
-
-              # Consider this handled if the method is in the 'try'
-              # block and the catch lists that exception.
-              catchTypeRange = extractCtxRange catchTypeCtx
-              if (((throwsRange.compare catchTypeRange) < 0) and
-                  (_isExceptionInList exception, exceptionsCaught))
-                return true
-
-      parentCtx = parentCtx.parentCtx
-
+  _isExceptionAlreadyCaught: (exception, throwsRange, activeRanges, catchTable) ->
+    catchRanges = catchTable.getCatchRanges throwsRange
+    for catchRange in catchRanges
+      for activeRange in activeRanges
+        if catchRange.intersectsWith activeRange
+          return true
     false
-
 
   detectEvents: (propertyName, oldValue, newValue) ->
 
@@ -107,8 +66,8 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
     if propertyName is ExampleModelProperty.ACTIVE_RANGES
 
       throwsTable = @model.getThrowsTable()
-      return events if not throwsTable?
-      parseTree = @model.getParseTree()
+      catchTable = @model.getCatchTable()
+      return events if (not throwsTable?) or (not catchTable?)
       activeRanges = @model.getRangeSet().getActiveRanges()
 
       # Search for ranges that throw exceptions in the set of active ranges
@@ -123,17 +82,15 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
             # If it isn't, we should create an event.
             for exception in throwsTable.getExceptions range
 
-              # It's can be really costly to check if an exception is already
-              # thrown by traversing the parse tree.  Before even computing
-              # whether to add this event, see if we've already created and
-              # queued it.  If so, don't bother adding it!
+              # It's can be costly to check if an exception is already
+              # thrown.  Before computing whether to add this event, see if
+              # it's already queued.
               potentialEvent = new MissingThrowsEvent range, exception
-              continue if @isEventQueued potentialEvent
 
               # If the example is already throwing this exception of the
               # superclass of the exception, we don't need to add it in.
               continue if @_isExceptionAlreadyThrown exception, @model
-              continue if @_isExceptionAlreadyCaught exception, range, activeRanges, parseTree
+              continue if @_isExceptionAlreadyCaught exception, range, activeRanges, catchTable
 
               # If it's not already handled, make an event
               events.push potentialEvent
@@ -154,7 +111,7 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
     exception = event.getException()
     range = event.getRange()
     activeRanges = @model.getRangeSet().getActiveRanges()
-    parseTree = @model.getParseTree()
+    catchTable = @model.getCatchTable()
     return true if (
       (@_isExceptionAlreadyThrown exception, @model) or
-      (@_isExceptionAlreadyCaught exception, range, activeRanges, parseTree))
+      (@_isExceptionAlreadyCaught exception, range, activeRanges, catchTable))

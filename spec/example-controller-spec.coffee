@@ -12,6 +12,7 @@
 { DeclarationsAnalysis } = require "../lib/analysis/declarations"
 { RangeGroupsAnalysis } = require "../lib/analysis/range-groups"
 { ThrowsAnalysis } = require "../lib/analysis/throws-analysis"
+{ CatchAnalysis } = require "../lib/analysis/catch"
 
 { AddRange } = require "../lib/command/add-range"
 { AddPrintedSymbol } = require "../lib/command/add-printed-symbol"
@@ -57,6 +58,7 @@ describe "ExampleController", ->
     declarationsAnalysis = new DeclarationsAnalysis symbolSet, testFile, parseTree
     rangeGroupsAnalysis = new RangeGroupsAnalysis parseTree
     throwsAnalysis = new ThrowsAnalysis testFile
+    catchAnalysis = new CatchAnalysis model
 
     controller = undefined
     importTable = undefined
@@ -77,7 +79,7 @@ describe "ExampleController", ->
           analyses: { importAnalysis, variableDefUseAnalysis,
             methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
             stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis,
-            throwsAnalysis }
+            throwsAnalysis, catchAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>
@@ -91,6 +93,7 @@ describe "ExampleController", ->
         symbolTable = model.getSymbolTable()
         rangeGroupTable = model.getRangeGroupTable()
         throwsTable = model.getThrowsTable()
+        catchTable = model.getCatchTable()
 
         ((variableDefs.length > 0) and valueMap? and stubSpecTable? and
           (methodDefs.length > 0) and (typeDefs.length > 0) and
@@ -99,7 +102,8 @@ describe "ExampleController", ->
           importTable? and
           symbolTable? and
           rangeGroupTable? and
-          throwsTable?)
+          throwsTable? and
+          catchTable?)
 
       # Once analyses complete, we wait for a transition into the IDLE state
       waitsFor =>

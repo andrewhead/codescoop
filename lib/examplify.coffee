@@ -15,6 +15,7 @@
 { DeclarationsAnalysis } = require "./analysis/declarations"
 { RangeGroupsAnalysis } = require "./analysis/range-groups"
 { ThrowsAnalysis } = require "./analysis/throws-analysis"
+{ CatchAnalysis } = require "./analysis/catch"
 
 { ExampleModel } = require "./model/example-model"
 { RangeSet } = require "./model/range-set"
@@ -108,6 +109,7 @@ module.exports.MainController = class MainController
       declarationsAnalysis: new DeclarationsAnalysis @symbols, codeEditorFile, @parseTree
       rangeGroupsAnalysis: new RangeGroupsAnalysis @parseTree
       throwsAnalysis: new ThrowsAnalysis codeEditorFile
+      catchAnalysis: new CatchAnalysis @exampleModel
 
     # Prepare controllers
     @exampleController = new ExampleController \

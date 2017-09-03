@@ -1,6 +1,7 @@
 { ExampleModel } = require "../../lib/model/example-model"
 { MissingThrowsEvent, MissingThrowsDetector } = require "../../lib/event/missing-throws"
 { ThrowsTable, Exception } = require "../../lib/model/throws-table"
+{ CatchTable } = require "../../lib/model/catch-table"
 { parse } = require "../../lib/analysis/parse-tree"
 { Range } = require "../../lib/model/range-set"
 
@@ -12,25 +13,24 @@ describe "MissingThrowsDetector", ->
   parseTree = undefined
   throwsTable = undefined
   beforeEach =>
-    parseTree = parse [
-      "import fake.pkg.Klazz;"
-      "import fake.pkg.FakeException1;"
-      "import fake.pkg.FakeException2;"
-      ""
-      "public class Example {"
-      "  public static void main(String[] args) {"
-      "    Klazz k = new Klazz();"
-      "    try {"
-      "      k.riskyMethod1();  // throws FakeException1"
-      "    } catch (FakeException1 e) {"
-      "      k.riskyMethod1();  // throws FakeException1"
-      "    }"
-      "    k.riskyMethod2();  // throws FakeException1, FakeException2"
-      "  }"
-      "}"
-    ].join "\n"
+
+    # This test case is based on the following example code:
+    # import fake.pkg.Klazz;"
+    # import fake.pkg.FakeException1;"
+    # import fake.pkg.FakeException2;"
+    # "
+    # public class Example {"
+    #   public static void main(String[] args) {"
+    #     Klazz k = new Klazz();"
+    #     try {"
+    #       k.riskyMethod1();  // throws FakeException1"
+    #     } catch (FakeException1 e) {"
+    #       k.riskyMethod1();  // throws FakeException1"
+    #     }"
+    #     k.riskyMethod2();  // throws FakeException1, FakeException2"
+    #   }"
+    # }"
     model = new ExampleModel()
-    model.setParseTree parseTree
 
     throwsTable = new ThrowsTable()
     exception1 = new Exception "fake.pkg.FakeException1", new Exception "java.lang.Exception"
@@ -39,8 +39,11 @@ describe "MissingThrowsDetector", ->
     throwsTable.addException (new Range [10, 6], [10, 22]), exception1
     throwsTable.addException (new Range [12, 8], [12, 20]), exception1
     throwsTable.addException (new Range [12, 8], [12, 20]), exception2
-
     model.setThrowsTable throwsTable
+
+    catchTable = new CatchTable()
+    catchTable.addCatch (new Range [8, 6], [8, 22]), new Range [9, 6], [11, 5]
+    model.setCatchTable catchTable
 
     detector = new MissingThrowsDetector model
 
@@ -71,7 +74,7 @@ describe "MissingThrowsDetector", ->
   it "doesn't enqueue the event if it is already caught", ->
     # The first range is part of the try-catch block.  This suggests that the
     # exception is already getting handled!
-    model.getRangeSet().getSnippetRanges().push new Range [7, 4], [7, 9]
+    model.getRangeSet().getSnippetRanges().push new Range [9, 0], [9, 32]
     model.getRangeSet().getSnippetRanges().push new Range [8, 0], [8, 23]
     (expect model.getEvents().length).toBe 0
 
@@ -89,5 +92,5 @@ describe "MissingThrowsDetector", ->
   it "marks an event obsolete when a 'catch' is added for the exception'", ->
     model.getRangeSet().getSnippetRanges().push new Range [8, 0], [8, 23]
     (expect model.getEvents().length).toBe 1
-    model.getRangeSet().getSnippetRanges().push new Range [7, 4], [7, 9]
+    model.getRangeSet().getSnippetRanges().push new Range [9, 0], [9, 32]
     (expect model.getEvents().length).toBe 0
