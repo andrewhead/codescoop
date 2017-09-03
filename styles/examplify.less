@@ -107,6 +107,10 @@ atom-overlay {
     font-family: @font-family;
   }
 
+  &.resolution-widget div {
+    white-space: nowrap;
+  }
+
   div.resolution-class-block {
 
     &:not(:last-of-type) {
@@ -124,7 +128,8 @@ atom-overlay {
     border-color: @tool-panel-border-color;
     color: @text-color-highlight;
 
-    float: left;
+    display: inline-block;
+    vertical-align: top;
 
     div.resolution-class-header {
       font-weight: bold;
