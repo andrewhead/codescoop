@@ -63,7 +63,8 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
 
     events = []
 
-    if propertyName is ExampleModelProperty.ACTIVE_RANGES
+    if ((propertyName is ExampleModelProperty.ACTIVE_RANGES) and
+        newValue.length > oldValue.length)
 
       throwsTable = @model.getThrowsTable()
       catchTable = @model.getCatchTable()

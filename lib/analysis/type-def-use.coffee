@@ -69,7 +69,7 @@ class TypeUseVisitor extends JavaListener
     if ctx.Identifier()?
       text = ctx.getText()
       range = extractCtxRange ctx
-      if text.match /^[A-Z]([_a-z0-9].*)?/
+      if text.match /^[A-Z]($|[_a-z0-9]+$)/
         symbol = new Symbol @file, text, range, "Class"
         @_saveSymbolIfTypeIsntIgnored symbol
 

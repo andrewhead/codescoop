@@ -77,28 +77,28 @@ public class CraigslistMonitor {
         int maxPriceLength = 0;
         int maxLinkLength = 0;
         for (int i = 0; i < titles.size(); i++) {
-            String title = (String) titles.get(i);
-            if (title.length() > maxTitleLength) {
-                maxTitleLength = title.length();
+            String titleLine = (String) titles.get(i);
+            if (titleLine.length() > maxTitleLength) {
+                maxTitleLength = titleLine.length();
             }
-            int price = ((Integer) prices.get(i)).intValue();
-            if (Integer.toString(price).length() > maxPriceLength) {
-                maxPriceLength = Integer.toString(price).length();
+            int priceLine = ((Integer) prices.get(i)).intValue();
+            if (Integer.toString(priceLine).length() > maxPriceLength) {
+                maxPriceLength = Integer.toString(priceLine).length();
             }
-            String link = (String) links.get(i);
-            if (link.length() > maxLinkLength) {
-                maxLinkLength = link.length();
+            String linkLine = (String) links.get(i);
+            if (linkLine.length() > maxLinkLength) {
+                maxLinkLength = linkLine.length();
             }
         }
 
         String messageHtml = "<code>";
-        for (int i = 0; i < titles.size(); i++) {
-            String title = (String) titles.get(i);
-            String priceString = ((Integer) prices.get(i)).toString();
-            String link = (String) links.get(i);
-            String titlePadded = title + StringUtils.repeat(" ", maxTitleLength - title.length());
-            String pricePadded = priceString + StringUtils.repeat(" ", maxPriceLength - priceString.length());
-            String linkPadded = link + StringUtils.repeat(" ", maxLinkLength - link.length());
+        for (int j = 0; j < titles.size(); j++) {
+            String titleText = (String) titles.get(j);
+            String priceText = ((Integer) prices.get(j)).toString();
+            String linkText = (String) links.get(j);
+            String titlePadded = titleText + StringUtils.repeat(" ", maxTitleLength - titleText.length());
+            String pricePadded = priceText + StringUtils.repeat(" ", maxPriceLength - priceText.length());
+            String linkPadded = linkText + StringUtils.repeat(" ", maxLinkLength - linkText.length());
             messageHtml += ("( $" + pricePadded + " ) " + titlePadded + "<br/>" + linkPadded + "<br/><br/>");
         }
         messageHtml += "</code>";
