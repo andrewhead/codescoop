@@ -63,8 +63,10 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
 
     events = []
 
-    if ((propertyName is ExampleModelProperty.ACTIVE_RANGES) and
-        newValue.length > oldValue.length)
+    # Check for errors whenever the state changes or the number of active
+    # ranges changes (i.e after initialization, or when ranges added)
+    if ((propertyName == ExampleModelProperty.ACTIVE_RANGES) or
+        (propertyName == ExampleModelProperty.STATE))
 
       throwsTable = @model.getThrowsTable()
       catchTable = @model.getCatchTable()
@@ -100,9 +102,9 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
 
   isEventQueued: (event) ->
     for pastEvent in @model.getEvents().concat @model.getViewedEvents()
-      if (pastEvent instanceof MissingThrowsEvent and
-         (pastEvent.equals event))
-        return true
+      if pastEvent instanceof MissingThrowsEvent
+        if pastEvent.equals event
+          return true
     false
 
   isEventObsolete: (event) ->

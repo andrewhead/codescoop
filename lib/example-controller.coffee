@@ -29,9 +29,7 @@ module.exports.ExampleController = class ExampleController
 
   constructor: (model, extras = {}) ->
 
-    # Listen to all changes in the model
     @model = model
-    @model.addObserver @
 
     @commandCreator = extras.commandCreator or new CommandCreator()
     @commandStack = extras.commandStack or new CommandStack()
@@ -79,6 +77,11 @@ module.exports.ExampleController = class ExampleController
         listender: new MissingThrowsDetector model
         extender: new MethodThrowsExtender model
     ]
+
+    # Listen to all changes in the model.  Add this as a last step, as the
+    # detectors will be listening too, and we want them to fire whenever the
+    # model changes, before the controller, which may need detector results.
+    @model.addObserver @
 
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis,
@@ -252,7 +255,7 @@ module.exports.ExampleController = class ExampleController
           # Check to see if the range is already included
           rangeAlreadyIncluded = false
           for activeRange in @model.getRangeSet().getActiveRanges()
-            if activeRange.containsRange newRange
+            if activeRange.intersectsWith newRange
               rangeAlreadyIncluded = true
 
           # Only add a new range when the range hasn't been added in the past

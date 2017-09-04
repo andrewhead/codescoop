@@ -32,7 +32,9 @@ module.exports.ControllerView = class ControllerView extends $
       .attr "disabled", (controller.getCommandStack().getHeight() == 0)
       .append @_svgForIcon "action-undo"
       .append "Undo"
-      .click => controller.undo()
+      .click =>
+        log.debug "Button press for undo"
+        controller.undo()
       .appendTo element
 
     @runButton = $ "<button></button>"
