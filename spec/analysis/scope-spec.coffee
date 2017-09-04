@@ -1,7 +1,7 @@
 { InputStream, CommonTokenStream } = require "antlr4"
 { JavaParser } = require "../../lib/grammar/Java/JavaParser"
 { ScopeFinder } = require "../../lib/analysis/scope"
-{ BlockScope, ForLoopScope, MethodScope, ClassScope } = require "../../lib/analysis/scope"
+{ BlockScope, ForLoopScope, CatchBlockScope, MethodScope, ClassScope } = require "../../lib/analysis/scope"
 { parse, partialParse } = require "../../lib/analysis/parse-tree"
 { Symbol, SymbolText, File } = require "../../lib/model/symbol-set"
 { Range } = require "../../lib/model/range-set"
@@ -16,6 +16,8 @@ describe "ScopeFinder", ->
       (scope.getCtx().parentCtx.ruleIndex is JavaParser.RULE_constructorBody)
 
   _isScopeForForLoop = (scope) => scope instanceof ForLoopScope
+
+  _isScopeForCatchBlock = (scope) => scope instanceof CatchBlockScope
 
   _isScopeForStatementBlock = (scope) => scope instanceof BlockScope
 
@@ -34,6 +36,8 @@ describe "ScopeFinder", ->
       "    {"
       "        int k = 2;"
       "    }"
+      "    try {"
+      "    } catch (Exception e) {}"
       "  }"
       "}"
     ].join "\n"
@@ -70,9 +74,13 @@ describe "ScopeFinder", ->
       count = _countMatchingScopes _isScopeForForLoop
       (expect count).toBe 1
 
+    it "finds catch blocks", ->
+      count = _countMatchingScopes _isScopeForCatchBlock
+      (expect count).toBe 1
+
     it "finds other blocks not attached to a particular structure", ->
       count = _countMatchingScopes _isScopeForStatementBlock
-      (expect count).toBe 1
+      (expect count).toBe 2  # unattached scope, and the 'try' scope
 
   describe "when looking for scopes for a symbol", ->
 
@@ -84,6 +92,10 @@ describe "ScopeFinder", ->
       "    {"
       "       int j = 2;"
       "       j = j + i;"
+      "    }"
+      "    try {"
+      "    } catch (Exception e) {"
+      "       System.out.println(e);"
       "    }"
       "  }"
       "  public void method1() {}"
@@ -113,6 +125,12 @@ describe "ScopeFinder", ->
       count = _countSymbolScopes scopes, _isScopeForMethod
       (expect count).toBe 1
 
+    it "can find a symbol in a catch block scope", ->
+      symbol = new SymbolText "e", (new Range [10, 26], [10, 27])
+      scopes = scopeFinder.findSymbolScopes symbol
+      count = _countSymbolScopes scopes, _isScopeForCatchBlock
+      (expect count).toBe 1
+
     it "can find a symbol within class declarations", ->
       symbol = new SymbolText "k", (new Range [1, 20], [1, 21])
       scopes = scopeFinder.findSymbolScopes symbol
@@ -120,7 +138,7 @@ describe "ScopeFinder", ->
       (expect count).toBe 1
 
     it "can find methods (not just variables!)", ->
-      symbol = new SymbolText "method1", (new Range [9, 14], [9, 21])
+      symbol = new SymbolText "method1", (new Range [13, 14], [13, 21])
       scopes = scopeFinder.findSymbolScopes symbol
       (expect (scopes.length >= 1)).toBe true
 
@@ -214,6 +232,24 @@ describe "Scope", ->
       (expect symbols.length).toBe 1
       (expect _isSymbolTextInList \
         (new SymbolText "s", (new Range [0, 18], [0, 19])),
+        symbols).toBe true
+
+  describe "for a catch block", ->
+
+    it "includes the variables declared in the catch clause", ->
+      CATCH_CODE = [
+        "      catch (Exception e) {"
+        "        System.out.println(e);"
+        "      }"
+      ].join "\n"
+      ctx = partialParse CATCH_CODE, "catchClause"
+      blockCtx = ctx.block()
+      scope = new CatchBlockScope fakeFile, blockCtx
+
+      symbols = scope.getDeclarations()
+      (expect symbols.length).toBe 1
+      (expect _isSymbolTextInList \
+        (new SymbolText "e", (new Range [0, 23], [0, 24])),
         symbols).toBe true
 
   describe "for a method", ->

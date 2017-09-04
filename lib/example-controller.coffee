@@ -39,6 +39,7 @@ module.exports.ExampleController = class ExampleController
     analyses = extras.analyses or {}
     importAnalysis = analyses.importAnalysis
     variableDefUseAnalysis = analyses.variableDefUseAnalysis
+    catchVariableDefAnalysis = analyses.catchVariableDefAnalysis
     methodDefUseAnalysis = analyses.methodDefUseAnalysis
     typeDefUseAnalysis = analyses.typeDefUseAnalysis
     valueAnalysis = analyses.valueAnalysis
@@ -81,12 +82,14 @@ module.exports.ExampleController = class ExampleController
 
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis,
-      methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis, stubAnalysis,
-      declarationsAnalysis, rangeGroupsAnalysis, throwsAnalysis, catchAnalysis
+      catchVariableDefAnalysis, methodDefUseAnalysis, typeDefUseAnalysis,
+      valueAnalysis, stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis,
+      throwsAnalysis, catchAnalysis
 
-  _startAnalyses: (importAnalysis, variableDefUseAnalysis, methodDefUseAnalysis,
-    typeDefUseAnalysis, valueAnalysis, stubAnalysis, declarationsAnalysis,
-    rangeGroupsAnalysis, throwsAnalysis, catchAnalysis) ->
+  _startAnalyses: (importAnalysis, variableDefUseAnalysis,
+    catchVariableDefAnalysis, methodDefUseAnalysis, typeDefUseAnalysis,
+    valueAnalysis, stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis,
+    throwsAnalysis, catchAnalysis) ->
 
     # Save a reference to analyses
     @analyses =
@@ -100,6 +103,13 @@ module.exports.ExampleController = class ExampleController
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
+        error: console.error
+      catchVariableDef:
+        runner: catchVariableDefAnalysis
+        callback: (definitions) =>
+          variableDefs = @model.getSymbols().getVariableDefs()
+          for def in definitions
+            variableDefs.push def
         error: console.error
       methodDefUse:
         runner: methodDefUseAnalysis

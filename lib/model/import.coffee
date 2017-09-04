@@ -43,3 +43,13 @@ module.exports.ImportTable = class ImportTable
   # Class can be either fully-qualified name or single token
   getImports: (className) ->
     @table[className] or []
+
+  getFullyQualifiedName: (shortName) ->
+    # If a fully-qualified name was already passed in, just return it
+    if (shortName.indexOf '.') != -1
+      return shortName
+    # Otherwise, look for the first qualified name of an importd class that
+    # ends with the class's short name
+    for className of @table
+      if className.endsWith ('.' + shortName)
+        return className

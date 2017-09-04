@@ -13,6 +13,7 @@
 { RangeGroupsAnalysis } = require "../lib/analysis/range-groups"
 { ThrowsAnalysis } = require "../lib/analysis/throws-analysis"
 { CatchAnalysis } = require "../lib/analysis/catch"
+{ CatchVariableDefAnalysis } = require "../lib/analysis/catch-variable-def"
 
 { AddRange } = require "../lib/command/add-range"
 { AddPrintedSymbol } = require "../lib/command/add-printed-symbol"
@@ -50,6 +51,7 @@ describe "ExampleController", ->
 
     # Prepare the analyses
     variableDefUseAnalysis = new VariableDefUseAnalysis testFile
+    catchVariableDefAnalysis = new CatchVariableDefAnalysis testFile, parseTree, model
     methodDefUseAnalysis = new MethodDefUseAnalysis testFile, parseTree
     typeDefUseAnalysis = new TypeDefUseAnalysis testFile, parseTree
     importAnalysis = new ImportAnalysis testFile
@@ -76,10 +78,10 @@ describe "ExampleController", ->
       # When the controller starts, it will run the analyses one after another
       runs ->
         controller = new ExampleController model,
-          analyses: { importAnalysis, variableDefUseAnalysis,
-            methodDefUseAnalysis, typeDefUseAnalysis, valueAnalysis,
-            stubAnalysis, declarationsAnalysis, rangeGroupsAnalysis,
-            throwsAnalysis, catchAnalysis }
+          analyses: { importAnalysis, catchVariableDefAnalysis,
+            variableDefUseAnalysis, methodDefUseAnalysis, typeDefUseAnalysis,
+            valueAnalysis, stubAnalysis, declarationsAnalysis,
+            rangeGroupsAnalysis, throwsAnalysis, catchAnalysis }
 
       # Wait for the analyses to finish
       waitsFor =>

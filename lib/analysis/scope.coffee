@@ -78,6 +78,13 @@ class EnhancedForVisitor extends DeclarationVisitor
     @symbolsDeclared.push symbol
 
 
+class CatchClauseVisitor extends DeclarationVisitor
+
+  enterCatchClause: (ctx) ->
+    symbol = _symbolTextFromIdNode ctx.Identifier().symbol
+    @symbolsDeclared.push symbol
+
+
 class MatchVisitor extends JavaListener
 
   # The constructor takes in a single argument:
@@ -133,6 +140,16 @@ module.exports.BlockScope = class BlockScope extends Scope
 
   getDeclarations: ->
     super()
+
+
+module.exports.CatchBlockScope = class CatchBlockScope extends Scope
+
+  getDeclarations: ->
+    declarations = super()
+    catchClauseVisitor = new CatchClauseVisitor @file, []
+    ParseTreeWalker.walk catchClauseVisitor, @ctx.parentCtx
+    declarations = declarations.concat catchClauseVisitor.getDeclarations()
+    declarations
 
 
 module.exports.ForLoopScope = class ForLoopScope extends Scope
@@ -212,6 +229,11 @@ module.exports.ScopeFinder = class ScopeFinder
             try
               forText = ctx.parentCtx.parentCtx.children[0].symbol.text
           forText? and (forText is "for")
+      }, {
+        type: CatchBlockScope,
+        rule: (ctx) => (ctx.parentCtx? and
+           ctx.ruleIndex is JavaParser.RULE_block and
+           ctx.parentCtx.ruleIndex is JavaParser.RULE_catchClause)
       }, {
         # This one should cover loops, conditionals, and
         # other blocks of statements not attached to control

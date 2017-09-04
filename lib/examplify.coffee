@@ -8,6 +8,7 @@
 { ExampleController } = require "./example-controller"
 { ImportAnalysis } = require "./analysis/import-analysis"
 { VariableDefUseAnalysis } = require "./analysis/variable-def-use"
+{ CatchVariableDefAnalysis } = require "./analysis/catch-variable-def"
 { MethodDefUseAnalysis } = require "./analysis/method-def-use"
 { TypeDefUseAnalysis } = require "./analysis/type-def-use"
 { ValueAnalysis } = require "./analysis/value-analysis"
@@ -102,6 +103,7 @@ module.exports.MainController = class MainController
     @analyses =
       importAnalysis: new ImportAnalysis codeEditorFile
       variableDefUseAnalysis: new VariableDefUseAnalysis codeEditorFile
+      catchVariableDefAnalysis: new CatchVariableDefAnalysis codeEditorFile, @parseTree, @exampleModel
       methodDefUseAnalysis: new MethodDefUseAnalysis codeEditorFile, @parseTree
       typeDefUseAnalysis: new TypeDefUseAnalysis codeEditorFile, @parseTree
       valueAnalysis: new ValueAnalysis codeEditorFile

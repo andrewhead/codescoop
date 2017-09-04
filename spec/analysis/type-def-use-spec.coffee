@@ -56,6 +56,16 @@ describe "TypeUseFinder", ->
     ].join "\n"
     _checkForOneTypeSymbol parseTree, "Book", new Range [2, 8], [2, 12]
 
+  it "finds classes in static method calls", ->
+    parseTree = parse [
+      "public class Book {"
+      "  public void method() {"
+      "    Math.min(0, 1);"
+      "  }"
+      "}"
+    ].join "\n"
+    _checkForOneTypeSymbol parseTree, "Math", new Range [2, 4], [2, 8]
+
   it "finds classes in variable declarations in for loop control", ->
     parseTree = parse [
       "public class Book {"

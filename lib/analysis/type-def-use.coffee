@@ -60,6 +60,19 @@ class TypeUseVisitor extends JavaListener
         symbol = new Symbol @file, text, range, "Class"
         @_saveSymbolIfTypeIsntIgnored symbol
 
+  # We use a heuristic to identify types for invocations calls: we look for
+  # CamelCase variable names followed by a dot.  This does not work if
+  # the type's fully-qualified name is being used, or if a variable has
+  # a CamelCase naming convention.  In the long run, this should rely instead on
+  # looking at the types of the symbols within scope.
+  enterPrimary: (ctx) ->
+    if ctx.Identifier()?
+      text = ctx.getText()
+      range = extractCtxRange ctx
+      if text.match /^[A-Z]([_a-z0-9].*)?/
+        symbol = new Symbol @file, text, range, "Class"
+        @_saveSymbolIfTypeIsntIgnored symbol
+
   getTypeUses: ->
     @typeUses
 
