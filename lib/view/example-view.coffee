@@ -455,6 +455,13 @@ module.exports.ExampleView = class ExampleView
       marker = @_markRange extension.getThrowingRange()
       decoration = new MethodThrowsExtensionView extension, @model
 
+    # Make sure that when the marker is destroyed, that any of its
+    # previewing side effects are also destroyed.  This is especially
+    # important for undo, which can dismiss a prompt before a user gets a
+    # chance to address it.
+    if marker? and decoration?
+      marker.onDidDestroy => decoration.revert()
+
     # Create a decoration for deciding whether to accept the extension
     params =
       type: "overlay"
