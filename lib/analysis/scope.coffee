@@ -147,7 +147,7 @@ module.exports.CatchClauseScope = class CatchClauseScope extends Scope
   getDeclarations: ->
     declarations = super()
     catchClauseVisitor = new CatchClauseVisitor @file, []
-    ParseTreeWalker.walk catchClauseVisitor, @ctx
+    ParseTreeWalker.walk catchClauseVisitor, @ctx.parentCtx
     declarations = declarations.concat catchClauseVisitor.getDeclarations()
     declarations
 

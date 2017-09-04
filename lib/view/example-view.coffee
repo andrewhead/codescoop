@@ -422,6 +422,8 @@ module.exports.ExampleView = class ExampleView
         block = new ImportSuggestionBlockView suggestions, @model, marker
       else if class_ is "InnerClassSuggestion"
         block = new InnerClassSuggestionBlockView suggestions, @model, marker
+      if block?
+        marker.onDidDestroy => block.dismiss()
       decoration.append block
 
     # Create a decoration from the element
@@ -455,10 +457,9 @@ module.exports.ExampleView = class ExampleView
       marker = @_markRange extension.getThrowingRange()
       decoration = new MethodThrowsExtensionView extension, @model
 
-    # Make sure that when the marker is destroyed, that any of its
-    # previewing side effects are also destroyed.  This is especially
-    # important for undo, which can dismiss a prompt before a user gets a
-    # chance to address it.
+    # When the marker is destroyed, any previews caused by the decoration should
+    # be reverted.  This is relevant for undo, which can prompt before a user
+    # gets a chance to either accept or decline it.
     if marker? and decoration?
       marker.onDidDestroy => decoration.revert()
 

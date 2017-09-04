@@ -1,5 +1,6 @@
 { SuggestionBlockView } = require "../../lib/view/suggestion-block-view"
 { SuggestionView } = require "../../lib/view/suggestion-view"
+{ ExampleModel } = require "../../lib/model/example-model"
 $ = require 'jquery'
 
 
@@ -9,7 +10,7 @@ describe "SuggestionBlockView", ->
 
   beforeEach =>
     # Create dead simple SuggestionBlockView that creates dummy suggestion views
-    blockView = new SuggestionBlockView "Title", [ 1 ], undefined, undefined
+    blockView = new SuggestionBlockView "Title", [ 1 ], new ExampleModel(), undefined
     blockView.createSuggestionView = =>
       view = ($ "<div></div>").addClass "suggestion"
       view.revert = =>

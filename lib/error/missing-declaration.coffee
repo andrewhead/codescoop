@@ -82,7 +82,6 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
 
       # Look for a declaration in all scopes that the symbol appears in.  Only
       # report a declaration as "found" if it is in one of the active ranges.
-      console.log symbol
       declaredSymbolText = symbolTable.getDeclaration symbol
       for activeRange in rangeSet.getActiveRanges()
         if (activeRange.containsRange declaredSymbolText.getRange()) and

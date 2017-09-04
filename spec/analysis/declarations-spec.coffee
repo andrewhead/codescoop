@@ -39,7 +39,7 @@ describe "DeclarationsAnalysis", ->
       createSymbol "path/", "File.java",  "i", [4, 8], [4, 9]
     (expect declarationSymbol.getRange()).toEqual new Range [3, 8], [3, 9]
 
-  fit "finds the declarations for variables declared in a catch clause", ->
+  it "finds the declarations for variables declared in a catch clause", ->
     declarationSymbol = symbolTable.getDeclaration \
       createSymbol "path/", "File.java",  "e", [6, 23], [6, 24]
     (expect declarationSymbol.getRange()).toEqual new Range [6, 23], [6, 24]
