@@ -83,6 +83,10 @@ module.exports.ExampleController = class ExampleController
     # model changes, before the controller, which may need detector results.
     @model.addObserver @
 
+    # Set this flag when reverting commands.  This prevents us from thrashing
+    # by adding automatic suggestions while reverting old commands.
+    @reverting = false
+
     # Before the state can update, the analyses must complete
     @_startAnalyses importAnalysis, variableDefUseAnalysis,
       catchVariableDefAnalysis, methodDefUseAnalysis, typeDefUseAnalysis,
@@ -190,7 +194,7 @@ module.exports.ExampleController = class ExampleController
         for suggester in corrector.suggesters
           suggesterSuggestions = suggester.getSuggestions error, @model
           suggestions = suggestions.concat suggesterSuggestions
-        if suggestions.length is 1
+        if (@reverting == false) and suggestions.length is 1
           suggestion = suggestions[0]
           commandGroup = @commandCreator.createCommandGroupForSuggestion suggestion, @model
           commandGroup.quickAdd = true
@@ -336,6 +340,7 @@ module.exports.ExampleController = class ExampleController
   undo: ->
 
     # Revert the last command and remove it from the stack
+    @reverting = true
     if @commandStack.getHeight() > 0
       quickAdd = true
       while quickAdd and @commandStack.peek()?
@@ -344,6 +349,7 @@ module.exports.ExampleController = class ExampleController
           log.debug "Reverting command", { type: command.constructor.name }
           command.revert @model
         quickAdd = lastCommandGroup.quickAdd
+    @reverting = false
 
     @_resetChoiceState()
 

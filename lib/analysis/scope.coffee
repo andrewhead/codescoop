@@ -142,12 +142,12 @@ module.exports.BlockScope = class BlockScope extends Scope
     super()
 
 
-module.exports.CatchBlockScope = class CatchBlockScope extends Scope
+module.exports.CatchClauseScope = class CatchClauseScope extends Scope
 
   getDeclarations: ->
     declarations = super()
     catchClauseVisitor = new CatchClauseVisitor @file, []
-    ParseTreeWalker.walk catchClauseVisitor, @ctx.parentCtx
+    ParseTreeWalker.walk catchClauseVisitor, @ctx
     declarations = declarations.concat catchClauseVisitor.getDeclarations()
     declarations
 
@@ -230,15 +230,17 @@ module.exports.ScopeFinder = class ScopeFinder
               forText = ctx.parentCtx.parentCtx.children[0].symbol.text
           forText? and (forText is "for")
       }, {
-        type: CatchBlockScope,
-        rule: (ctx) => (ctx.parentCtx? and
-           ctx.ruleIndex is JavaParser.RULE_block and
-           ctx.parentCtx.ruleIndex is JavaParser.RULE_catchClause)
+        type: CatchClauseScope,
+        rule: (ctx) =>
+          ctx.ruleIndex is JavaParser.RULE_catchClause
       }, {
         # This one should cover loops, conditionals, and
         # other blocks of statements not attached to control
         type: BlockScope,
-        rule: (ctx) => ctx.ruleIndex is JavaParser.RULE_block
+        # Don't double-list blocks as both independent and belonging to a catch.
+        rule: (ctx) => ((ctx.ruleIndex is JavaParser.RULE_block) and
+          ((not ctx.parentCtx?) or
+            ctx.parentCtx.ruleIndex != JavaParser.RULE_catchClause))
       }
     ]
 

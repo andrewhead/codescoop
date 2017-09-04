@@ -1,7 +1,7 @@
 { InputStream, CommonTokenStream } = require "antlr4"
 { JavaParser } = require "../../lib/grammar/Java/JavaParser"
 { ScopeFinder } = require "../../lib/analysis/scope"
-{ BlockScope, ForLoopScope, CatchBlockScope, MethodScope, ClassScope } = require "../../lib/analysis/scope"
+{ BlockScope, ForLoopScope, CatchClauseScope, MethodScope, ClassScope } = require "../../lib/analysis/scope"
 { parse, partialParse } = require "../../lib/analysis/parse-tree"
 { Symbol, SymbolText, File } = require "../../lib/model/symbol-set"
 { Range } = require "../../lib/model/range-set"
@@ -17,7 +17,7 @@ describe "ScopeFinder", ->
 
   _isScopeForForLoop = (scope) => scope instanceof ForLoopScope
 
-  _isScopeForCatchBlock = (scope) => scope instanceof CatchBlockScope
+  _isScopeForCatchClause = (scope) => scope instanceof CatchClauseScope
 
   _isScopeForStatementBlock = (scope) => scope instanceof BlockScope
 
@@ -75,7 +75,7 @@ describe "ScopeFinder", ->
       (expect count).toBe 1
 
     it "finds catch blocks", ->
-      count = _countMatchingScopes _isScopeForCatchBlock
+      count = _countMatchingScopes _isScopeForCatchClause
       (expect count).toBe 1
 
     it "finds other blocks not attached to a particular structure", ->
@@ -128,7 +128,7 @@ describe "ScopeFinder", ->
     it "can find a symbol in a catch block scope", ->
       symbol = new SymbolText "e", (new Range [10, 26], [10, 27])
       scopes = scopeFinder.findSymbolScopes symbol
-      count = _countSymbolScopes scopes, _isScopeForCatchBlock
+      count = _countSymbolScopes scopes, _isScopeForCatchClause
       (expect count).toBe 1
 
     it "can find a symbol within class declarations", ->
@@ -244,7 +244,7 @@ describe "Scope", ->
       ].join "\n"
       ctx = partialParse CATCH_CODE, "catchClause"
       blockCtx = ctx.block()
-      scope = new CatchBlockScope fakeFile, blockCtx
+      scope = new CatchClauseScope fakeFile, blockCtx
 
       symbols = scope.getDeclarations()
       (expect symbols.length).toBe 1
