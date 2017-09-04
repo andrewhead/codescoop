@@ -12,6 +12,10 @@ describe "MissingThrowsDetector", ->
   detector = undefined
   parseTree = undefined
   throwsTable = undefined
+
+  exception1 = new Exception "fake.pkg.FakeException1", new Exception "java.lang.Exception"
+  exception2 = new Exception "fake.pkg.FakeException2", new Exception "java.lang.Exception"
+
   beforeEach =>
 
     # This test case is based on the following example code:
@@ -33,8 +37,6 @@ describe "MissingThrowsDetector", ->
     model = new ExampleModel()
 
     throwsTable = new ThrowsTable()
-    exception1 = new Exception "fake.pkg.FakeException1", new Exception "java.lang.Exception"
-    exception2 = new Exception "fake.pkg.FakeException2", new Exception "java.lang.Exception"
     throwsTable.addException (new Range [8, 6], [8, 22]), exception1
     throwsTable.addException (new Range [10, 6], [10, 22]), exception1
     throwsTable.addException (new Range [12, 8], [12, 20]), exception1
@@ -94,3 +96,10 @@ describe "MissingThrowsDetector", ->
     (expect model.getEvents().length).toBe 1
     model.getRangeSet().getSnippetRanges().push new Range [9, 0], [9, 32]
     (expect model.getEvents().length).toBe 0
+
+  it "marks an event obsolete when the throwable range is no longer active", ->
+    event = new MissingThrowsEvent (new Range [8, 6], [8, 22]), exception1
+    model.getRangeSet().getSnippetRanges().push new Range [8, 0], [8, 23]
+    (expect detector.isEventObsolete event).toBe false
+    model.getRangeSet().getSnippetRanges().reset []
+    (expect detector.isEventObsolete event).toBe true

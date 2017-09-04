@@ -116,3 +116,10 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
     return true if (
       (@_isExceptionAlreadyThrown exception, @model) or
       (@_isExceptionAlreadyCaught exception, range, activeRanges, catchTable))
+
+    isRangeInactive = true
+    for activeRange in activeRanges
+      if activeRange.containsRange range
+        isRangeInactive = false
+
+    return isRangeInactive
