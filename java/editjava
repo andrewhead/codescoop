@@ -1,5 +1,0 @@
-#! /bin/bash
-# Script that creates Java classpath before starting vi
-
-source includes.sh
-CLASSPATH=$ALL_JARS:. vi $@

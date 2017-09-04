@@ -2,8 +2,8 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Make example",
-        "command": "examplify:make-example-code"
+        "label": "Make example (Sierras)",
+        "command": "sierras:make-example-code"
       }
     ]
   },
@@ -12,11 +12,11 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "Examplify",
+          "label": "Sierras",
           "submenu": [
             {
-              "label": "Make example",
-              "command": "examplify:make-example-code"
+              "label": "Make example (Sierras)",
+              "command": "sierras:make-example-code"
             }
           ]
         }
