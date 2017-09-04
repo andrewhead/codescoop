@@ -483,6 +483,12 @@ describe "ExampleController", ->
       (expect commandGroup[0] instanceof AddRange)
       (expect commandGroup[0].getRange()).toEqual new Range [0, 0], [0, 10]
 
+    it "doesn't add a range that's already included", ->
+      (expect commandStack.getHeight()).toBe 1
+      # This is a subset of the range from before
+      model.getRangeSet().getChosenRanges().push new Range [0, 0], [0, 10]
+      (expect commandStack.getHeight()).toBe 1
+
   describe "when a print request is added in the middle of another task", ->
 
     commandStack = undefined

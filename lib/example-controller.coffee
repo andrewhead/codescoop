@@ -248,10 +248,19 @@ module.exports.ExampleController = class ExampleController
       # Make a command for adding a range for each of the chosen ranges.
       if newValue.length > 0
         for newRange in newValue
-          commandGroup = @commandCreator.createCommandGroupForChosenRange newRange, @model
-          @commandStack.push commandGroup
-          for command in commandGroup
-            command.apply @model
+
+          # Check to see if the range is already included
+          rangeAlreadyIncluded = false
+          for activeRange in @model.getRangeSet().getActiveRanges()
+            if activeRange.containsRange newRange
+              rangeAlreadyIncluded = true
+
+          # Only add a new range when the range hasn't been added in the past
+          if not rangeAlreadyIncluded
+            commandGroup = @commandCreator.createCommandGroupForChosenRange newRange, @model
+            @commandStack.push commandGroup
+            for command in commandGroup
+              command.apply @model
 
         # Clear out the list of chosen ranges
         newValue.reset()

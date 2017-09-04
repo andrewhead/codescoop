@@ -66,6 +66,7 @@ module.exports.ControlCrossingDetector = class ControlCrossingDetector extends E
 
     _getAncestors = (ctx) =>
       ancestors = []
+      return ancestors if not ctx?
       while ctx.parentCtx?
         ancestors.push [ctx.parentCtx]
         ctx = ctx.parentCtx

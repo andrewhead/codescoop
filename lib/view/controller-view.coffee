@@ -1,6 +1,7 @@
 { ExampleModelState, ExampleModelProperty } = require "../model/example-model"
 { PACKAGE_PATH } = require "../config/paths"
 $ = require 'jquery'
+log = require "examplify-log"
 
 
 module.exports.ControllerView = class ControllerView extends $
@@ -20,6 +21,8 @@ module.exports.ControllerView = class ControllerView extends $
       .append @_svgForIcon "double-quote-serif-left"
       .append "Print"
       .click =>
+        log.debug "Printing out a variable",
+          { selection: exampleEditor.getSelectedBufferRange() }
         symbolName = exampleEditor.getSelectedText()
         controller.addPrintedSymbol symbolName
       .appendTo element
