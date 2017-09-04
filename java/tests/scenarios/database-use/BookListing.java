@@ -10,8 +10,6 @@ import java.util.List;
 
 public class BookListing {
 
-    private boolean DEBUG = true;
-
     public Booklist getBookListing(String genre, int maxBooks) {
 
         String QUERY = "SELECT id, title, year, num_pages FROM table WHERE title LIKE '%" + genre + "%'";
@@ -19,6 +17,7 @@ public class BookListing {
         int COLUMN_INDEX_TITLE = 1;
         int COLUMN_INDEX_YEAR = 2;
         int COLUMN_INDEX_NUM_PAGES = 3;
+        boolean DEBUG = true;
 
         Database database = new Database("lou", "PA$$W0RD", "https://acme-books.com/db");
         Cursor cursor = database.cursor();
@@ -33,7 +32,7 @@ public class BookListing {
             if (cursor.rowCount() > 0) {
 
                 int rowNumber = 0;
-                while (!finished) {
+                while (finished == false) {
 
                     int rowCount = cursor.rowCount();
 
@@ -56,7 +55,7 @@ public class BookListing {
                             }
                         }
 
-                        if (DEBUG) {
+                        if (DEBUG == true) {
                             System.out.println("Fetched book: " + title + " (" + genre + ")");
                         }
 
@@ -64,14 +63,13 @@ public class BookListing {
 
                         if (cursor.end() || rowNumber >= maxBooks) {
                             finished = true;
-                        } else if (i == rowCount - 1){
+                        }
+                        if (finished == false && i == rowCount - 1) {
                             cursor.next(id);
                         }
 
                     }
                  }
-            } else {
-                System.out.println("No results found in the database");
             }
 
         } catch (ConnectionException exception) {

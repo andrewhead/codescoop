@@ -55,11 +55,9 @@ public class CraigslistMonitor {
             Element row = (Element) rowsIterator.next();
 
             String price = row.select("span.result-meta span.result-price").text();
-            int priceInt;
+            int priceInt = -1;
             if (!price.equals("")) {
                 priceInt = Integer.parseInt(price.replaceFirst("\\$", ""));
-            } else {
-                priceInt = -1;
             }
             prices.add(new Integer(priceInt));
 
