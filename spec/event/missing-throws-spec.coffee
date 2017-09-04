@@ -1,6 +1,7 @@
 { ExampleModel } = require "../../lib/model/example-model"
 { MissingThrowsEvent, MissingThrowsDetector } = require "../../lib/event/missing-throws"
 { ThrowsTable, Exception } = require "../../lib/model/throws-table"
+{ ImportTable } = require "../../lib/model/import"
 { CatchTable } = require "../../lib/model/catch-table"
 { parse } = require "../../lib/analysis/parse-tree"
 { Range } = require "../../lib/model/range-set"
@@ -35,6 +36,8 @@ describe "MissingThrowsDetector", ->
     #   }"
     # }"
     model = new ExampleModel()
+    importTable = new ImportTable()
+    model.setImportTable importTable
 
     throwsTable = new ThrowsTable()
     throwsTable.addException (new Range [8, 6], [8, 22]), exception1
@@ -103,3 +106,23 @@ describe "MissingThrowsDetector", ->
     (expect detector.isEventObsolete event).toBe false
     model.getRangeSet().getSnippetRanges().reset []
     (expect detector.isEventObsolete event).toBe true
+
+  it "marks an event as queued if it shares the same imported exception", ->
+    # Create three exception types, where two are sub-types of the first
+    superclassException = new Exception "fake.pkg.SuperclassException"
+    subclassException1 = new Exception "fake.pkg.SubclassException1", superclassException
+    subclassException2 = new Exception "fake.pkg.SubclassException2", superclassException
+
+    # Import only the superclass
+    importTable = new ImportTable()
+    importTable.addImport "fake.pkg.SuperclassException", "java.io.*"
+    model.setImportTable importTable
+
+    # Add an event that one of the subclass events has been seen
+    event1 = new MissingThrowsEvent (new Range [8, 6], [8, 22]), subclassException1
+    event2 = new MissingThrowsEvent (new Range [8, 6], [8, 22]), subclassException2
+    model.getViewedEvents().push event1
+
+    # The second sub-class exception should be seen as already being "queued",
+    # as its superclass import is already handled by a past event
+    (expect detector.isEventQueued event2).toBe true

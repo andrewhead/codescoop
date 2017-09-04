@@ -2,6 +2,23 @@
 { ExampleModelProperty } = require "../model/example-model"
 
 
+module.exports.resolveExceptionClass = resolveExceptionClass = \
+    (importTable, exception) =>
+
+  # The default suggested exception name is the fully-qualified name
+  exceptionName = exception.getName()
+
+  # However, if the exception or one of its super-classes have been imported,
+  # suggest the short name for one of those exceptions.
+  while exception?
+    if (importTable.getImports exception.getName()).length > 0
+      exceptionName = exception.getName().replace /.*\./, ""
+      break
+    exception = exception.getSuperclass()
+
+  exceptionName
+
+
 module.exports.MissingThrowsEvent = class MissingThrowsEvent
 
   constructor: (range, exception) ->
@@ -103,8 +120,11 @@ module.exports.MissingThrowsDetector = class MissingThrowsDetector extends Event
   isEventQueued: (event) ->
     for pastEvent in @model.getEvents().concat @model.getViewedEvents()
       if pastEvent instanceof MissingThrowsEvent
-        if pastEvent.equals event
-          return true
+        if pastEvent.getRange().isEqual event.getRange()
+          pastExceptionClass = resolveExceptionClass @model.getImportTable(), pastEvent.getException()
+          exceptionClass = resolveExceptionClass @model.getImportTable(), event.getException()
+          if pastExceptionClass == exceptionClass
+            return true
     false
 
   isEventObsolete: (event) ->
