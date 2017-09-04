@@ -8,39 +8,38 @@
 
 describe "MediatingUseDetector", ->
 
+  # This test is based on the following example:
+  # public class Example {
+  #   public static void main(String[] args) {
+  #     int i = 1;
+  #     int j = 2;
+  #     System.out.println(i);
+  #     System.out.println(i);
+  #     System.out.println(j);  // Ignored, it isn't i
+  #     i + 1;
+  #   }
+  #   public static void anotherMethod() {
+  #     int i = 1;
+  #     System.out.println(i);
+  #   }
+  # }
+  # In the 'main' function: this is where most tests will focus
+  iDef = createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"
+  jDef = createSymbol "path", "filename", "j", [3, 8], [3, 9], "int"
+  # In 'anotherMethod'.  This is for more specialized tests
+  iDef2 = createSymbol "path", "filename", "i", [10, 8], [10, 9], "int"
+
+  # In the 'main' function
+  iUse = createSymbol "path", "filename", "i", [4, 23], [4, 24], "int"
+  iUse2 = createSymbol "path", "filename", "i", [5, 23], [5, 24], "int"
+  jUse = createSymbol "path", "filename", "j", [6, 23], [6, 24], "int"
+  iUse3 = createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"
+  # In 'anotherMethod'
+  iUse4 = createSymbol "path", "filename", "i", [11, 23], [11, 24], "int"
+
   model = undefined
   detector = undefined
   beforeEach =>
-    # This test is based on the following example:
-    # public class Example {
-    #   public static void main(String[] args) {
-    #     int i = 1;
-    #     int j = 2;
-    #     System.out.println(i);
-    #     System.out.println(i);
-    #     System.out.println(j);  // Ignored, it isn't i
-    #     i + 1;
-    #   }
-    #   public static void anotherMethod() {
-    #     int i = 1;
-    #     System.out.println(i);
-    #   }
-    # }
-
-    # In the 'main' function: this is where most tests will focus
-    iDef = createSymbol "path", "filename", "i", [2, 8], [2, 9], "int"
-    jDef = createSymbol "path", "filename", "j", [3, 8], [3, 9], "int"
-    # In 'anotherMethod'.  This is for more specialized tests
-    iDef2 = createSymbol "path", "filename", "i", [10, 8], [10, 9], "int"
-
-    # In the 'main' function
-    iUse = createSymbol "path", "filename", "i", [4, 23], [4, 24], "int"
-    iUse2 = createSymbol "path", "filename", "i", [5, 23], [5, 24], "int"
-    jUse = createSymbol "path", "filename", "j", [6, 23], [6, 24], "int"
-    iUse3 = createSymbol "path", "filename", "i", [7, 4], [7, 5], "int"
-    # In 'anotherMethod'
-    iUse4 = createSymbol "path", "filename", "i", [11, 23], [11, 24], "int"
-
     model = new ExampleModel()
     model.getSymbols().getVariableUses().reset [iUse, iUse2, jUse, iUse3, iUse4]
     model.getSymbols().getVariableDefs().reset [iDef, jDef, iDef2]
@@ -119,6 +118,16 @@ describe "MediatingUseDetector", ->
     ]
     model.getRangeSet().getSnippetRanges().reset snippetRanges
     (expect model.getEvents().length).toBe 1
+
+  it "marks an event as obselete when the use isn't in the active ranges", ->
+    event = new MediatingUseEvent iDef, iUse, iUse2
+    model.getRangeSet().getSnippetRanges().reset [iDef.getRange()]
+    (expect detector.isEventObsolete event).toBe true
+
+  it "marks an event as obselete when the use isn't in the active ranges", ->
+    event = new MediatingUseEvent iDef, iUse, iUse2
+    model.getRangeSet().getSnippetRanges().reset [iUse.getRange()]
+    (expect detector.isEventObsolete event).toBe true
 
   describe "when there are nested scopes", ->
 

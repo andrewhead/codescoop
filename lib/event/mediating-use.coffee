@@ -88,9 +88,25 @@ module.exports.MediatingUseDetector = class MediatingUseDetector extends EventDe
   # as the user may have added code that defines the use.  For all of these
   # unseen, obsoleted events, just remove them from the queue.
   isEventObsolete: (event) ->
+
     activeRanges = @model.getRangeSet().getActiveRanges()
     if event instanceof MediatingUseEvent
+
+      mediatingUseActive = false
+      defActive = false
+      useActive = false
+
       for range in activeRanges
         if (range.containsRange event.getMediatingUse().getRange())
-          return true
+          mediatingUseActive = true
+        if (range.containsRange event.getUse().getRange())
+          useActive = true
+        if (range.containsRange event.getDef().getRange())
+          defActive = true
+
+      # A mediating use is no longer relevant if a user has added the use.
+      # It's also no longer relevant if the definition and use are no longer
+      # included in the active ranges of the program (e.g., from undo)
+      return mediatingUseActive or (!defActive or !useActive)
+
     false
