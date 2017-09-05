@@ -104,6 +104,7 @@ public class CraigslistMonitor {
         BufferedReader confReader = new BufferedReader(new FileReader("/etc/smtp.conf"));
         String username = confReader.readLine();
         String password = confReader.readLine();
+        System.out.println("Logging in with " + username + ", " + password);
 
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         String sslFactoryClass = "javax.net.ssl.SSLSocketFactory";
