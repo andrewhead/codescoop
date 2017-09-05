@@ -80,7 +80,7 @@ describe "CodeView", () ->
     _addGutter editorView
 
     (expect rangeSet.getChosenRanges().length).toBe 0
-    ($(($ editorView).find '.line-number#second')).click()
+    ($(($ editorView).find '.line-number#second')).mousedown()
     (expect rangeSet.getChosenRanges().length).toBe 1
     (expect rangeSet.getChosenRanges()[0]).toEqual new Range [1, 0], [1, 6]
 

@@ -28,6 +28,8 @@ module.exports.MissingDefinitionDetector = class MissingDefinitionDetector
       # And `this` appears to be an erroneous name Soot gives to some ranges
       # of expressions that aren't variables.
       continue if use.getName() is "this"
+      # And if something is "args", then it will be defined for the main
+      continue if use.getName() is "args"
 
       useDefined = false
       for def in activeDefs

@@ -2,38 +2,6 @@
 { JavaParser } = require "../grammar/Java/JavaParser"
 
 
-###
-module.exports.isSymbolDeclaredInParameters = \
-    isSymbolDeclaredInParameters = (symbol, parseTree) ->
-
-  node = parseTree.getNodeForSymbol symbol
-
-  # Search for the method that includes this symbol
-  parentCtx = node.parentCtx
-  while parentCtx?
-    if parentCtx.ruleIndex is JavaParser.RULE_methodDeclaration
-
-      # Once we have found the symbol, iterate through the parameters list
-      # to look for the symbol's name.
-      formalParametersCtx = parentCtx.children[2]
-      formalParametersListCtx = formalParametersCtx.children[1]
-      for childCtx in formalParametersListCtx.children
-        if (childCtx.ruleIndex is JavaParser.RULE_formalParameter) or
-            (childCtx.ruleIndex is JavaParser.RULE_lastFormalParameter)
-          variableDeclaratorIdCtx = childCtx.children[childCtx.children.length - 1]
-          identifierNode = variableDeclaratorIdCtx.children[0]
-
-          # If the parameter has the name of the symbol, the symbol is
-          # declared in the parameters list!
-          if identifierNode.getText() is symbol.getName()
-            return true
-
-    parentCtx = parentCtx.parentCtx
-
-  false
-###
-
-
 module.exports.MissingDeclarationError = class MissingDeclarationError
 
   constructor: (symbol) ->
@@ -71,6 +39,8 @@ module.exports.MissingDeclarationDetector = class MissingDeclarationDetector
       continue if symbol.getName().startsWith "$"
       # ...or the symbols that Soot implicitly marked as "this"
       continue if symbol.getName() is "this"
+      # ...or if it's already declared by the main
+      continue if symbol.getName() is "args"
 
       # Check to see if the symbol was declared in the auxiliary declarations
       for declaration in model.getAuxiliaryDeclarations()
