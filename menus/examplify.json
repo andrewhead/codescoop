@@ -2,7 +2,7 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Make example",
+        "label": "Make example (Rockies)",
         "command": "examplify:make-example-code"
       }
     ]
@@ -15,7 +15,7 @@
           "label": "Examplify",
           "submenu": [
             {
-              "label": "Make example",
+              "label": "Make example (Rockies)",
               "command": "examplify:make-example-code"
             }
           ]

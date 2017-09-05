@@ -77,12 +77,14 @@ module.exports.CodeView = class CodeView
 
   listenForLineClick: ->
     editorView = (atom.views.getView @textEditor)
-    (($ editorView).find '.gutter').on 'click', '.line-number', (event) =>
-      rowNumber = Number(event.target.dataset.screenRow)
-      log.debug "Clicked on line number", { lineNumber: rowNumber }
-      lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
-      newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
-      @rangeSet.getChosenRanges().push newRange
+    (($ editorView).find '.gutter').on 'mousemove mousedown', '.line-number', (event) =>
+      if event.which == 1
+        rowNumber = Number(event.target.dataset.screenRow)
+        log.debug "Clicked on line number", { lineNumber: rowNumber }
+        lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
+        newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
+        if newRange not in @rangeSet.getChosenRanges()
+          @rangeSet.getChosenRanges().push newRange
 
   listenForRefocus: ->
 
