@@ -1,4 +1,5 @@
 {
   "atom-workspace": {
+    "cmd-z": "examplify:undo"
   }
 }
