@@ -45,15 +45,22 @@ atom-text-editor div.line.definition span {
   opacity: 1;
 }
 
-atom-text-editor.example-editor {
-  .cursors .cursor {
-    opacity: 0;
-  }
-  .line.cursor-line {
-    background-color: rgba(0, 0, 0, 0);
-  }
-  .bracket-matcher {
-    opacity: 0;
+
+atom-text-editor {
+
+  &.source-editor, &.example-editor {
+    .cursors .cursor {
+      opacity: 0;
+    }
+    .line.cursor-line {
+      background-color: rgba(0, 0, 0, 0);
+    }
+    .bracket-matcher {
+      opacity: 0;
+    }
+    .selection .region {
+      background-color: rgba(0, 0, 0, 0);;
+    }
   }
 }
 
