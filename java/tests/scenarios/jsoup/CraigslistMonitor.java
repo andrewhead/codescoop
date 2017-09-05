@@ -33,16 +33,15 @@ public class CraigslistMonitor {
 
     public static void main(String[] args) throws IOException, MessagingException, AddressException {
 
-        if (args.length < 2) {
-          args = new String[]{"electric bike", "openairandrew@gmail.com"};
-        }
+        String arg0 = "electric bike";
+        String arg1 = "openairandrew@gmail.com";
 
         List titles = new ArrayList();
         List prices = new ArrayList();
         List links = new ArrayList();
 
-        String query = URLEncoder.encode(args[0], "utf-8");
-        String destination = args[1];
+        String query = URLEncoder.encode(arg0, "utf-8");
+        String destination = arg1;
         URL url = new URL("https://sfbay.craigslist.org/search/bia?query=" + query);
         System.out.println("Fetching " + url.toExternalForm() + "...");
 
