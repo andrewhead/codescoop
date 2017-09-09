@@ -6,13 +6,16 @@
 .highlight {
 
   &.error-choice-highlight .region {
-    background-color: @syntax-color-removed;
+    background-color: fade(@text-color-error, 10%);
+    border: 2px fade(@text-color-error, 40%) solid;
     opacity: .8;
   }
 
   &.extension-highlight, &.resolution-highlight {
     .region {
-      background-color: @background-color-info;
+      // background-color: fade(@background-color-info, 70%);
+      background-color: fade(@text-color-info, 15%);
+      border: 2px fade(@text-color-info, 40%) solid;
       opacity: .6;
     }
   }
@@ -24,20 +27,20 @@ atom-text-editor.source-editor div.line {
     opacity: 1;
   }
   &:not(.active) {
-    opacity: .5;
+    opacity: .35;
     &.suggested {
       opacity: 1;
       background-color: fade(@syntax-color-renamed, 40%);
-      animation: pulsate 1.5s ease-in-out;
+      animation: pulsate .8s ease-in-out;
       animation-iteration-count: infinite;
     }
   }
 }
 
 @keyframes pulsate {
-  0%   { background-color: fade(@syntax-color-renamed, 20%); }
-  50%  { background-color: fade(@syntax-color-renamed, 40%); }
-  100% { background-color: fade(@syntax-color-renamed, 20%); }
+  0%  { background-color: fade(@syntax-color-renamed, 25%); }
+  50%   { background-color: fade(@syntax-color-renamed, 10%); }
+  100%  { background-color: fade(@syntax-color-renamed, 25%); }
 }
 
 atom-text-editor div.line.definition span {
@@ -49,31 +52,36 @@ atom-text-editor div.line.definition span {
 atom-text-editor {
 
   &.source-editor, &.example-editor {
+    .selection .region {
+      background-color: rgba(0, 0, 0, 0);
+    }
     .cursors .cursor {
       opacity: 0;
     }
-    .line.cursor-line {
+    div.line.cursor-line {
+      background-color: rgba(0, 0, 0, 0);
+    }
+    div.line-number.cursor-line {
       background-color: rgba(0, 0, 0, 0);
     }
     .bracket-matcher {
       opacity: 0;
-    }
-    .selection .region {
-      background-color: rgba(0, 0, 0, 0);;
     }
   }
 }
 
 atom-overlay.error-choice-button {
 
-  background-color: @background-color-warning;
-  border-color: @tool-panel-border-color;
-  color: @text-color-highlight;
+  background-color: #fff;
+  border: 2px solid @background-color-warning;
   padding: @component-padding;
   font-family: @font-family;
   opacity: 0;
+  font-weight: bold;
+  color: black;
 
   &:hover {
+    // background-color: @syntax-color-renamed;
     opacity: 1;
     cursor: pointer;
     z-index: 100;
@@ -84,7 +92,8 @@ atom-overlay.error-choice-button {
 atom-overlay.extension-widget {
 
   font-family: @font-family;
-  background-color: @background-color-info - 30%;
+  border: 2px solid @background-color-info;
+  background-color: #fff;
   color: @text-color-highlight;
 
   div div {
@@ -93,13 +102,13 @@ atom-overlay.extension-widget {
     padding: @component-padding;
 
     &:not(:last-of-type) {
-      border-right: 1px white dashed;
+      border-right: 1px @tool-panel-border-color solid;
     }
 
     &:not(:first-of-type) {
       font-weight: bold;
       &:hover {
-        background-color: @background-color-info;
+        background-color: fade(@syntax-color-renamed, 30%);
         cursor: pointer;
       }
     }
@@ -121,17 +130,14 @@ atom-overlay {
   div.resolution-class-block {
 
     &:not(:last-of-type) {
-      border-right: 1px white dashed;
+      border-right: 2px @tool-panel-border-color solid;
     }
 
     &:not(:first-of-type) {
     }
 
-    &:hover {
-      background-color: @background-color-info;
-    }
-
-    background-color: @background-color-info - 30%;
+    background-color: #fff;
+    border: 2px solid @background-color-info;
     border-color: @tool-panel-border-color;
     color: @text-color-highlight;
 
@@ -145,7 +151,7 @@ atom-overlay {
     }
 
     div.suggestion {
-      border-top: 1px white dotted;
+      border-top: 1px @tool-panel-border-color solid;
       text-align: center;
       padding: @component-padding;
       cursor: pointer;
@@ -153,6 +159,10 @@ atom-overlay {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      &:hover {
+        border-color: @syntax-color-renamed - 20%;
+        background-color: lighten(@syntax-color-renamed, 20%);
+      }
     }
 
   }
@@ -170,7 +180,7 @@ div.controller {
       width: 32px;
       height: 32px;
       display: block;
-      fill: #fff;
+      fill: #6182B8;
     }
 
     border-radius: @component-border-radius;
@@ -189,7 +199,7 @@ div.controller {
 
     &:enabled {
       &:hover {
-        background-color: fade(@button-background-color-selected, 50%);
+        background-color: lighten(#6182B8, 41%);
       }
       &:active {
         background-color: @button-background-color-selected;
@@ -297,4 +307,15 @@ div.agent-runner {
     background-color: @button-background-color-selected;
   }
 
+}
+
+div.script-view {
+  font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  .panel-body {
+    background-color: #fff;
+    .line {
+      font-size: 16px;
+      background-color: #fff;
+    }
+  }
 }

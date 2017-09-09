@@ -18,7 +18,7 @@
 { ThrowsAnalysis } = require "./analysis/throws-analysis"
 { CatchAnalysis } = require "./analysis/catch"
 
-{ ExampleModel } = require "./model/example-model"
+{ ExampleModel, ExampleModelState } = require "./model/example-model"
 { RangeSet } = require "./model/range-set"
 { File, SymbolSet } = require "./model/symbol-set"
 
@@ -48,14 +48,24 @@ module.exports = plugin =
         # Launch a new editor to hold the example code.
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
           (exampleEditor) =>
-            # This editor should be read-only.
-            # Abort any textual changes so user can't type in code.
-            exampleEditor.onWillInsertText (event) => event.cancel()
-            exampleEditorView = atom.views.getView exampleEditor
+
+            @controller = new MainController @codeEditor, exampleEditor
+
             # Set the class, so we can do stylings that hide typical signifiers
             # of text modifiability, like cursors and highlights.
+            exampleEditorView = atom.views.getView exampleEditor
             ($ exampleEditorView).addClass 'example-editor'
-            @controller = new MainController @codeEditor, exampleEditor
+
+            # This editor should be read-only.
+            # Abort any textual changes so user can't type in code.
+            exampleEditor.onWillInsertText (event) =>
+              if @controller.getModel().getState() != ExampleModelState.IDLE
+                event.cancel()
+            ($ exampleEditorView).click (event) =>
+              if @controller.getModel().getState() == ExampleModelState.IDLE
+                ($ exampleEditorView).removeClass 'example-editor'
+              else if @controller.getModel().getState() == ExampleModelState.IDLE
+                ($ exampleEditorView).addClass 'example-editor'
 
       "examplify:add-selection-to-example": =>
         selectedRange = @codeEditor.getSelectedBufferRange()

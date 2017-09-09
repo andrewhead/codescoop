@@ -2,7 +2,7 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Make example (Rockies)",
+        "label": "Extract example",
         "command": "examplify:make-example-code"
       }
     ]
@@ -12,10 +12,10 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "Rockies",
+          "label": "CodeScoop",
           "submenu": [
             {
-              "label": "Make example (Rockies)",
+              "label": "Extract example",
               "command": "examplify:make-example-code"
             }
           ]

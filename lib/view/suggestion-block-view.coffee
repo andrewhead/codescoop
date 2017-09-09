@@ -53,7 +53,12 @@ module.exports.SuggestionBlockView = class SuggestionBlockView extends $
     @state = SuggestionBlockViewState.HEADER
     # XXX: This is a hack.  Suggested ranges should probably only be rewound
     # one at a time whenever a suggestion or extension is reverted
-    @model.getRangeSet().getSuggestedRanges().reset []
+    ranges = @model.getRangeSet().getSuggestedRanges()
+    range_index = ranges.length
+    while range_index > 0
+      ranges.remove(ranges[range_index])
+      range_index -= 1
+    # for range in @model.getRangeSet().getSuggestedRanges().reset []
 
   # Propagate mouseout to suggestions and remove suggestions
   onMouseLeave: (event) -> @dismiss()
