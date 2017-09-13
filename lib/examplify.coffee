@@ -44,6 +44,7 @@ module.exports = plugin =
         @codeEditor = atom.workspace.getActiveTextEditor()
         codeEditorView = atom.views.getView @codeEditor
         ($ codeEditorView).addClass 'source-editor'
+        ($ codeEditorView).addClass 'locked-editor'
 
         # Launch a new editor to hold the example code.
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
@@ -55,6 +56,7 @@ module.exports = plugin =
             # of text modifiability, like cursors and highlights.
             exampleEditorView = atom.views.getView exampleEditor
             ($ exampleEditorView).addClass 'example-editor'
+            ($ exampleEditorView).addClass 'locked-editor'
 
             # This editor should be read-only.
             # Abort any textual changes so user can't type in code.
@@ -63,9 +65,9 @@ module.exports = plugin =
                 event.cancel()
             ($ exampleEditorView).click (event) =>
               if @controller.getModel().getState() == ExampleModelState.IDLE
-                ($ exampleEditorView).removeClass 'example-editor'
+                ($ exampleEditorView).removeClass 'locked-editor'
               else if @controller.getModel().getState() == ExampleModelState.IDLE
-                ($ exampleEditorView).addClass 'example-editor'
+                ($ exampleEditorView).addClass 'locked-editor'
 
       "examplify:add-selection-to-example": =>
         selectedRange = @codeEditor.getSelectedBufferRange()

@@ -1,21 +1,22 @@
 @import "syntax-variables";
 @import "ui-variables";
 @import "chosen";
+@import "material-light";
+@import "material-dark";
 
 
 .highlight {
 
   &.error-choice-highlight .region {
-    background-color: fade(@text-color-error, 10%);
-    border: 2px fade(@text-color-error, 40%) solid;
+    background-color: fade(@text-color-error, 20%);
+    border: 2px fade(@text-color-error, 80%) solid;
     opacity: .8;
   }
 
   &.extension-highlight, &.resolution-highlight {
     .region {
-      // background-color: fade(@background-color-info, 70%);
-      background-color: fade(@text-color-info, 15%);
-      border: 2px fade(@text-color-info, 40%) solid;
+      background-color: fade(@text-color-info, 30%);
+      border: 2px fade(@text-color-info, 90%) solid;
       opacity: .6;
     }
   }
@@ -31,16 +32,25 @@ atom-text-editor.source-editor div.line {
     &.suggested {
       opacity: 1;
       background-color: fade(@syntax-color-renamed, 40%);
-      animation: pulsate .8s ease-in-out;
+      animation: pulsate 1.2s ease-in-out;
       animation-iteration-count: infinite;
     }
   }
 }
 
 @keyframes pulsate {
-  0%  { background-color: fade(@syntax-color-renamed, 25%); }
-  50%   { background-color: fade(@syntax-color-renamed, 10%); }
-  100%  { background-color: fade(@syntax-color-renamed, 25%); }
+  0%, 10% {
+    background-color: fade(@syntax-color-renamed, 20%);
+    outline: 1px solid fade(@syntax-color-renamed, 80%);
+  }
+  40%, 60% {
+    background-color: fade(@syntax-color-renamed, 10%);
+    outline: 1px solid fade(@syntax-color-renamed, 10%);
+  }
+  100% {
+    background-color: fade(@syntax-color-renamed, 20%);
+    outline: 1px solid fade(@syntax-color-renamed, 80%);
+  }
 }
 
 atom-text-editor div.line.definition span {
@@ -48,25 +58,21 @@ atom-text-editor div.line.definition span {
   opacity: 1;
 }
 
-
-atom-text-editor {
-
-  &.source-editor, &.example-editor {
-    .selection .region {
-      background-color: rgba(0, 0, 0, 0);
-    }
-    .cursors .cursor {
-      opacity: 0;
-    }
-    div.line.cursor-line {
-      background-color: rgba(0, 0, 0, 0);
-    }
-    div.line-number.cursor-line {
-      background-color: rgba(0, 0, 0, 0);
-    }
-    .bracket-matcher {
-      opacity: 0;
-    }
+atom-text-editor.locked-editor {
+  .selection .selection.region {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  .cursors .cursor {
+    opacity: 0;
+  }
+  div.line.cursor-line {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  div.line-number.cursor-line {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  .bracket-matcher {
+    opacity: 0;
   }
 }
 
@@ -314,7 +320,7 @@ div.script-view {
   .panel-body {
     background-color: #fff;
     .line {
-      font-size: 16px;
+      font-size: 20px;
       background-color: #fff;
     }
   }
