@@ -119,7 +119,7 @@ module.exports.MainController = class MainController
       methodDefUseAnalysis: new MethodDefUseAnalysis codeEditorFile, @parseTree
       typeDefUseAnalysis: new TypeDefUseAnalysis codeEditorFile, @parseTree
       valueAnalysis: new ValueAnalysis codeEditorFile
-      # stubAnalysis: new StubAnalysis codeEditorFile
+      stubAnalysis: new StubAnalysis codeEditorFile
       declarationsAnalysis: new DeclarationsAnalysis @symbols, codeEditorFile, @parseTree
       rangeGroupsAnalysis: new RangeGroupsAnalysis @parseTree
       throwsAnalysis: new ThrowsAnalysis codeEditorFile

@@ -1,7 +1,6 @@
 @import "syntax-variables";
 @import "ui-variables";
 @import "chosen";
-@import "material-light";
 @import "material-dark";
 
 
@@ -9,14 +8,14 @@
 
   &.error-choice-highlight .region {
     background-color: fade(@text-color-error, 20%);
-    border: 2px fade(@text-color-error, 80%) solid;
+    border: 2px fade(@text-color-error, 100%) solid;
     opacity: .8;
   }
 
   &.extension-highlight, &.resolution-highlight {
     .region {
       background-color: fade(@text-color-info, 30%);
-      border: 2px fade(@text-color-info, 90%) solid;
+      border: 2px fade(@text-color-info, 100%) solid;
       opacity: .6;
     }
   }
@@ -26,6 +25,7 @@
 atom-text-editor.source-editor div.line {
   &.active {
     opacity: 1;
+    background-color: darken(#FAFAFA, 4%);
   }
   &:not(.active) {
     opacity: .35;
@@ -38,18 +38,26 @@ atom-text-editor.source-editor div.line {
   }
 }
 
+atom-text-editor.stub-editor {
+  background-color: darken(#F0F0FF, 90%) !important;
+  div.gutter.line-numbers {
+    background-color: darken(#F0F0FF, 90%) !important;
+    color: #DDDDDD;
+  }
+}
+
 @keyframes pulsate {
   0%, 10% {
-    background-color: fade(@syntax-color-renamed, 20%);
-    outline: 1px solid fade(@syntax-color-renamed, 80%);
+    background-color: fade(@syntax-color-renamed, 25%);
+    outline: 1px solid fade(@syntax-color-renamed, 90%);
   }
   40%, 60% {
     background-color: fade(@syntax-color-renamed, 10%);
-    outline: 1px solid fade(@syntax-color-renamed, 10%);
+    outline: 1px solid fade(@syntax-color-renamed, 30%);
   }
   100% {
-    background-color: fade(@syntax-color-renamed, 20%);
-    outline: 1px solid fade(@syntax-color-renamed, 80%);
+    background-color: fade(@syntax-color-renamed, 25%);
+    outline: 1px solid fade(@syntax-color-renamed, 90%);
   }
 }
 
@@ -79,7 +87,7 @@ atom-text-editor.locked-editor {
 atom-overlay.error-choice-button {
 
   background-color: #fff;
-  border: 2px solid @background-color-warning;
+  border: 2px solid @text-color-warning;
   padding: @component-padding;
   font-family: @font-family;
   opacity: 0;
@@ -87,7 +95,6 @@ atom-overlay.error-choice-button {
   color: black;
 
   &:hover {
-    // background-color: @syntax-color-renamed;
     opacity: 1;
     cursor: pointer;
     z-index: 100;
@@ -136,15 +143,14 @@ atom-overlay {
   div.resolution-class-block {
 
     &:not(:last-of-type) {
-      border-right: 2px @tool-panel-border-color solid;
+      border-right: 2px @text-color-info solid;
     }
 
     &:not(:first-of-type) {
     }
 
     background-color: #fff;
-    border: 2px solid @background-color-info;
-    border-color: @tool-panel-border-color;
+    border: 2px solid @text-color-info;
     color: @text-color-highlight;
 
     display: inline-block;
@@ -157,7 +163,7 @@ atom-overlay {
     }
 
     div.suggestion {
-      border-top: 1px @tool-panel-border-color solid;
+      border-top: 1px @text-color-info solid;
       text-align: center;
       padding: @component-padding;
       cursor: pointer;

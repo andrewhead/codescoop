@@ -1,6 +1,6 @@
 @import "dark-syntax-variables";
 
-atom-text-editor.example-editor {
+atom-text-editor.example-editor, atom-text-editor.stub-editor {
     background-color: @syntax-background-color;
     color: @syntax-text-color;
 
@@ -67,7 +67,8 @@ atom-text-editor.example-editor {
 
     // Syntax styles
     .syntax--comment {
-        color: @syntax-comment-color;
+        color: lighten(#545454, 40%);
+        // color: @syntax-comment-color;
     }
 
     .syntax--keyword {

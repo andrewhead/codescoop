@@ -29,7 +29,7 @@ module.exports.CodeView = class CodeView
     )
     @scrollToSuggestedRange() if (
       (propertyName is RangeSetProperty.SUGGESTED_RANGES_CHANGED) and
-      (newValue.length > 0)
+      (newValue.length > oldValue.length)
     )
 
   updateHighlights: ->

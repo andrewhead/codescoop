@@ -7,7 +7,7 @@ module.exports.InstanceStubSuggestionView = \
     class InstanceStubSuggestionView extends SuggestionView
 
   constructor: (suggestion, model, errorMarker, i) ->
-    super suggestion, model, ("Stub " + String(i + 1))
+    super suggestion, model, ("← Preview Stub " + String(i + 1))
     @symbol = suggestion.getSymbol()
     @stubSpec = suggestion.getStubSpec()
 

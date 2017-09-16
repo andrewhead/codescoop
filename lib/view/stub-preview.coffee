@@ -1,5 +1,6 @@
 { ExampleModelProperty } = require "../model/example-model"
 { StubPrinter } = require "./stub-printer"
+$ = require "jquery"
 
 
 module.exports.StubPreview = class StubPreview
@@ -43,4 +44,6 @@ module.exports.StubPreview = class StubPreview
               activateItem: true
             }).then (editor) =>
               @textEditor = editor
+              editorView = atom.views.getView @textEditor
+              ($ editorView).addClass 'stub-editor'
               @_updateStubText newValue
