@@ -272,6 +272,28 @@ module.exports.ExampleController = class ExampleController
         # Clear out the list of chosen ranges
         newValue.reset()
 
+    else if propertyName is ExampleModelProperty.DELETE_RANGES
+      # Make a command for adding a range for each of the chosen ranges.
+      if newValue.length > 0
+        for newRange in newValue
+
+          # Check to see if the range is already included
+          rangeAlreadyIncluded = false
+          for activeRange in @model.getRangeSet().getActiveRanges()
+            if activeRange.intersectsWith newRange
+              rangeAlreadyIncluded = true
+
+          # Only add a new range when the range hasn't been added in the past
+          if rangeAlreadyIncluded
+            console.log "Range already included"
+            commandGroup = @commandCreator.createCommandGroupForDeleteRange newRange, @model
+            @commandStack.push commandGroup
+            for command in commandGroup
+              command.apply @model
+
+        # Clear out the list of chosen ranges
+        newValue.reset()
+
     # If the active ranges have changed, stop what is currently happening,
     # and send the controller back to IDLE to check for errors and resolutions
     else if propertyName is ExampleModelProperty.ACTIVE_RANGES

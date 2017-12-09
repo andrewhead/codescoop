@@ -1,9 +1,9 @@
-module.exports.ObservableArrayProperty = ObservableArrayProperty =
+module.exports.ObservableRangeArrayProperty = ObservableRangeArrayProperty =
   UNKNOWN: { value: -1, name: "unknown" }
   ARRAY_CHANGE: { value: 0, name: "array-change" }
 
 
-module.exports.makeObservableArray = (array = undefined) ->
+module.exports.makeObservableRangeArray = (array = undefined) ->
 
   array or= []
 
@@ -14,7 +14,7 @@ module.exports.makeObservableArray = (array = undefined) ->
 
   array.notifyObservers = (arrayBefore) ->
     for observer in @observers
-      observer.onPropertyChanged @, ObservableArrayProperty.ARRAY_CHANGE,
+      observer.onPropertyChanged @, ObservableRangeArrayProperty.ARRAY_CHANGE,
         arrayBefore, @
 
   # It should be easy to copy the array, so that people can modify a copy of
@@ -51,9 +51,15 @@ module.exports.makeObservableArray = (array = undefined) ->
   array.remove = (element) ->
     arrayBefore = @.copy()
     for arrayElement, index in @
-      if element is arrayElement
+      if element.isEqual arrayElement
         @.splice index, 1
         break
     @notifyObservers arrayBefore
+
+  array.contains = (element) ->
+    for arrayElement in @
+      if element.isEqual arrayElement
+        return true
+    return false
 
   array

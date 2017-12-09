@@ -1,4 +1,5 @@
 { makeObservableArray } = require "./observable-array"
+{ makeObservableRangeArray } = require "./observable-range-array"
 { Range } = require "atom"
 
 
@@ -17,6 +18,7 @@ module.exports.RangeSetProperty = RangeSetProperty =
   METHOD_RANGES_CHANGED: { value: 4, name: "method-ranges-changed" }
   # Lines a user chose that haven't yet been added to the snippet ranges.
   CHOSEN_RANGES_CHANGED: { value: 5, name: "chosen-ranges-changed" }
+  DELETE_RANGES_CHANGED: { value: 6, name: "delete-ranges-changed" }
 
 
 module.exports.Range = Range
@@ -93,13 +95,15 @@ module.exports.RangeSet = class RangeSet
 
   constructor: (snippetRanges, suggestedRanges)->
 
-    @snippetRanges = makeObservableArray snippetRanges
+    @snippetRanges = makeObservableRangeArray snippetRanges
     @chosenRanges = makeObservableArray []
+    @deleteRanges = makeObservableArray []
     @methodRanges = makeObservableArray []
     @classRanges = makeObservableArray []
     @suggestedRanges = makeObservableArray suggestedRanges
     @snippetRanges.addObserver @
     @chosenRanges.addObserver @
+    @deleteRanges.addObserver @
     @methodRanges.addObserver @
     @classRanges.addObserver @
     @suggestedRanges.addObserver @
@@ -135,6 +139,8 @@ module.exports.RangeSet = class RangeSet
       propertyName = RangeSetProperty.SUGGESTED_RANGES_CHANGED
     else if object is @chosenRanges
       propertyName = RangeSetProperty.CHOSEN_RANGES_CHANGED
+    else if object is @deleteRanges
+      propertyName = RangeSetProperty.DELETE_RANGES_CHANGED
     @notifyObservers @, propertyName, oldValue, newValue
 
     # Whenever one of the constituent range lists of active ranges updates,
@@ -170,6 +176,9 @@ module.exports.RangeSet = class RangeSet
 
   getChosenRanges: ->
     @chosenRanges
+
+  getDeleteRanges: ->
+    @deleteRanges
 
   getActiveSymbols: (symbols) ->
     activeSymbols = []
