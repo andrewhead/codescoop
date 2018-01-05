@@ -1,24 +1,36 @@
-# Examplify
+# CodeScoop
 
-## Installation
+This is the code for the prototype system "CodeScoop", from the CHI paper on "Interactive Extraction of Examples from Existing Code"
 
-### Java 1.7
+## Getting Started
 
-The only workable configuration I have found for satisfying
-Soot and the Node `java` packages is to have JDK version 1.7
-as the primary Java VM.  Check out installation instructions
-specific to your OS for getting this version.
+### Download GitHub Atom text editor
 
-Your `JAVA_HOME` environment variable should be set to point
-to Java 1.7.  On OSX, you can add a line like this to your
+CodeScoop is built as an add-on for the GitHub
+Atom text editor.
+Download and install Atom text editor from the 
+download link on the Atom home page
+[here](https://atom.io/).
+
+### Download Java 1.7
+
+Currently, the tool depends on Java 1.7 for running Soot
+static analyses and for connecting to Java through the
+`node-java` package.  You can download Java 1.7 from the 
+Oracle website.
+
+After installing the JDK, your `JAVA_HOME` environment variable
+should point to Java 1.7 instead of another version of Java.
+On OSX, you can do this by adding a line like this to your
 `~/.bashrc` set the `JAVA_HOME` to 1.7.
 
 ```bash
 export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
 ```
 
-On OSX, you need to add a few symbolic links so that Soot
-gets the class definitions it expects:
+If you're using OSX, you will also need to create a few symbolic
+links so that Soot can find the class definitions it expects (see 
+https://github.com/Sable/soot/issues/686 for context):
 
 ```bash
 cd $JAVA_HOME
@@ -28,56 +40,43 @@ sudo ln -s ../jre/lib/rt.jar classes.jr
 sudo ln -s ../jre/lib/rt.jar ui.jar
 ```
 
-See https://github.com/Sable/soot/issues/686 for details on the
-hack we are following.
+### Install the CodeScoop plugin in Atom
 
-### Adding the Examplify plugin to Atom
-
-First, download and install the GitHub Atom text editor.
-There should be a download link on the Atom home page
-[here](https://atom.io/).
-
-Then clone this repository.  `cd` into the repository's main
-directory, and install all of the Node dependencies for the
-package by running
+Clone this repository locally, and install its dependencies:
 
 ```bash
-npm install
+git clone https://github.com/andrewhead/codescoop.git codescoop
+
+cd codescoop/
+npm install      # install Node dependencies
+
+cd java/libs/
+./fetch_libs.sh  # install Java dependencies (e.g., Soot, etc.)
 ```
 
-This project requires Soot, a static analysis tool, to run.
-The classes for Soot are stored in a pretty large JAR.  It's
-not included in the repository, so for right now, you can
-run this helper script to fetch the dependencies.
+Then compile the analysis code written in Java:
 
 ```bash
-cd java/libs
-./fetch_libs.sh
-```
-
-You will also need to compile all of the Java analyses once
-before the plugin can run correctly.  To do this, you can
-run the `build.sh` script:
-
-```bash
-cd java/  # run this from the main directory
+cd java/        # run this from the main `codescoop` directory
 ./build.sh
 ```
 
-Last, install the Examplify plugin into Atom by running this
-command in the main folder:
+Then, install CodeScoop as an Atom plugin:
 
 ```bash
 apm link
 ```
 
-### Adding the Script package to Atom
+### Additional Dependencies
 
-This lets you compile and run Java from Atom.  We made a fork
+CodeScoop depends on several third-party plugins.  Install them as follows:
+
+#### "Script" plugin
+
+"Script" lets you compile and run Java within Atom.  We made a fork
 of the `script` package with the right text sizing and with a
-tweaks to the Java classpath argument.
-
-To clone the repository and install the package, do this:
+tweaks to the Java classpath argument.  Clone the repository and
+install the plugin:
 
 ```bash
 git clone https://github.com/andrewhead/atom-script
@@ -86,10 +85,11 @@ npm install
 apm link
 ```
 
-### Adding an event logger to Atom
+#### Event logger plugin
 
-You don't need this to run examplify, but you might need it if
-you're running a study and want to log typical interactions.
+You don't need this to run CodeScoop, but you might need it if
+you want to log the user interactions.  If so, install this plugin
+with these commands:
 
 ```bash
 git clone https://github.com/andrewhead/atom-event-logger
@@ -98,48 +98,16 @@ npm install
 apm link
 ```
 
-### Adding the Atom clock to Atom
+## Using CodeScoop
 
-This is important for being able to trace study video back
-to log data.  Install the `atom-clock` package in Atom
-(go to Preferences->Install->type in query "atom-clock").  In
-the preferences for the package, set the format to 
-`MMMM Do, dddd, h:mm:ss a`.
+Once you have installed CodeScoop, you can test it out on
+a few source programs from the repository.
 
-## Using Examplify
-
-This step assumes that you have already followed all of the
-installation instructions.
-
-If this is your first time using Examplify, or if you have
-changed the contents of the source code files that you want
-to create examples from, you should rebuild the Java code
-and source code files.
-
-```bash
-cd java/
-./build.sh
-```
-
-If Atom was already open, you should probably reload the
-Examplify plugin (`Cmd-Ctrl-Opt-L`).
-
-Then, open the file you want to create an example from in
-Atom.  Select a line or lines of text that you want to
-create an example out of.  Right click in the editor, and
-choose the item "Create example from selection" in the
-context menu.
-
-You may have to wait up to 30 seconds for the Java analysis
-to complete before you can start finishing the examples.
-Performance improvements to come soon?
-
-Currently, there are a few files that you can make examples
-out of.
+Open up one of these files in Atom:
 
 * `tests/scenarios/database-use/BookListing.java`: based on
-    a code example from a formative study.  Uses a fake
-    cursor-based database access API.
+    a code example from a formative study.  Uses a synthetic
+    cursor-based database API.
 * `tests/scenarios/jsoup/CraigslistMonitor.java`: uses Jsoup
     to fetch and parse web page content, uses a file reader
     API to read credentials from a file, and uses a
@@ -147,34 +115,35 @@ out of.
     an email address.
 
 Each of these files may have specific setup instructions.
-For example, for `CraigslistMonitor.java`, you need to add a
-`/etc/smtp.conf` file to your machine.  If there are special
-setup instructions, they are specified in the `README.md`
-file in the directory with the `.java` file.
-
-**For some of these (`CraigslistMonitor.java`), you should
-disable stub analysis**, as it takes prohibitively long to
-run (way longer than a few minutes).  To disable stub
-analysis, comment out this line in `examplify.coffee`.  The
-line to comment looks like:
+If there are special setup instructions, they are specified
+in the `README.md` file for that `.java` file.  For some of
+programs (`CraigslistMonitor.java`), you should
+disable stub analysis, as it takes a long time to run for
+programs with lots of complex objects.  To disable stub
+analysis, comment out the line in `examplify.coffee` that reads:
 
 ```coffeescript
       stubAnalysis: new StubAnalysis codeEditorFile
 ```
 
-and after you comment it, it should look like:
+If you update the `examplify.coffee` file, make sure to
+reload the plugin by refreshing Atom (`Cmd-Ctrl-Option-L`).
 
-```coffeescript
-      # stubAnalysis: new StubAnalysis codeEditorFile
-```
+Now, it's time to create an example!  Once you have opened
+the `.java` file you want to extract code from, select a line
+or lines that constitute the pattern you want to share.  Right click
+in the editor, and choose the item "Create example from
+selection" in the context menu.
 
-Remember that you should reload Atom (`Cmd-Ctrl-Option-L`)
-after making changes to the `examplify.coffee` file for stub
-analysis to be disabled.
+Depending on the Java file you're working with, CodeScoop will take a
+few seconds (up to 30 seconds) to analyze the code
+before you can interact with it.
 
-## Developing
+## Contributing to CodeScoop
 
-### Java tests
+### Running the unit tests
+
+#### Running the Java tests
 
 To make sure that the static analysis code is working properly:
 
@@ -208,13 +177,24 @@ Explanation of those less readable options:
     `.class` file
 * `-f J`: produces a Jimple IR file (instead of a class)
 
-### Editing Java code
+### Changing the Java code
 
 If you like to use `vi` to edit the Java code, consider
 using the `editjava` script in the `java/` directory.  This
 sets up the class path to include all of the dependencies
 before starting `vi`, in case you have an integrated Linter
 and want to make sure it notices all your dependencies.
+
+If you edit any of the Java files, you will
+need to recompile them to see the changes take effect:
+
+```bash
+cd java/    # call this from the main directory
+./build.sh
+```
+
+If Atom was already open, you should probably reload the
+CodeScoop plugin (`Cmd-Ctrl-Opt-L`).
 
 ### Style Guide
 
@@ -245,30 +225,27 @@ fields of the object.
 
 Ctrl-Option-Command-l (lowercase L)
 
-#### When running specs on examplify in Atom
+#### Version mismatch problem
 
-* If all else fails you need to install your packages and then run `npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49` where 1.3.4 is your electron version and 49 is the abi it's expecting. (Source: https://github.com/electron-userland/electron-builder/issues/453)
+You may need to rebuild project dependencies if you see a version mismatch error in the Atom console.  You can do this with a command like:
 
-#### Compiling example code
-
-* InstallCert: Compile code with debug flags, e.g., `javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
-* Chat Client: Don't forget to specify the classpath when compiling with debug flags, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
-* Polyglot: `./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
-* BookListing: `Elenas-MacBook-Pro:java elenaglassman$ ./runclass.sh PrimitiveValueAnalysis tests/scenarios/database-use/ BookListing`
-
-#### Dealing with bad VM launch
-
-Try some `/etc/hosts` entries like this:
+```bash
+npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49
 ```
-##
-# Host Database
-#
-# localhost is used to configure the loopback interface
-# when the system is booting.  Do not change this entry.
-##
+
+where `1.3.4` is your electron version and `49` is the abi it's expecting. For more context, see https://github.com/electron-userland/electron-builder/issues/453)
+
+#### VM launch issues
+
+If a Java VM fails to launch when using CodeScoop, you may have to update
+your `/etc/hosts` file to redirect your machine's host name to
+the localhost address of `127.0.0.1`  Here's an example of an
+`/etc/hosts` file that works for one of the contributors to this project.
+
+```
 127.0.0.1	localhost
 255.255.255.255	broadcasthost
 ::1             localhost.localdomain   localhost
-::1             Elenas-MacBook-Pro.local
-127.0.0.1	Elenas-MacBook-Pro.local
+::1             My-MacBook-Pro.local
+127.0.0.1	My-MacBook-Pro.local
 ```
