@@ -62,17 +62,11 @@ describe "MissingDeclarationDetector", ->
     (expect error.getSymbol().getName()).toBe "i"
     (expect error.getSymbol().getRange()).toEqual new Range [3, 12], [3, 13]
 
-  it "returns uses of arguments that are missing declarations", ->
-    rangeSet.getSnippetRanges().reset [ new Range [4, 0], [4, 25] ]
-    errors = detector.detectErrors model
-    error = errors[0]
-    (expect error.getSymbol().getName()).toBe "args"
-
   it "skips temporary symbols", ->
     rangeSet.getSnippetRanges().reset [ new Range [4, 0], [4, 25] ]
     errors = detector.detectErrors model
-    # Missing declarations should only include "args", not "System.out"
-    (expect errors.length).toBe 1
+    # Missing declarations should not include "args" or "System.out"
+    (expect errors.length).toBe 0
 
   it "skips over variables that have already had a declaration fix", ->
     rangeSet.getSnippetRanges().reset [ new Range [4, 0], [4, 25] ]
