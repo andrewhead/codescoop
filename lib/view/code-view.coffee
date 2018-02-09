@@ -84,7 +84,11 @@ module.exports.CodeView = class CodeView
         log.debug "Clicked on line number", { lineNumber: rowNumber }
         lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
         newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
-        if newRange not in @rangeSet.getChosenRanges()
+        console.log newRange
+        console.log @rangeSet.getSnippetRanges()
+        if @rangeSet.getSnippetRanges().contains newRange
+          @rangeSet.getDeleteRanges().push newRange
+        else
           @rangeSet.getChosenRanges().push newRange
 
   listenForRefocus: ->

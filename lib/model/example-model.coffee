@@ -34,6 +34,8 @@ module.exports.ExampleModelProperty = ExampleModelProperty =
   PRINTED_SYMBOLS: { value: 26, name: "printed-symbols" }
   THROWS_TABLE: { value: 27, name: "throws-table" }
   CATCH_TABLE: { value: 28, name: "catch-table" }
+  DELETE_RANGES: { value: 29, name: "delete-ranges" }
+
 
 
 module.exports.ExampleModelState = ExampleModelState =
@@ -111,9 +113,12 @@ module.exports.ExampleModel = class ExampleModel
   notifyObservers: (object, propertyName, oldValue, newValue) ->
     # For now, it's sufficient to bubble up the event
     if propertyName is RangeSetProperty.ACTIVE_RANGES_CHANGED
+      console.log "Active Ranges Changed"
       propertyName = ExampleModelProperty.ACTIVE_RANGES
     else if propertyName is RangeSetProperty.CHOSEN_RANGES_CHANGED
       propertyName = ExampleModelProperty.CHOSEN_RANGES
+    else if propertyName is RangeSetProperty.DELETE_RANGES_CHANGED
+      propertyName = ExampleModelProperty.DELETE_RANGES
     else if object is @edits
       propertyName = ExampleModelProperty.EDITS
     else if object is @auxiliaryDeclarations

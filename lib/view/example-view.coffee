@@ -69,7 +69,8 @@ module.exports.ExampleView = class ExampleView
       ExampleModelProperty.PRINTED_SYMBOLS
     ]
     if (propertyName is ExampleModelProperty.ACTIVE_RANGES) and
-        (newValue.length > oldValue.length)
+        (newValue.length != oldValue.length)
+      console.log "Snippet Ranges Changed"
       @update()
     if (propertyName is ExampleModelProperty.EDITS)
       if (newValue.length > oldValue.length)

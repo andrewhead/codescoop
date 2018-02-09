@@ -28,6 +28,8 @@
 { AddDeclaration } = require "../command/add-declaration"
 { AddStubSpec } = require "../command/add-stub-spec"
 { ArchiveEvent } = require "../command/archive-event"
+{ DeleteRange } = require "../command/delete-range"
+
 
 
 # Each of the createCommand* functions returns a group of commands that specify
@@ -42,6 +44,15 @@ module.exports.CommandCreator = class CommandCreator
       relatedRanges = model.getRangeGroupTable().getRelatedRanges range
       for relatedRange in relatedRanges
         commandGroup.push new AddRange relatedRange
+    commandGroup
+
+  createCommandGroupForDeleteRange: (range, model) ->
+    commandGroup = []
+    commandGroup.push new DeleteRange range
+    if model? and model.getRangeGroupTable()?
+      relatedRanges = model.getRangeGroupTable().getRelatedRanges range
+      for relatedRange in relatedRanges
+        commandGroup.push new DeleteRange relatedRange
     commandGroup
 
   createCommandGroupForPrintedSymbol: (symbolName) ->
