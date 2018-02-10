@@ -1,5 +1,5 @@
 {
-  "name": "examplify",
+  "name": "codescoop",
   "main": "./lib/examplify",
   "version": "0.0.0",
   "description": "A short description of your package",
@@ -7,14 +7,13 @@
   "activationCommands": {
     "atom-workspace": "examplify:make-example-code"
   },
-  "repository": "https://github.com/atom/examplify",
+  "repository": "https://github.com/atom/codescoop",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
     "antlr4": "^4.6.0",
-    "chosen-js": "^1.7.0",
     "examplify-log": "^1.3.2",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4"
