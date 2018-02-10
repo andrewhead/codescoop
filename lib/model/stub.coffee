@@ -54,6 +54,9 @@ module.exports.StubSpec = class StubSpec
       methodCalls: @methodCalls
       superclassName: @superclassName
 
+  @deserialize: (json) ->
+    new StubSpec json.className, json
+
 
 module.exports.StubSpecTable = class StubSpecTable
 
@@ -81,3 +84,13 @@ module.exports.StubSpecTable = class StubSpecTable
 
   getSize: ->
     @size
+
+  @deserialize: (json) ->
+    table = new StubSpecTable()
+    for contextClass, objectNames of json.table
+      for objectName, lineNumbers of objectNames
+        for lineNumber, specRecords of lineNumbers
+          for specRecord in specRecords
+            stubSpec = StubSpec.deserialize specRecord
+            table.putStubSpec contextClass, objectName, lineNumber, stubSpec
+    return table

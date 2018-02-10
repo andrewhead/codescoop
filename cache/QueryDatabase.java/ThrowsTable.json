@@ -1,0 +1,20 @@
+{
+  "table": {
+    "[(67, 28) - (67, 43)]": [
+      {
+        "name": "org.acme.database.ConnectionException",
+        "superclass": {
+          "name": "java.lang.Exception"
+        }
+      }
+    ],
+    "[(40, 24) - (40, 41)]": [
+      {
+        "name": "org.acme.database.ConnectionException",
+        "superclass": {
+          "name": "java.lang.Exception"
+        }
+      }
+    ]
+  }
+}

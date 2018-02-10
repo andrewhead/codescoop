@@ -1,4 +1,3 @@
-
 { makeObservableArray } = require "./observable-array"
 { RangeSet, RangeSetProperty } = require "./range-set"
 { SymbolSet } = require "./symbol-set"

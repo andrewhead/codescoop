@@ -1,274 +1,105 @@
-# Examplify
+# CodeScoop Online Demo
 
-## Installation
+This is the version of CodeScoop that is has been re-written
+to be deployed as a demo on a server.
 
-### Java 1.7
+The main change for the demo is that the results of analyses
+that used to be run in Java code are now precomputed.  This
+makes the CodeScoop plugin easier to port to another
+machine.  It also means that the demo server can support
+more simultaneous users, as running some of the Java analyses
+could take a few seconds of time.
 
-The only workable configuration I have found for satisfying
-Soot and the Node `java` packages is to have JDK version 1.7
-as the primary Java VM.  Check out installation instructions
-specific to your OS for getting this version.
+## Setup instructions
 
-Your `JAVA_HOME` environment variable should be set to point
-to Java 1.7.  On OSX, you can add a line like this to your
-`~/.bashrc` set the `JAVA_HOME` to 1.7.
+This plugin has been reworked to fit into
+[atom-in-orbit](https://github.com/facebook-atom/atom-in-orbit),
+a wrapper around GitHub Atom that lets Atom run in the
+browser.  Follow the instructions to set up atom-in-orbit,
+which includes downloading an old version of Atom.
 
-```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+### Tweaking GitHub Atom dependencies
+
+We'll tweak a GitHub Atom build so that it depends on the
+CodeScoop project.
+
+First, a little cleanup.  You should have cloned [GitHub
+Atom repository](https://github.com/atom/atom) and checked
+out the version against which atom-in-orbit could be built.
+There are some broken dependencies in this version.  Fix
+these broken dependencies as follows.  In `package.json`,
+remove the `packageDependencies` entries for
+`autocomplete-plus`, `find-and-replace`, `settings-view`,
+and `tree-view`.  Then, add these replacement entries to the
+list of `dependencies`.
+
+```json
+    "find-and-replace": "atom/find-and-replace#v0.204.0",
+    "tree-view": "atom/tree-view#v0.211.1",
+    "autocomplete-plus": "atom/autocomplete-plus#v2.33.1",
+    "settings-view": "atom/settings-view#v0.244.0",
 ```
 
-On OSX, you need to add a few symbolic links so that Soot
-gets the class definitions it expects:
+Then, add entries to the `dependencies` for the CodeScoop
+plugin:
 
-```bash
-cd $JAVA_HOME
-sudo mkdir Classes
-cd Classes/
-sudo ln -s ../jre/lib/rt.jar classes.jr
-sudo ln -s ../jre/lib/rt.jar ui.jar
+```json
+    "codescoop": "andrewhead/codescoop#online-demo",
+    "atom-script": "andrewhead/atom-script"
 ```
 
-See https://github.com/Sable/soot/issues/686 for details on the
-hack we are following.
+Run `npm install` and `apm install` within the Atom
+directory before trying to build atom-in-orbit.
 
-### Adding the Examplify plugin to Atom
+### Updating dependencies for atom-in-orbit
 
-First, download and install the GitHub Atom text editor.
-There should be a download link on the Atom home page
-[here](https://atom.io/).
+Then change directory into your local directory for the
+atom-in-orbit repository.
 
-Then clone this repository.  `cd` into the repository's main
-directory, and install all of the Node dependencies for the
-package by running
+We need to make sure atom-in-orbit knows to include the
+CodeScoop plugin too.  Go to the definition of
+`atomPackages` in `scripts/build.js`, and make sure the
+following entries are in the list of dependencies:
 
-```bash
-npm install
+```javascript
+    'codescoop',
+    'atom-script',
+    'language-java',
 ```
 
-This project requires Soot, a static analysis tool, to run.
-The classes for Soot are stored in a pretty large JAR.  It's
-not included in the repository, so for right now, you can
-run this helper script to fetch the dependencies.
+Then, follow the instructions from the repository for
+building and launching the project.
 
-```bash
-cd java/libs
-./fetch_libs.sh
-```
+### TODO: Downloading the test files
 
-You will also need to compile all of the Java analyses once
-before the plugin can run correctly.  To do this, you can
-run the `build.sh` script:
+### Enabling the demos
 
-```bash
-cd java/  # run this from the main directory
-./build.sh
-```
+Download the following JARs to a directory on your machine,
+and add each of the JARs to your Java classpath:
 
-Last, install the Examplify plugin into Atom by running this
-command in the main folder:
+* [Database API](https://github.com/andrewhead/codescoop/releases/download/jars/database.jar)
+* [Javax Mail Library](https://github.com/andrewhead/codescoop/releases/download/jars/javax.mail-1.4.7.jar)
+* [Jsoup Library](https://github.com/andrewhead/codescoop/releases/download/jars/jsoup-jdk-1.4.jar)
 
-```bash
-apm link
-```
+#### Scraping / Emailing Demo
 
-### Adding the Script package to Atom
+Add an `/etc/smtp.conf`  to the machine so emails can be
+sent out when someone tests the emailing program.  If you
+are deploying this as a demo, only put credentials for a
+throwaway account in this file!  The username and password
+will be visible in the demo.  The first line should be a
+GMail username, and the second line should be the password
+for that account.
 
-This lets you compile and run Java from Atom.  We made a fork
-of the `script` package with the right text sizing and with a
-tweaks to the Java classpath argument.
+## Using the tool
 
-To clone the repository and install the package, do this:
+There are a couple files that you can make examples from:
 
-```bash
-git clone https://github.com/andrewhead/atom-script
-cd atom-script
-npm install
-apm link
-```
+* `QueryDatabase.java`: based on a code example from a
+  formative study.  Uses a fake cursor-based database API.
+* `ScrapeAndEmail.java`: uses Jsoup to fetch and parse web
+  page content, uses a file reader API to read credentials
+  from a file, and uses a javax.mail to send a digest of
+  the web page contents to an email address.
 
-### Adding an event logger to Atom
-
-You don't need this to run examplify, but you might need it if
-you're running a study and want to log typical interactions.
-
-```bash
-git clone https://github.com/andrewhead/atom-event-logger
-cd atom-event-logger
-npm install
-apm link
-```
-
-### Adding the Atom clock to Atom
-
-This is important for being able to trace study video back
-to log data.  Install the `atom-clock` package in Atom
-(go to Preferences->Install->type in query "atom-clock").  In
-the preferences for the package, set the format to 
-`MMMM Do, dddd, h:mm:ss a`.
-
-## Using Examplify
-
-This step assumes that you have already followed all of the
-installation instructions.
-
-If this is your first time using Examplify, or if you have
-changed the contents of the source code files that you want
-to create examples from, you should rebuild the Java code
-and source code files.
-
-```bash
-cd java/
-./build.sh
-```
-
-If Atom was already open, you should probably reload the
-Examplify plugin (`Cmd-Ctrl-Opt-L`).
-
-Then, open the file you want to create an example from in
-Atom.  Select a line or lines of text that you want to
-create an example out of.  Right click in the editor, and
-choose the item "Create example from selection" in the
-context menu.
-
-You may have to wait up to 30 seconds for the Java analysis
-to complete before you can start finishing the examples.
-Performance improvements to come soon?
-
-Currently, there are a few files that you can make examples
-out of.
-
-* `tests/scenarios/database-use/BookListing.java`: based on
-    a code example from a formative study.  Uses a fake
-    cursor-based database access API.
-* `tests/scenarios/jsoup/CraigslistMonitor.java`: uses Jsoup
-    to fetch and parse web page content, uses a file reader
-    API to read credentials from a file, and uses a
-    javax.mail to send a digest of the web page contents to
-    an email address.
-
-Each of these files may have specific setup instructions.
-For example, for `CraigslistMonitor.java`, you need to add a
-`/etc/smtp.conf` file to your machine.  If there are special
-setup instructions, they are specified in the `README.md`
-file in the directory with the `.java` file.
-
-**For some of these (`CraigslistMonitor.java`), you should
-disable stub analysis**, as it takes prohibitively long to
-run (way longer than a few minutes).  To disable stub
-analysis, comment out this line in `examplify.coffee`.  The
-line to comment looks like:
-
-```coffeescript
-      stubAnalysis: new StubAnalysis codeEditorFile
-```
-
-and after you comment it, it should look like:
-
-```coffeescript
-      # stubAnalysis: new StubAnalysis codeEditorFile
-```
-
-Remember that you should reload Atom (`Cmd-Ctrl-Option-L`)
-after making changes to the `examplify.coffee` file for stub
-analysis to be disabled.
-
-## Developing
-
-### Java tests
-
-To make sure that the static analysis code is working properly:
-
-```bash
-cd java/
-./runtests.sh
-```
-
-### Coffeescript tests
-
-`Cmd-Shift-p` in Atom, type `specs` into window, and choose `run package specs`
-
-### Running Soot
-
-After following the dependency instructions above, you should
-be able to run [Soot](https://github.com/Sable/soot) to
-generate intermediate representation.  To run soot, use the
-following commands:
-
-```bash
-CLASSPATH=$JAVA_HOME/jre/lib/rt.jar:libs/*:. java soot.Main Example -src-prec java -f J
-```
-with the following caveats/substitutions:
-1. Substitute `Example` with the name of your `.java` file
-(though omit the `.java` extension).  
-2. This file will need to be placed in the same directory as the one that you
-are running the command.  
-
-Explanation of those less readable options:
-* `-src-prec java`: runs Soot on a `.java` file instead of a
-    `.class` file
-* `-f J`: produces a Jimple IR file (instead of a class)
-
-### Editing Java code
-
-If you like to use `vi` to edit the Java code, consider
-using the `editjava` script in the `java/` directory.  This
-sets up the class path to include all of the dependencies
-before starting `vi`, in case you have an integrated Linter
-and want to make sure it notices all your dependencies.
-
-### Style Guide
-
-When possible, I use this style guide for Coffeescript:
-https://github.com/polarmobile/coffeescript-style-guide
-
-#### Equality checks
-
-When implementing equality checks, call the method `equals`.
-The method should take in another object as a parameter and
-return a Boolean of whether the two objects are equal.
-
-#### Accessors
-
-Members of an object should only be accessed by other
-objects through accessors (`get` methods).
-
-#### Enums
-
-When defining enums, define each field as an object.  This
-make comparisons with an equals sign use values that are
-exclusive to each class, instead of comparing just on the
-fields of the object.
-
-### Troubleshooting
-
-#### Refresh atom
-
-Ctrl-Option-Command-l (lowercase L)
-
-#### When running specs on examplify in Atom
-
-* If all else fails you need to install your packages and then run `npm rebuild --runtime=electron --target=1.3.4 --disturl=https://atom.io/download/atom-shell --abi=49` where 1.3.4 is your electron version and 49 is the abi it's expecting. (Source: https://github.com/electron-userland/electron-builder/issues/453)
-
-#### Compiling example code
-
-* InstallCert: Compile code with debug flags, e.g., `javac -g tests/scenarios/InstallCertFolder/InstallCert.java`
-* Chat Client: Don't forget to specify the classpath when compiling with debug flags, e.g., `CLASSPATH=tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ javac -g tests/scenarios/Basic-Java-Instant-Messenger/IMClient/src/ClientTest.java`
-* Polyglot: `./runclass.sh PrimitiveValueAnalysis libs/polyglot.jar:libs/java_cup.jar:libs/pao.jar:tests/scenarios/polyglot-simple/ Main` and `./runclass.sh PrimitiveValueAnalysis tests/scenarios/polyglot-simple/ Main`
-* BookListing: `Elenas-MacBook-Pro:java elenaglassman$ ./runclass.sh PrimitiveValueAnalysis tests/scenarios/database-use/ BookListing`
-
-#### Dealing with bad VM launch
-
-Try some `/etc/hosts` entries like this:
-```
-##
-# Host Database
-#
-# localhost is used to configure the loopback interface
-# when the system is booting.  Do not change this entry.
-##
-127.0.0.1	localhost
-255.255.255.255	broadcasthost
-::1             localhost.localdomain   localhost
-::1             Elenas-MacBook-Pro.local
-127.0.0.1	Elenas-MacBook-Pro.local
-```
+Object "stubs" is only enabled for `QueryDatabase.java`

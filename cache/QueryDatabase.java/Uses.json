@@ -1,0 +1,1064 @@
+[
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "titles",
+    "range": {
+      "start": {
+        "row": 48,
+        "column": 28
+      },
+      "end": {
+        "row": 48,
+        "column": 34
+      }
+    },
+    "type": "java.util.List"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "exception",
+    "range": {
+      "start": {
+        "row": 75,
+        "column": 12
+      },
+      "end": {
+        "row": 75,
+        "column": 21
+      }
+    },
+    "type": "org.acme.database.ConnectionException"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "QUERY",
+    "range": {
+      "start": {
+        "row": 28,
+        "column": 27
+      },
+      "end": {
+        "row": 28,
+        "column": 32
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "COLUMN_INDEX_NUM_PAGES",
+    "range": {
+      "start": {
+        "row": 44,
+        "column": 54
+      },
+      "end": {
+        "row": 44,
+        "column": 76
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "title",
+    "range": {
+      "start": {
+        "row": 45,
+        "column": 49
+      },
+      "end": {
+        "row": 45,
+        "column": 54
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "id",
+    "range": {
+      "start": {
+        "row": 67,
+        "column": 40
+      },
+      "end": {
+        "row": 67,
+        "column": 42
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "database",
+    "range": {
+      "start": {
+        "row": 22,
+        "column": 24
+      },
+      "end": {
+        "row": 22,
+        "column": 32
+      }
+    },
+    "type": "org.acme.database.Database"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$i3",
+    "range": {
+      "start": {
+        "row": 66,
+        "column": 54
+      },
+      "end": {
+        "row": 66,
+        "column": 66
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "rowCount",
+    "range": {
+      "start": {
+        "row": 38,
+        "column": 49
+      },
+      "end": {
+        "row": 38,
+        "column": 57
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "id",
+    "range": {
+      "start": {
+        "row": 84,
+        "column": 15
+      },
+      "end": {
+        "row": 84,
+        "column": 17
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$i1",
+    "range": {
+      "start": {
+        "row": 38,
+        "column": 40
+      },
+      "end": {
+        "row": 38,
+        "column": 68
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "rowCount",
+    "range": {
+      "start": {
+        "row": 66,
+        "column": 54
+      },
+      "end": {
+        "row": 66,
+        "column": 62
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "COLUMN_INDEX_ID",
+    "range": {
+      "start": {
+        "row": 41,
+        "column": 47
+      },
+      "end": {
+        "row": 41,
+        "column": 62
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "id",
+    "range": {
+      "start": {
+        "row": 45,
+        "column": 45
+      },
+      "end": {
+        "row": 45,
+        "column": 47
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 28,
+        "column": 12
+      },
+      "end": {
+        "row": 28,
+        "column": 18
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r8",
+    "range": {
+      "start": {
+        "row": 58,
+        "column": 28
+      },
+      "end": {
+        "row": 58,
+        "column": 38
+      }
+    },
+    "type": "java.io.PrintStream"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "DEBUG",
+    "range": {
+      "start": {
+        "row": 57,
+        "column": 28
+      },
+      "end": {
+        "row": 57,
+        "column": 33
+      }
+    },
+    "type": "boolean"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "genre",
+    "range": {
+      "start": {
+        "row": 14,
+        "column": 92
+      },
+      "end": {
+        "row": 14,
+        "column": 97
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "id",
+    "range": {
+      "start": {
+        "row": 50,
+        "column": 28
+      },
+      "end": {
+        "row": 50,
+        "column": 30
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r15",
+    "range": {
+      "start": {
+        "row": 58,
+        "column": 47
+      },
+      "end": {
+        "row": 58,
+        "column": 92
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "maxBooks",
+    "range": {
+      "start": {
+        "row": 38,
+        "column": 59
+      },
+      "end": {
+        "row": 38,
+        "column": 67
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "finished",
+    "range": {
+      "start": {
+        "row": 34,
+        "column": 23
+      },
+      "end": {
+        "row": 34,
+        "column": 31
+      }
+    },
+    "type": "boolean"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "book",
+    "range": {
+      "start": {
+        "row": 51,
+        "column": 62
+      },
+      "end": {
+        "row": 51,
+        "column": 66
+      }
+    },
+    "type": "org.acme.database.Book"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "i",
+    "range": {
+      "start": {
+        "row": 38,
+        "column": 36
+      },
+      "end": {
+        "row": 38,
+        "column": 37
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 41,
+        "column": 33
+      },
+      "end": {
+        "row": 41,
+        "column": 39
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "booklist",
+    "range": {
+      "start": {
+        "row": 79,
+        "column": 15
+      },
+      "end": {
+        "row": 79,
+        "column": 23
+      }
+    },
+    "type": "org.acme.database.Booklist"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "COLUMN_INDEX_TITLE",
+    "range": {
+      "start": {
+        "row": 42,
+        "column": 56
+      },
+      "end": {
+        "row": 42,
+        "column": 74
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 40,
+        "column": 24
+      },
+      "end": {
+        "row": 40,
+        "column": 30
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$i2",
+    "range": {
+      "start": {
+        "row": 51,
+        "column": 62
+      },
+      "end": {
+        "row": 51,
+        "column": 74
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$z0",
+    "range": {
+      "start": {
+        "row": 84,
+        "column": 15
+      },
+      "end": {
+        "row": 84,
+        "column": 22
+      }
+    },
+    "type": "boolean"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "booklist",
+    "range": {
+      "start": {
+        "row": 78,
+        "column": 8
+      },
+      "end": {
+        "row": 78,
+        "column": 16
+      }
+    },
+    "type": "org.acme.database.Booklist"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 63,
+        "column": 28
+      },
+      "end": {
+        "row": 63,
+        "column": 34
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 42,
+        "column": 39
+      },
+      "end": {
+        "row": 42,
+        "column": 45
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "COLUMN_INDEX_YEAR",
+    "range": {
+      "start": {
+        "row": 43,
+        "column": 49
+      },
+      "end": {
+        "row": 43,
+        "column": 66
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$i0",
+    "range": {
+      "start": {
+        "row": 31,
+        "column": 16
+      },
+      "end": {
+        "row": 31,
+        "column": 33
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "genre",
+    "range": {
+      "start": {
+        "row": 58,
+        "column": 81
+      },
+      "end": {
+        "row": 58,
+        "column": 86
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "rowNumber",
+    "range": {
+      "start": {
+        "row": 63,
+        "column": 44
+      },
+      "end": {
+        "row": 63,
+        "column": 53
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r7",
+    "range": {
+      "start": {
+        "row": 45,
+        "column": 36
+      },
+      "end": {
+        "row": 45,
+        "column": 72
+      }
+    },
+    "type": "org.acme.database.Book"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "maxBooks",
+    "range": {
+      "start": {
+        "row": 63,
+        "column": 57
+      },
+      "end": {
+        "row": 63,
+        "column": 65
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "year",
+    "range": {
+      "start": {
+        "row": 45,
+        "column": 56
+      },
+      "end": {
+        "row": 45,
+        "column": 60
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "title",
+    "range": {
+      "start": {
+        "row": 47,
+        "column": 28
+      },
+      "end": {
+        "row": 47,
+        "column": 33
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "num_pages",
+    "range": {
+      "start": {
+        "row": 45,
+        "column": 62
+      },
+      "end": {
+        "row": 45,
+        "column": 71
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 67,
+        "column": 28
+      },
+      "end": {
+        "row": 67,
+        "column": 34
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r5",
+    "range": {
+      "start": {
+        "row": 23,
+        "column": 28
+      },
+      "end": {
+        "row": 23,
+        "column": 42
+      }
+    },
+    "type": "org.acme.database.Booklist"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "booklist",
+    "range": {
+      "start": {
+        "row": 53,
+        "column": 32
+      },
+      "end": {
+        "row": 53,
+        "column": 40
+      }
+    },
+    "type": "org.acme.database.Booklist"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 43,
+        "column": 35
+      },
+      "end": {
+        "row": 43,
+        "column": 41
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "finished",
+    "range": {
+      "start": {
+        "row": 66,
+        "column": 28
+      },
+      "end": {
+        "row": 66,
+        "column": 36
+      }
+    },
+    "type": "boolean"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 31,
+        "column": 16
+      },
+      "end": {
+        "row": 31,
+        "column": 22
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "title",
+    "range": {
+      "start": {
+        "row": 58,
+        "column": 66
+      },
+      "end": {
+        "row": 58,
+        "column": 71
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "bestseller",
+    "range": {
+      "start": {
+        "row": 53,
+        "column": 57
+      },
+      "end": {
+        "row": 53,
+        "column": 67
+      }
+    },
+    "type": "boolean"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r0",
+    "range": {
+      "start": {
+        "row": 88,
+        "column": 8
+      },
+      "end": {
+        "row": 88,
+        "column": 29
+      }
+    },
+    "type": "QueryDatabase"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 36,
+        "column": 35
+      },
+      "end": {
+        "row": 36,
+        "column": 41
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r4",
+    "range": {
+      "start": {
+        "row": 21,
+        "column": 28
+      },
+      "end": {
+        "row": 21,
+        "column": 88
+      }
+    },
+    "type": "org.acme.database.Database"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "titles",
+    "range": {
+      "start": {
+        "row": 78,
+        "column": 26
+      },
+      "end": {
+        "row": 78,
+        "column": 32
+      }
+    },
+    "type": "java.util.List"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "cursor",
+    "range": {
+      "start": {
+        "row": 44,
+        "column": 40
+      },
+      "end": {
+        "row": 44,
+        "column": 46
+      }
+    },
+    "type": "org.acme.database.Cursor"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "$r6",
+    "range": {
+      "start": {
+        "row": 24,
+        "column": 22
+      },
+      "end": {
+        "row": 24,
+        "column": 37
+      }
+    },
+    "type": "java.util.ArrayList"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "i",
+    "range": {
+      "start": {
+        "row": 66,
+        "column": 49
+      },
+      "end": {
+        "row": 66,
+        "column": 50
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "title",
+    "range": {
+      "start": {
+        "row": 48,
+        "column": 39
+      },
+      "end": {
+        "row": 48,
+        "column": 44
+      }
+    },
+    "type": "java.lang.String"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "this",
+    "range": {
+      "start": {
+        "row": 51,
+        "column": 49
+      },
+      "end": {
+        "row": 51,
+        "column": 75
+      }
+    },
+    "type": "QueryDatabase"
+  }
+]

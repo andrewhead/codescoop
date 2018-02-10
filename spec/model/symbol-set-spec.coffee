@@ -1,8 +1,40 @@
 { File, Symbol, SymbolSet } = require "../../lib/model/symbol-set"
+{ Range } = require "../../lib/model/range-set"
+
+TEST_FILE = new File "path", "filename"
+
+
+describe "Symbol", ->
+
+  it "deserializes JSON into a symbol", ->
+
+    symbol = Symbol.deserialize {
+      file: {
+        path: "/path/to/Klazz.java"
+        fileName: "Klazz.java"
+      }
+      name: "var"
+      range: {
+        start: {
+          row: 10
+          column: 8
+        }
+        end: {
+          row: 10
+          column: 11
+        }
+      }
+      type: "int"
+    }
+
+    (expect symbol.getRange()).toEqual new Range [10, 8], [10, 11]
+    (expect symbol.getName()).toBe "var"
+    (expect symbol.getType()).toBe "int"
+    (expect symbol.getFile().getPath()).toBe "/path/to/Klazz.java"
+    (expect symbol.getFile().getName()).toBe "Klazz.java"
+
 
 describe "SymbolSet", ->
-
-  TEST_FILE = new File "path", "filename"
 
   it "returns defs and uses from 'all'", ->
 

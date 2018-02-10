@@ -94,6 +94,13 @@ module.exports.Symbol = class Symbol
   getSymbolText: ->
     new SymbolText @name, @range
 
+  @deserialize: (json) ->
+    new Symbol \
+      (new File json.file.path, json.file.fileName),
+      json.name,
+      (new Range json.range.start, json.range.end),
+      json.type
+
 
 module.exports.SymbolSet = class SymbolSet
 

@@ -1,0 +1,2478 @@
+{
+  "table": {
+    "QueryDatabase": {
+      "book": {
+        "45": [
+          {
+            "className": "Book",
+            "fieldAccesses": {
+              "id": {
+                "type": "int",
+                "values": []
+              },
+              "title": {
+                "type": "String",
+                "values": []
+              },
+              "year": {
+                "type": "int",
+                "values": []
+              },
+              "numPages": {
+                "type": "int",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getYear",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.String",
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getTitle",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getId",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  0
+                ]
+              },
+              {
+                "signature": {
+                  "name": "getNumPages",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              }
+            ]
+          },
+          {
+            "className": "Book",
+            "fieldAccesses": {
+              "id": {
+                "type": "int",
+                "values": []
+              },
+              "title": {
+                "type": "String",
+                "values": []
+              },
+              "year": {
+                "type": "int",
+                "values": []
+              },
+              "numPages": {
+                "type": "int",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getYear",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.String",
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getTitle",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getId",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  1
+                ]
+              },
+              {
+                "signature": {
+                  "name": "getNumPages",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              }
+            ]
+          },
+          {
+            "className": "Book",
+            "fieldAccesses": {
+              "id": {
+                "type": "int",
+                "values": []
+              },
+              "title": {
+                "type": "String",
+                "values": []
+              },
+              "year": {
+                "type": "int",
+                "values": []
+              },
+              "numPages": {
+                "type": "int",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getYear",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.String",
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getTitle",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getId",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  2
+                ]
+              },
+              {
+                "signature": {
+                  "name": "getNumPages",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              }
+            ]
+          }
+        ]
+      },
+      "titles": {
+        "24": [
+          {
+            "className": "Titles",
+            "fieldAccesses": {
+              "elementData": {
+                "type": "java.lang.Object[]",
+                "values": []
+              },
+              "EMPTY_ELEMENTDATA": {
+                "type": "java.lang.Object[]",
+                "values": []
+              },
+              "MAX_ARRAY_SIZE": {
+                "type": "int",
+                "values": []
+              },
+              "serialVersionUID": {
+                "type": "long",
+                "values": []
+              },
+              "DEFAULT_CAPACITY": {
+                "type": "int",
+                "values": []
+              },
+              "modCount": {
+                "type": "int",
+                "values": []
+              },
+              "size": {
+                "type": "int",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "readObject",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.io.ObjectInputStream"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "trimToSize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "elementData",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "retainAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "subListRangeCheck",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "isEmpty",
+                  "returnType": "boolean",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "addAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "int",
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "set",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "outOfBoundsMsg",
+                  "returnType": "String",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "addAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "remove",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "iterator",
+                  "returnType": "java.util.Iterator",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "rangeCheck",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.lang.Object[]"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "writeObject",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.io.ObjectOutputStream"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "listIterator",
+                  "returnType": "unknown",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "indexOf",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "contains",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "batchRemove",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection",
+                    "boolean"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "size",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "listIterator",
+                  "returnType": "unknown",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "add",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": [
+                  true,
+                  true,
+                  true
+                ]
+              },
+              {
+                "signature": {
+                  "name": "grow",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "add",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "removeRange",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "containsAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "rangeCheckForAdd",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "remove",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clear",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureCapacity",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureCapacityInternal",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hugeCapacity",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureExplicitCapacity",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "get",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "subList",
+                  "returnType": "java.util.List",
+                  "argumentTypes": [
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "lastIndexOf",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "access$100",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.util.ArrayList"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "access$200",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.util.ArrayList"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "fastRemove",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finishToArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.lang.Object[]",
+                    "java.util.Iterator"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "removeAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              }
+            ]
+          }
+        ]
+      },
+      "database": {
+        "21": [
+          {
+            "className": "Database",
+            "fieldAccesses": {
+              "cursor": {
+                "type": "org.acme.database.Cursor",
+                "values": []
+              },
+              "rows": {
+                "type": "java.lang.Object[][]",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "cursor",
+                  "returnType": "org.acme.database.Cursor",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  {
+                    "fieldAccesses": {
+                      "BATCH_SIZE": {
+                        "type": "int",
+                        "values": []
+                      },
+                      "mBatchPointer": {
+                        "type": "int",
+                        "values": []
+                      },
+                      "mWithinBatchPointer": {
+                        "type": "int",
+                        "values": []
+                      },
+                      "mRows": {
+                        "type": "java.util.List",
+                        "values": []
+                      }
+                    },
+                    "methodCalls": [
+                      {
+                        "signature": {
+                          "name": "<init>",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "hashCode",
+                          "returnType": "int",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "rowCount",
+                          "returnType": "int",
+                          "argumentTypes": []
+                        },
+                        "returnValues": [
+                          2,
+                          2,
+                          1
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "wait",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "notify",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "finalize",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "getSize",
+                          "returnType": "int",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "end",
+                          "returnType": "boolean",
+                          "argumentTypes": []
+                        },
+                        "returnValues": [
+                          false,
+                          false,
+                          true
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "notifyAll",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "getClass",
+                          "returnType": "java.lang.Class",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "registerNatives",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "clone",
+                          "returnType": "java.lang.Object",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "wait",
+                          "returnType": "void",
+                          "argumentTypes": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "getString",
+                          "returnType": "String",
+                          "argumentTypes": [
+                            "int"
+                          ]
+                        },
+                        "returnValues": [
+                          "Lord of the Flies",
+                          "Lorna Doone",
+                          "Daphne de Maurier"
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "addRows",
+                          "returnType": "void",
+                          "argumentTypes": [
+                            "java.util.List"
+                          ]
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "next",
+                          "returnType": "void",
+                          "argumentTypes": [
+                            "int"
+                          ]
+                        },
+                        "returnValues": [
+                          null
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "getCurrentRow",
+                          "returnType": "java.lang.Object[]",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "getCurrentRowId",
+                          "returnType": "int",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "fetchone",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": [
+                          null,
+                          null,
+                          null
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "execute",
+                          "returnType": "void",
+                          "argumentTypes": [
+                            "java.lang.String"
+                          ]
+                        },
+                        "returnValues": [
+                          null
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "wait",
+                          "returnType": "void",
+                          "argumentTypes": [
+                            "long"
+                          ]
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "<clinit>",
+                          "returnType": "void",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "getInt",
+                          "returnType": "int",
+                          "argumentTypes": [
+                            "int"
+                          ]
+                        },
+                        "returnValues": [
+                          0,
+                          1954,
+                          250,
+                          1,
+                          1869,
+                          200,
+                          2,
+                          1936,
+                          330
+                        ]
+                      },
+                      {
+                        "signature": {
+                          "name": "equals",
+                          "returnType": "boolean",
+                          "argumentTypes": [
+                            "java.lang.Object"
+                          ]
+                        },
+                        "returnValues": []
+                      },
+                      {
+                        "signature": {
+                          "name": "toString",
+                          "returnType": "String",
+                          "argumentTypes": []
+                        },
+                        "returnValues": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.lang.String",
+                    "java.lang.String",
+                    "java.lang.String"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              }
+            ]
+          }
+        ]
+      },
+      "cursor": {
+        "22": [
+          {
+            "className": "Cursor",
+            "fieldAccesses": {
+              "BATCH_SIZE": {
+                "type": "int",
+                "values": []
+              },
+              "mBatchPointer": {
+                "type": "int",
+                "values": []
+              },
+              "mWithinBatchPointer": {
+                "type": "int",
+                "values": []
+              },
+              "mRows": {
+                "type": "java.util.List",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "rowCount",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  2,
+                  2,
+                  1
+                ]
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getSize",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "end",
+                  "returnType": "boolean",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  false,
+                  false,
+                  true
+                ]
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getString",
+                  "returnType": "String",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": [
+                  "Lord of the Flies",
+                  "Lorna Doone",
+                  "Daphne de Maurier"
+                ]
+              },
+              {
+                "signature": {
+                  "name": "addRows",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.util.List"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "next",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": [
+                  null
+                ]
+              },
+              {
+                "signature": {
+                  "name": "getCurrentRow",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getCurrentRowId",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "fetchone",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": [
+                  null,
+                  null,
+                  null
+                ]
+              },
+              {
+                "signature": {
+                  "name": "execute",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.lang.String"
+                  ]
+                },
+                "returnValues": [
+                  null
+                ]
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getInt",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": [
+                  0,
+                  1954,
+                  250,
+                  1,
+                  1869,
+                  200,
+                  2,
+                  1936,
+                  330
+                ]
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              }
+            ]
+          }
+        ]
+      },
+      "booklist": {
+        "23": [
+          {
+            "className": "Booklist",
+            "fieldAccesses": {
+              "elementData": {
+                "type": "java.lang.Object[]",
+                "values": []
+              },
+              "EMPTY_ELEMENTDATA": {
+                "type": "java.lang.Object[]",
+                "values": []
+              },
+              "hasBestseller": {
+                "type": "boolean",
+                "values": []
+              },
+              "titles": {
+                "type": "java.util.List",
+                "values": []
+              },
+              "MAX_ARRAY_SIZE": {
+                "type": "int",
+                "values": []
+              },
+              "serialVersionUID": {
+                "type": "long",
+                "values": []
+              },
+              "DEFAULT_CAPACITY": {
+                "type": "int",
+                "values": []
+              },
+              "modCount": {
+                "type": "int",
+                "values": []
+              },
+              "size": {
+                "type": "int",
+                "values": []
+              }
+            },
+            "methodCalls": [
+              {
+                "signature": {
+                  "name": "readObject",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.io.ObjectInputStream"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "trimToSize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hashCode",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "elementData",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "retainAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "subListRangeCheck",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "isEmpty",
+                  "returnType": "boolean",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "addAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "int",
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "set",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finalize",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "outOfBoundsMsg",
+                  "returnType": "String",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "addAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notifyAll",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "registerNatives",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clone",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "remove",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "iterator",
+                  "returnType": "java.util.Iterator",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "rangeCheck",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.lang.Object[]"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "writeObject",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.io.ObjectOutputStream"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "listIterator",
+                  "returnType": "unknown",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "indexOf",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "contains",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "batchRemove",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection",
+                    "boolean"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "size",
+                  "returnType": "int",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "equals",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "listIterator",
+                  "returnType": "unknown",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toString",
+                  "returnType": "String",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "add",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "grow",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "add",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<init>",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "removeRange",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "containsAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "rangeCheckForAdd",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "remove",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "clear",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "notify",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureCapacity",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureCapacityInternal",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "getClass",
+                  "returnType": "java.lang.Class",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "wait",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "long",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "hugeCapacity",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "toArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "ensureExplicitCapacity",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "get",
+                  "returnType": "java.lang.Object",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "subList",
+                  "returnType": "java.util.List",
+                  "argumentTypes": [
+                    "int",
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "lastIndexOf",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.lang.Object"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "access$100",
+                  "returnType": "int",
+                  "argumentTypes": [
+                    "java.util.ArrayList"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "access$200",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.util.ArrayList"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "fastRemove",
+                  "returnType": "void",
+                  "argumentTypes": [
+                    "int"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "<clinit>",
+                  "returnType": "void",
+                  "argumentTypes": []
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "finishToArray",
+                  "returnType": "java.lang.Object[]",
+                  "argumentTypes": [
+                    "java.lang.Object[]",
+                    "java.util.Iterator"
+                  ]
+                },
+                "returnValues": []
+              },
+              {
+                "signature": {
+                  "name": "removeAll",
+                  "returnType": "boolean",
+                  "argumentTypes": [
+                    "java.util.Collection"
+                  ]
+                },
+                "returnValues": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "size": 7
+}

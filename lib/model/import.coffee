@@ -1,3 +1,6 @@
+{ Range } = require "./range-set"
+
+
 module.exports.Import = class Import
 
   constructor: (name, range) ->
@@ -53,3 +56,15 @@ module.exports.ImportTable = class ImportTable
     for className of @table
       if className.endsWith ('.' + shortName)
         return className
+
+  @deserialize: (json) ->
+
+    table = new ImportTable()
+
+    for className, matchingImports of json.table
+      for importData in matchingImports
+        importRange = new Range importData.range.start, importData.range.end
+        import_ = new Import importData.name, importRange
+        table.addImport className, import_
+
+    return table

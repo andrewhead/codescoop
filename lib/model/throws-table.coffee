@@ -19,6 +19,11 @@ module.exports.Exception = class Exception
      (other.getName() == @name) and
      (other.getSuperclass()? and other.getSuperclass().equals @superclass))
 
+  @deserialize: (json) ->
+    if json.superclass?
+      superclass = Exception.deserialize json.superclass
+    new Exception json.name, superclass
+
 
 module.exports.ThrowsTable = class ThrowsTable extends RangeTable
 
@@ -32,3 +37,12 @@ module.exports.ThrowsTable = class ThrowsTable extends RangeTable
 
   getRangesWithThrows: ->
     @getRanges()
+
+  @deserialize: (json) ->
+    table = new ThrowsTable()
+    for rangeString, exceptions of json.table
+      for exceptionData in exceptions
+        range = table._toRange rangeString
+        exception = Exception.deserialize exceptionData
+        table.addException range, exception
+    return table

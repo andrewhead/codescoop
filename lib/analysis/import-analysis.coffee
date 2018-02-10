@@ -4,9 +4,7 @@
 ParseTreeWalker = (require "antlr4").tree.ParseTreeWalker.DEFAULT
 { parse } = require "../../lib/analysis/parse-tree"
 { Range } = require "../../lib/model/range-set"
-{ java } = require "../config/paths"
-fs = require "fs"
-ImportAnalysisJ = java.import "ImportAnalysis"
+{ loadJson } = require "../config/paths"
 
 
 class ImportVisitor extends JavaListener
@@ -78,38 +76,6 @@ module.exports.ImportAnalysis = class ImportAnalysis
     @file = file
 
   run: (callback, err) ->
-
-    fs.readFile @file.getPath(), (fileError, data) =>
-
-      if fileError?
-        err fileError
-        return
-
-      importTable = new ImportTable()
-
-      # Find all imports in the current code
-      importFinder = new ImportFinder()
-      code = data.toString()
-      imports = importFinder.findImports code
-
-      # Run analysis to find which classes are provided by each import
-      # Perform analyses for each import sequentially, so that we don't have
-      # to worry about synchronous access to the import table
-      analysisJ = new ImportAnalysisJ()
-      analysisDone = Promise.resolve()
-      for import_ in imports
-        analysisDone = analysisDone.then (() ->
-          new Promise (resolve, reject) =>
-            importName = @.getName()
-            classes = analysisJ.getClassNames importName, (javaErr, classNamesJ) =>
-              if javaErr
-                err javaErr
-                return
-              for className in classNamesJ.toArraySync()
-                importTable.addImport className, @
-              resolve()
-          ).bind import_
-
-      # Once analysis has been run for all imports, then we return the imports
-      analysisDone.then =>
-        callback importTable
+    loadJson @file.getName(), "ImportTable", (error, json) =>
+      err error if error
+      callback ImportTable.deserialize json

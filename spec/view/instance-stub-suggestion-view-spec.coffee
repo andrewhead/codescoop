@@ -20,7 +20,7 @@ describe "InstanceStubSuggestionView", ->
     view = new InstanceStubSuggestionView suggestion, model, undefined, 41
 
   it "has a label that includes the index of the suggestion", ->
-    (expect view.text()).toEqual "Stub 42"
+    (expect view.text()).toEqual "← Preview Stub 42"
 
   describe "when previewing a suggestion", ->
 

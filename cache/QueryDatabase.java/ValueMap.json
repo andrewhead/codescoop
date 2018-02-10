@@ -1,0 +1,2927 @@
+{
+  "QueryDatabase.java": {
+    "14": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "15": {
+      "genre": [
+        "\"romance\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "16": {
+      "genre": [
+        "\"romance\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "17": {
+      "genre": [
+        "\"romance\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "18": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "19": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "21": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "22": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3"
+      ]
+    },
+    "23": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "24": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "28": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "29": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "31": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3"
+      ]
+    },
+    "33": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "finished": [
+        "false"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "34": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "true"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "rowNumber": [
+        "0",
+        "2",
+        "3"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "36": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "2",
+        "2"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "38": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "true",
+        "true"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2",
+        "2",
+        "3",
+        "3"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "0",
+        "0",
+        "1"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "40": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "41": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "42": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "43": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "44": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "45": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "250",
+        "250",
+        "200",
+        "200",
+        "330",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "47": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "48": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "250",
+        "200",
+        "200",
+        "330",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "50": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "51": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "250",
+        "250",
+        "200",
+        "200",
+        "200",
+        "330",
+        "330",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1869",
+        "1936",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "52": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "bestseller": [
+        "false",
+        "false",
+        "true"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "53": {
+      "genre": [
+        "\"romance\""
+      ],
+      "num_pages": [
+        "330"
+      ],
+      "bestseller": [
+        "true"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "finished": [
+        "false"
+      ],
+      "rowNumber": [
+        "2"
+      ],
+      "rowCount": [
+        "1"
+      ],
+      "i": [
+        "0"
+      ],
+      "id": [
+        "2"
+      ],
+      "title": [
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "year": [
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "57": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "58": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "250",
+        "250",
+        "250",
+        "250",
+        "250",
+        "250",
+        "250",
+        "200",
+        "200",
+        "200",
+        "200",
+        "200",
+        "200",
+        "200",
+        "200",
+        "330",
+        "330",
+        "330",
+        "330",
+        "330",
+        "330",
+        "330",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1954",
+        "1954",
+        "1954",
+        "1954",
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1869",
+        "1869",
+        "1869",
+        "1869",
+        "1869",
+        "1869",
+        "1936",
+        "1936",
+        "1936",
+        "1936",
+        "1936",
+        "1936",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "61": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "0",
+        "1",
+        "2"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "63": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "250",
+        "200",
+        "200",
+        "330",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false"
+      ],
+      "rowNumber": [
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "1"
+      ],
+      "i": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "0",
+        "0"
+      ],
+      "id": [
+        "0",
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1954",
+        "1869",
+        "1869",
+        "1936",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true",
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3",
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "64": {
+      "genre": [
+        "\"romance\""
+      ],
+      "num_pages": [
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "finished": [
+        "false"
+      ],
+      "rowNumber": [
+        "3"
+      ],
+      "rowCount": [
+        "1"
+      ],
+      "i": [
+        "0"
+      ],
+      "id": [
+        "2"
+      ],
+      "title": [
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "year": [
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "66": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "num_pages": [
+        "250",
+        "200",
+        "330"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0",
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3",
+        "3"
+      ],
+      "finished": [
+        "false",
+        "false",
+        "true"
+      ],
+      "rowNumber": [
+        "1",
+        "2",
+        "3"
+      ],
+      "rowCount": [
+        "2",
+        "2",
+        "1"
+      ],
+      "i": [
+        "0",
+        "1",
+        "0"
+      ],
+      "id": [
+        "0",
+        "1",
+        "2"
+      ],
+      "title": [
+        "\"Lord of the Flies\"",
+        "\"Lorna Doone\"",
+        "\"Daphne de Maurier\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2",
+        "2"
+      ],
+      "year": [
+        "1954",
+        "1869",
+        "1936"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1",
+        "1"
+      ],
+      "DEBUG": [
+        "true",
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3",
+        "3"
+      ]
+    },
+    "67": {
+      "genre": [
+        "\"romance\""
+      ],
+      "num_pages": [
+        "200"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "finished": [
+        "false"
+      ],
+      "rowNumber": [
+        "2"
+      ],
+      "rowCount": [
+        "2"
+      ],
+      "i": [
+        "1"
+      ],
+      "id": [
+        "1"
+      ],
+      "title": [
+        "\"Lorna Doone\""
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "year": [
+        "1869"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "71": {
+      "genre": [
+        "\"romance\"",
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2",
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\"",
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3",
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0",
+        "0"
+      ],
+      "finished": [
+        "false",
+        "true"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1",
+        "1"
+      ],
+      "rowNumber": [
+        "2",
+        "3"
+      ],
+      "DEBUG": [
+        "true",
+        "true"
+      ],
+      "maxBooks": [
+        "3",
+        "3"
+      ]
+    },
+    "76": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "78": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "79": {
+      "genre": [
+        "\"romance\""
+      ],
+      "COLUMN_INDEX_YEAR": [
+        "2"
+      ],
+      "QUERY": [
+        "\"SELECT id, title, year, num_pages FROM table WHERE title LIKE '%romance%'\""
+      ],
+      "COLUMN_INDEX_NUM_PAGES": [
+        "3"
+      ],
+      "COLUMN_INDEX_ID": [
+        "0"
+      ],
+      "COLUMN_INDEX_TITLE": [
+        "1"
+      ],
+      "DEBUG": [
+        "true"
+      ],
+      "maxBooks": [
+        "3"
+      ]
+    },
+    "84": {
+      "id": [
+        "0",
+        "1",
+        "2"
+      ]
+    }
+  }
+}

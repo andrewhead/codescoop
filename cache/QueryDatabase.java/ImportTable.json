@@ -1,0 +1,214 @@
+{
+  "table": {
+    "org.acme.database.Book": [
+      {
+        "name": "org.acme.database.Book",
+        "range": {
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "Book": [
+      {
+        "name": "org.acme.database.Book",
+        "range": {
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "org.acme.database.Booklist": [
+      {
+        "name": "org.acme.database.Booklist",
+        "range": {
+          "start": {
+            "row": 1,
+            "column": 7
+          },
+          "end": {
+            "row": 1,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "Booklist": [
+      {
+        "name": "org.acme.database.Booklist",
+        "range": {
+          "start": {
+            "row": 1,
+            "column": 7
+          },
+          "end": {
+            "row": 1,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "org.acme.database.Cursor": [
+      {
+        "name": "org.acme.database.Cursor",
+        "range": {
+          "start": {
+            "row": 2,
+            "column": 7
+          },
+          "end": {
+            "row": 2,
+            "column": 31
+          }
+        }
+      }
+    ],
+    "Cursor": [
+      {
+        "name": "org.acme.database.Cursor",
+        "range": {
+          "start": {
+            "row": 2,
+            "column": 7
+          },
+          "end": {
+            "row": 2,
+            "column": 31
+          }
+        }
+      }
+    ],
+    "org.acme.database.Database": [
+      {
+        "name": "org.acme.database.Database",
+        "range": {
+          "start": {
+            "row": 3,
+            "column": 7
+          },
+          "end": {
+            "row": 3,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "Database": [
+      {
+        "name": "org.acme.database.Database",
+        "range": {
+          "start": {
+            "row": 3,
+            "column": 7
+          },
+          "end": {
+            "row": 3,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "org.acme.database.ConnectionException": [
+      {
+        "name": "org.acme.database.ConnectionException",
+        "range": {
+          "start": {
+            "row": 4,
+            "column": 7
+          },
+          "end": {
+            "row": 4,
+            "column": 44
+          }
+        }
+      }
+    ],
+    "ConnectionException": [
+      {
+        "name": "org.acme.database.ConnectionException",
+        "range": {
+          "start": {
+            "row": 4,
+            "column": 7
+          },
+          "end": {
+            "row": 4,
+            "column": 44
+          }
+        }
+      }
+    ],
+    "java.util.ArrayList": [
+      {
+        "name": "java.util.ArrayList",
+        "range": {
+          "start": {
+            "row": 6,
+            "column": 7
+          },
+          "end": {
+            "row": 6,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "ArrayList": [
+      {
+        "name": "java.util.ArrayList",
+        "range": {
+          "start": {
+            "row": 6,
+            "column": 7
+          },
+          "end": {
+            "row": 6,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "java.util.List": [
+      {
+        "name": "java.util.List",
+        "range": {
+          "start": {
+            "row": 7,
+            "column": 7
+          },
+          "end": {
+            "row": 7,
+            "column": 21
+          }
+        }
+      }
+    ],
+    "List": [
+      {
+        "name": "java.util.List",
+        "range": {
+          "start": {
+            "row": 7,
+            "column": 7
+          },
+          "end": {
+            "row": 7,
+            "column": 21
+          }
+        }
+      }
+    ]
+  }
+}
