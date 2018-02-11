@@ -48,6 +48,13 @@ plugin:
     "atom-script": "andrewhead/atom-script"
 ```
 
+And the following entries to `packageDependencies`:
+
+```json
+    "atom-material-syntax-light": "0.4.6",
+    "atom-material-ui": "2.1.1",
+```
+
 Run `npm install` and `apm install` within the Atom
 directory before trying to build atom-in-orbit.
 
@@ -63,8 +70,10 @@ following entries are in the list of dependencies:
 
 ```javascript
     'codescoop',
-    'atom-script',
+    'script',
     'language-java',
+    'atom-material-syntax-light',
+    'atom-material-ui',
 ```
 
 Then, follow the instructions from the repository for
