@@ -50,6 +50,10 @@ module.exports = plugin =
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
           (exampleEditor) =>
 
+            # Editor syntax should be for Java instead of default
+            if atom.grammars.grammarsByScopeName['source.java']?
+              editor.setGrammar atom.grammars.grammarsByScopeName['source.java']
+
             @controller = new MainController @codeEditor, exampleEditor
 
             # Set the class, so we can do stylings that hide typical signifiers
