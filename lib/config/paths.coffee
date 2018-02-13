@@ -6,7 +6,9 @@ This way we can configure the classpath for the module only once
 fs = require "fs"
 path = require "path"
 
-PACKAGE_PATH = __dirname + "/../.."
+PACKAGE_PATH = __dirname + "../.."
+if atom? and atom.packages? and atom.packages.getActivePackage?
+  PACKAGE_PATH = (atom.packages.getActivePackage 'codescoop').path
 
 loadJson = (className, dataName, callback) =>
   filePath = path.join PACKAGE_PATH, "cache", className, dataName + ".json"
