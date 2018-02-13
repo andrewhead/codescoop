@@ -52,7 +52,7 @@ module.exports = plugin =
 
             # Editor syntax should be for Java instead of default
             if atom.grammars.grammarsByScopeName['source.java']?
-              editor.setGrammar atom.grammars.grammarsByScopeName['source.java']
+              exampleEditor.setGrammar atom.grammars.grammarsByScopeName['source.java']
 
             @controller = new MainController @codeEditor, exampleEditor
 
