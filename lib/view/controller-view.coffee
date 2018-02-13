@@ -61,7 +61,7 @@ module.exports.ControllerView = class ControllerView extends $
         if propertyName == ExampleModelProperty.STATE
           @_updateRunButton()
     }
-    atom.workspace.onDidChangeActiveTextEditor (@_updateRunButton.bind @)
+    atom.workspace.onDidChangeActivePane (@_updateRunButton.bind @)
 
     @.extend @, element
 
