@@ -104,18 +104,12 @@ module.exports.ExampleController = class ExampleController
         runner: importAnalysis
         callback: (importTable) =>
           @model.setImportTable importTable
-          console.log "Import table"
-          console.log JSON.stringify importTable, null, 2
         error: console.error
       variableDefUse:
         runner: variableDefUseAnalysis
         callback: (analysis) =>
           @model.getSymbols().setVariableDefs analysis.getDefs()
           @model.getSymbols().setVariableUses analysis.getUses()
-          console.log "Defs"
-          console.log JSON.stringify analysis.getDefs(), null, 2
-          console.log "Uses"
-          console.log JSON.stringify analysis.getUses(), null, 2
         error: console.error
       catchVariableDef:
         runner: catchVariableDefAnalysis
@@ -140,15 +134,11 @@ module.exports.ExampleController = class ExampleController
         runner: valueAnalysis or= null
         callback: (valueMap) =>
           @model.setValueMap valueMap
-          console.log "Value map"
-          console.log JSON.stringify valueMap, null, 2
         error: console.error
       stub:
         runner: stubAnalysis or= null
         callback: (stubSpecTable) =>
           @model.setStubSpecTable stubSpecTable
-          console.log "Stub spec table"
-          console.log JSON.stringify stubSpecTable, null, 2
         error: console.error
       declarations:
         runner: declarationsAnalysis or= null
@@ -164,8 +154,6 @@ module.exports.ExampleController = class ExampleController
         runner: throwsAnalysis or= null
         callback: (throwsTable) =>
           @model.setThrowsTable throwsTable
-          console.log "Throws table"
-          console.log JSON.stringify throwsTable, null, 2
         error: console.error
       catch:
         runner: catchAnalysis or= null
