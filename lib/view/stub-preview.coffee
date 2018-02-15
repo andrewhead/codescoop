@@ -43,6 +43,11 @@ module.exports.StubPreview = class StubPreview
               activatePane: false
               activateItem: true
             }).then (editor) =>
+
+              # Editor syntax should be for Java instead of default
+              if atom.grammars.grammarsByScopeName['source.java']?
+                editor.setGrammar atom.grammars.grammarsByScopeName['source.java']
+
               @textEditor = editor
               editorView = atom.views.getView @textEditor
               ($ editorView).addClass 'stub-editor'
