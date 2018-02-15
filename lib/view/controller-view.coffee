@@ -18,8 +18,7 @@ module.exports.ControllerView = class ControllerView extends $
     @printButton = $ "<button></button>"
       .attr "id", "print-symbol-button"
       .attr "disabled", (exampleEditor.getSelectedText().length == 0)
-      .append @_svgForIcon "double-quote-serif-left"
-      .append "Print"
+      .append @_makeIcon "quote", "Print"
       .click =>
         log.debug "Printing out a variable",
           { selection: exampleEditor.getSelectedBufferRange() }
@@ -30,8 +29,7 @@ module.exports.ControllerView = class ControllerView extends $
     @undoButton = $ "<button></button>"
       .attr "id", "undo-button"
       .attr "disabled", (controller.getCommandStack().getHeight() == 0)
-      .append @_svgForIcon "action-undo"
-      .append "Undo"
+      .append @_makeIcon "reply", "Undo"
       .click =>
         log.debug "Button press for undo"
         controller.undo()
@@ -40,8 +38,7 @@ module.exports.ControllerView = class ControllerView extends $
     @runButton = $ "<button></button>"
       .attr "id", "run-button"
       .attr "disabled", (model.getState() == ExampleModelState.ANALYSIS)
-      .append @_svgForIcon "play-circle"
-      .append "Run"
+      .append @_makeIcon "diff-renamed", "Run"
       .click =>
         atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
       .appendTo element
@@ -70,20 +67,18 @@ module.exports.ControllerView = class ControllerView extends $
       ((@model.getState() == ExampleModelState.ANALYSIS) or
        (atom.workspace.getActiveTextEditor() != @exampleEditor))
 
-  _svgForIcon: (iconName )->
-    use = $ "<use></use>"
-      .attr "xlink:href", "#{PACKAGE_PATH}/styles/open-iconic.svg##{iconName}"
-      .addClass "icon-#{iconName}"
-    svg = $ "<svg></svg>"
+  _makeIcon: (iconName, label)->
+    span = $ "<span></span>"
       .addClass "icon"
-      .attr "width", "100%"
-      .attr "height", "100%"
-      .attr "viewBox", "0 0 8 8"
-      .append use
+      .addClass "icon-#{iconName}"
+    label = $ "<p></p>"
+      .addClass "action_label"
+      .text label
     # We return HTML instead of the object based on this recommended hack:
     # https://stackoverflow.com/questions/3642035/
     $ "<div></div>"
-      .append svg
+      .append span
+      .append label
       .html()
 
   getNode: ->
