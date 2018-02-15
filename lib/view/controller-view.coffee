@@ -29,7 +29,7 @@ module.exports.ControllerView = class ControllerView extends $
     @undoButton = $ "<button></button>"
       .attr "id", "undo-button"
       .attr "disabled", (controller.getCommandStack().getHeight() == 0)
-      .append @_makeIcon "reply", "Undo"
+      .append @_makeIcon "mail-reply", "Undo"
       .click =>
         log.debug "Button press for undo"
         controller.undo()
