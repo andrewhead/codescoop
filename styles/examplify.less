@@ -21,17 +21,6 @@
 
 }
 
-// A few hard-coded over-writes for Java styling
-.syntax--string .syntax--constant.syntax--other.syntax--placeholder,
-.syntax--variable {
-    color: #607D8B !important;
-}
-.syntax--storage.syntax--modifier {
-    color: #8796B0 !important;
-}
-.syntax--variable.syntax--function {
-    color: #80CBC4 !important;
-}
 
 atom-text-editor.source-editor div.line {
   &.active {
@@ -46,6 +35,18 @@ atom-text-editor.source-editor div.line {
       animation: pulsate 1.2s ease-in-out;
       animation-iteration-count: infinite;
     }
+  }
+
+  // A few hard-coded over-writes for Java styling
+  .syntax--string .syntax--constant.syntax--other.syntax--placeholder,
+  .syntax--variable {
+      color: #607D8B !important;
+  }
+  .syntax--storage.syntax--modifier {
+      color: #8796B0 !important;
+  }
+  .syntax--variable.syntax--function {
+      color: #80CBC4 !important;
   }
 }
 
