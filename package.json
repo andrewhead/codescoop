@@ -7,6 +7,9 @@
   "activationCommands": {
     "atom-workspace": "examplify:make-example-code"
   },
+  "activationHooks": [
+    "language-java:grammar-used"
+  ],
   "repository": "https://github.com/atom/codescoop",
   "license": "MIT",
   "engines": {

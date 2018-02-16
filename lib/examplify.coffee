@@ -36,14 +36,24 @@ module.exports = plugin =
 
   activate: (state) ->
 
+    # Mark the current code editor as the source editor
+    @codeEditor = atom.workspace.getActiveTextEditor()
+    codeEditorView = atom.views.getView @codeEditor
+    ($ codeEditorView).addClass 'source-editor'
+
+    # Prepare user interface panels
+    @pluginController = new MainController()
+    for panel in atom.workspace.getRightPanels()
+      panel.destroy() if panel.item instanceof MainController
+    atom.views.addViewProvider MainController, (controller) =>
+      (new ControllerView controller).getNode()
+    atom.workspace.addRightPanel { item: @pluginController }
+
     @subscriptions = new CompositeDisposable()
     @subscriptions.add (atom.commands.add "atom-workspace",
       "examplify:make-example-code": =>
 
-        # Mark the current code editor as the source editor
-        @codeEditor = atom.workspace.getActiveTextEditor()
-        codeEditorView = atom.views.getView @codeEditor
-        ($ codeEditorView).addClass 'source-editor'
+        # Don't allow any edits to the source code at this point
         ($ codeEditorView).addClass 'locked-editor'
 
         # Launch a new editor to hold the example code.
@@ -54,7 +64,8 @@ module.exports = plugin =
             if atom.grammars.grammarsByScopeName['source.java']?
               exampleEditor.setGrammar atom.grammars.grammarsByScopeName['source.java']
 
-            @controller = new MainController @codeEditor, exampleEditor
+            # Initialize the controller now that the scoop is starting
+            @pluginController.init @codeEditor, exampleEditor
 
             # Set the class, so we can do stylings that hide typical signifiers
             # of text modifiability, like cursors and highlights.
@@ -65,12 +76,12 @@ module.exports = plugin =
             # This editor should be read-only.
             # Abort any textual changes so user can't type in code.
             exampleEditor.onWillInsertText (event) =>
-              if @controller.getModel().getState() != ExampleModelState.IDLE
+              if @pluginController.getModel().getState() != ExampleModelState.IDLE
                 event.cancel()
             ($ exampleEditorView).click (event) =>
-              if @controller.getModel().getState() == ExampleModelState.IDLE
+              if @pluginController.getModel().getState() == ExampleModelState.IDLE
                 ($ exampleEditorView).removeClass 'locked-editor'
-              else if @controller.getModel().getState() == ExampleModelState.IDLE
+              else if @pluginController.getModel().getState() == ExampleModelState.IDLE
                 ($ exampleEditorView).addClass 'locked-editor'
 
       "examplify:add-selection-to-example": =>
@@ -91,7 +102,13 @@ module.exports = plugin =
 
 module.exports.MainController = class MainController
 
-  constructor: (codeEditor, exampleEditor) ->
+  constructor: ->
+    @initListeners = []
+
+  init: (codeEditor, exampleEditor) ->
+
+    @codeEditor = codeEditor
+    @exampleEditor = exampleEditor
 
     selectedRanges = codeEditor.getSelectedBufferRanges()
     snippetRanges = selectedRanges
@@ -107,12 +124,6 @@ module.exports.MainController = class MainController
     @codeView = new CodeView codeEditor, @rangeSet
     @exampleView = new ExampleView @exampleModel, exampleEditor
     @stubPreview = new StubPreview @exampleModel
-
-    # Prepare user interface panels
-    for panel in atom.workspace.getRightPanels()
-      panel.destroy() if panel.item instanceof ExampleController
-    atom.views.addViewProvider ExampleController, (controller) =>
-      (new ControllerView controller, @exampleModel, exampleEditor).getNode()
 
     # Prepare analyses
     codeEditorFile = new File codeEditor.getPath(), codeEditor.getTitle()
@@ -133,7 +144,11 @@ module.exports.MainController = class MainController
     @exampleController = new ExampleController \
       @exampleModel, { analyses: @analyses }
 
-    atom.workspace.addRightPanel { item: @exampleController }
+    for listener in @initListeners
+      listener.onPluginInitDone @
+
+  addInitListener: (listener) ->
+    @initListeners.push listener
 
   # These accessors are here to let us test the controller
   getRangeSet: ->

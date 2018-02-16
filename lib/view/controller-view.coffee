@@ -6,66 +6,98 @@ log = require "examplify-log"
 
 module.exports.ControllerView = class ControllerView extends $
 
-  constructor: (controller, model, exampleEditor) ->
-    @controller = controller
-    @model = model
-    @exampleEditor = exampleEditor
+  constructor: (pluginController) ->
+
+    @pluginController = pluginController
+    @pluginController.addInitListener @
 
     element = $ "<div></div>"
       .addClass "controller"
 
-    # Make a button for running the chosen agent
+    @scoopButton = $ "<button></button>"
+      .attr "id", "run-button"
+      .append @_makeIcon "paintcan", "Scoop"
+      .click =>
+        atom.commands.dispatch \
+          (atom.views.getView atom.workspace.getActiveTextEditor()),
+          "examplify:make-example-code"
+      .appendTo element
+
     @printButton = $ "<button></button>"
       .attr "id", "print-symbol-button"
-      .attr "disabled", (exampleEditor.getSelectedText().length == 0)
+      .attr "disabled", true
       .append @_makeIcon "quote", "Print"
-      .click =>
-        log.debug "Printing out a variable",
-          { selection: exampleEditor.getSelectedBufferRange() }
-        symbolName = exampleEditor.getSelectedText()
-        controller.addPrintedSymbol symbolName
       .appendTo element
 
     @undoButton = $ "<button></button>"
       .attr "id", "undo-button"
-      .attr "disabled", (controller.getCommandStack().getHeight() == 0)
+      .attr "disabled", true
       .append @_makeIcon "mail-reply", "Undo"
-      .click =>
-        log.debug "Button press for undo"
-        controller.undo()
       .appendTo element
 
+    # Make a button for running the chosen agent
     @runButton = $ "<button></button>"
       .attr "id", "run-button"
-      .attr "disabled", (model.getState() == ExampleModelState.ANALYSIS)
+      .attr "disabled", true
       .append @_makeIcon "diff-renamed", "Run"
-      .click =>
-        atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
       .appendTo element
 
-    # Enable the undo button based on whether there are commands on the stack
-    controller.getCommandStack().addListener {
-      onStackChanged: (stack) => @undoButton.attr "disabled", (stack.getHeight() == 0)
-    }
+    @.extend @, element
 
-    # Enable the print button based on whether a selection has been made
+  onPluginInitDone: (pluginController) ->
+
+    exampleEditor = pluginController.exampleEditor
+    exampleController = pluginController.exampleController
+    model = pluginController.exampleModel
+
+    # Disable the "scoop" button
+    @scoopButton.attr "disabled", true
+
+    # Enable run button only when the example editor is selected, and
+    # when analysis isn't going on.
+    model.addObserver {
+      onPropertyChanged: (target, propertyName, oldValue, newValue) =>
+        if propertyName == ExampleModelProperty.STATE
+          @_updateRunButton model, exampleEditor
+    }
+    atom.workspace.onDidChangeActivePane =>
+      @_updateRunButton.bind model, exampleEditor
+
+    # When the run button is clicked, run the code!
+    @runButton.click =>
+      atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
+
+    # Enable the run-button: people should be able to test the program now!
+    @runButton.attr "disabled", false
+
+    # Enable the print button whenever a selection is made in the example
+    # editor.
     exampleEditor.onDidChangeSelectionRange (event) =>
       newRange = event.newBufferRange
       @printButton.attr "disabled", (newRange.start.isEqual newRange.end)
 
-    model.addObserver {
-      onPropertyChanged: (target, propertyName, oldValue, newValue) =>
-        if propertyName == ExampleModelProperty.STATE
-          @_updateRunButton()
+    # When the print button is clicked, add a print statement
+    @printButton.click =>
+      log.debug "Printing out a variable",
+        { selection: exampleEditor.getSelectedBufferRange() }
+      symbolName = exampleEditor.getSelectedText()
+      exampleController.addPrintedSymbol symbolName
+
+    # Enable the undo button based on whether there are commands on the stack
+    exampleController.getCommandStack().addListener {
+      onStackChanged: (stack) =>
+        @undoButton.attr "disabled", (stack.getHeight() == 0)
     }
-    atom.workspace.onDidChangeActivePane (@_updateRunButton.bind @)
 
-    @.extend @, element
+    # Undo an action when the undo button is clicked
+    @undoButton.click =>
+      log.debug "Button press for undo"
+      exampleController.undo()
 
-  _updateRunButton: ->
+  _updateRunButton: (model, exampleEditor) ->
     @runButton.attr "disabled",
-      ((@model.getState() == ExampleModelState.ANALYSIS) or
-       (atom.workspace.getActiveTextEditor() != @exampleEditor))
+      ((model.getState() == ExampleModelState.ANALYSIS) or
+       (atom.workspace.getActiveTextEditor() != exampleEditor))
 
   _makeIcon: (iconName, label)->
     span = $ "<span></span>"
