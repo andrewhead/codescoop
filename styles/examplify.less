@@ -3,6 +3,13 @@
 @import "chosen";
 
 
+// Make scrollbar thinner
+::-webkit-scrollbar {
+    width: 5px !important;
+    height: 5px !important;
+}
+
+
 .highlight {
 
   &.error-choice-highlight .region {
@@ -21,32 +28,43 @@
 
 }
 
+atom-text-editor.source-editor {
 
-atom-text-editor.source-editor div.line {
-  &.active {
-    opacity: 1;
-    background-color: darken(#FAFAFA, 4%);
+  .gutter .line-number {
+    background-color: #fafafa;
   }
-  &:not(.active) {
-    opacity: .35;
-    &.suggested {
-      opacity: 1;
-      background-color: fade(@syntax-color-renamed, 40%);
-      animation: pulsate 1.2s ease-in-out;
-      animation-iteration-count: infinite;
+
+  div.line {
+    // A few hard-coded over-writes for Java styling
+    .syntax--string .syntax--constant.syntax--other.syntax--placeholder,
+    .syntax--variable {
+        color: #607D8B !important;
+    }
+    .syntax--storage.syntax--modifier {
+        color: #8796B0 !important;
+    }
+    .syntax--variable.syntax--function {
+        color: #80CBC4 !important;
     }
   }
 
-  // A few hard-coded over-writes for Java styling
-  .syntax--string .syntax--constant.syntax--other.syntax--placeholder,
-  .syntax--variable {
-      color: #607D8B !important;
-  }
-  .syntax--storage.syntax--modifier {
-      color: #8796B0 !important;
-  }
-  .syntax--variable.syntax--function {
-      color: #80CBC4 !important;
+  &.locked-editor {
+
+    div.line {
+      &.active {
+        opacity: 1;
+        background-color: darken(#FAFAFA, 3%);
+      }
+      &:not(.active) {
+        opacity: .35;
+        &.suggested {
+          opacity: 1;
+          background-color: fade(@syntax-color-renamed, 40%);
+          animation: pulsate 1.2s ease-in-out;
+          animation-iteration-count: infinite;
+        }
+      }
+    }
   }
 }
 
