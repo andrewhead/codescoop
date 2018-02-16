@@ -55,7 +55,35 @@ module.exports.StubSpec = class StubSpec
       superclassName: @superclassName
 
   @deserialize: (json) ->
-    new StubSpec json.className, json
+
+    deserializedSpec = {
+      className: json.className
+      fieldAccesses: {}
+      methodCalls: []
+      superclassName: json.superclassName
+    }
+
+    # Deserialize field accesses, if any returned values are specs
+    for fieldName, fieldData of json.fieldAccesses
+      deserializedSpec.fieldAccesses[fieldName] = {
+        type: fieldData.type
+        values: fieldData.values.map (value) =>
+          if value? and ((typeof value) is "object")
+            return StubSpec.deserialize value
+          return value
+      }
+
+    # Deserialize method calls, if any returned values are specs
+    for method in json.methodCalls
+      deserializedSpec.methodCalls.push {
+        signature: method.signature
+        returnValues: method.returnValues.map (value) =>
+          if value? and ((typeof value) is "object")
+            return StubSpec.deserialize value
+          return value
+      }
+
+    new StubSpec json.className, deserializedSpec
 
 
 module.exports.StubSpecTable = class StubSpecTable

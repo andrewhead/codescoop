@@ -7,8 +7,8 @@ fs = require "fs"
 path = require "path"
 
 PACKAGE_PATH = __dirname + "../.."
-if atom? and atom.packages? and atom.packages.loadedPackages?
-  PACKAGE_PATH = atom.packages.loadedPackages['codescoop'].path
+if atom? and atom.packages? and atom.packages.loadedPackages? and atom.packages.loadedPackages.codescoop?
+  PACKAGE_PATH = atom.packages.loadedPackages.codescoop.path
 
 loadJson = (className, dataName, callback) =>
   filePath = path.join PACKAGE_PATH, "cache", className, dataName + ".json"
