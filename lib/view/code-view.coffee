@@ -34,8 +34,8 @@ module.exports.CodeView = class CodeView
 
   updateHighlights: ->
 
-    editorView = atom.views.getView @textEditor
-    lines = $ ( editorView.querySelectorAll 'div.line' )
+    # By default, no lines are chosen or unchosen
+    @resetHighlights()
 
     _rangesToRows = (ranges) =>
       rows = []
@@ -48,8 +48,8 @@ module.exports.CodeView = class CodeView
     activeRows = _rangesToRows @rangeSet.getActiveRanges()
     suggestedRows = _rangesToRows @rangeSet.getSuggestedRanges()
 
-    # By default, no lines are chosen or unchosen
-    ((lines.removeClass 'inactive').removeClass 'active').removeClass 'suggested'
+    editorView = atom.views.getView @textEditor
+    lines = $ ( editorView.querySelectorAll 'div.line' )
     for line in ($ _ for _ in lines)
 
       # We access "screenRow" through dataset and not the jQuery data() function
@@ -98,3 +98,8 @@ module.exports.CodeView = class CodeView
     editorView = atom.views.getView @textEditor
     scrollObserver = new MutationObserver ((m, o) => @updateHighlights())
     scrollObserver.observe editorView, { childList: true, subtree: true }
+
+  resetHighlights: ->
+    editorView = atom.views.getView @textEditor
+    lines = $ ( editorView.querySelectorAll 'div.line' )
+    ((lines.removeClass 'inactive').removeClass 'active').removeClass 'suggested'

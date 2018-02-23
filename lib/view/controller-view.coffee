@@ -42,6 +42,13 @@ module.exports.ControllerView = class ControllerView extends $
       .append @_makeIcon "diff-renamed", "Run"
       .appendTo element
 
+    # Make a button for running the chosen agent
+    @resetButton = $ "<button></button>"
+      .attr "id", "reset-button"
+      .attr "disabled", true
+      .append @_makeIcon "sync", "Reset"
+      .appendTo element
+
     @.extend @, element
 
   onPluginInitDone: (pluginController) ->
@@ -93,6 +100,12 @@ module.exports.ControllerView = class ControllerView extends $
     @undoButton.click =>
       log.debug "Button press for undo"
       exampleController.undo()
+
+    @resetButton
+      .attr "disabled", false
+      .click =>
+        atom.commands.dispatch \
+          (atom.views.getView exampleEditor), "examplify:reset"
 
   _updateRunButton: (model, exampleEditor) ->
     @runButton.attr "disabled",

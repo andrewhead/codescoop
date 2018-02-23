@@ -43,14 +43,19 @@ module.exports = plugin =
 
     # Prepare user interface panels
     @pluginController = new MainController()
-    for panel in atom.workspace.getRightPanels()
-      panel.destroy() if panel.item instanceof MainController
     atom.views.addViewProvider MainController, (controller) =>
       (new ControllerView controller).getNode()
     atom.workspace.addRightPanel { item: @pluginController }
 
     @subscriptions = new CompositeDisposable()
     @subscriptions.add (atom.commands.add "atom-workspace",
+      "examplify:reset": =>
+        thisPackage = atom.packages.getActivePackage "codescoop"
+        thisPackage.onDidDeactivate =>
+          # Force an immediate reload of the package.  Just the API `activate`
+          # might defer activation for later.
+          thisPackage.activateNow()
+        thisPackage.deactivate()
       "examplify:make-example-code": =>
 
         # Don't allow any edits to the source code at this point
@@ -60,16 +65,18 @@ module.exports = plugin =
         (atom.workspace.open EXAMPLE_FILE_NAME, { split: "right" }).then \
           (exampleEditor) =>
 
+            @exampleEditor = exampleEditor
+
             # Editor syntax should be for Java instead of default
             if atom.grammars.grammarsByScopeName['source.java']?
               exampleEditor.setGrammar atom.grammars.grammarsByScopeName['source.java']
 
             # Initialize the controller now that the scoop is starting
-            @pluginController.init @codeEditor, exampleEditor
+            @pluginController.init @codeEditor, @exampleEditor
 
             # Set the class, so we can do stylings that hide typical signifiers
             # of text modifiability, like cursors and highlights.
-            exampleEditorView = atom.views.getView exampleEditor
+            exampleEditorView = atom.views.getView @exampleEditor
             ($ exampleEditorView).addClass 'example-editor'
             ($ exampleEditorView).addClass 'locked-editor'
 
@@ -95,6 +102,20 @@ module.exports = plugin =
 
   deactivate: () ->
     this.subscriptions.dispose()
+
+    # Reset the user interface to where it was before.
+    @exampleEditor.destroy() if @exampleEditor?
+    for panel in atom.workspace.getRightPanels()
+      panel.destroy() if panel.item instanceof MainController
+
+    # Reset main data fields
+    @pluginController = undefined
+
+    # Open a new source program editor, without annotations and highlights.
+    # Force the file-open action to be synchronous.
+    sourcePath = @codeEditor.getPath()
+    @codeEditor.destroy()
+    (atom.workspace.open sourcePath).then()
 
   serialize: () ->
     return {}
