@@ -55,6 +55,7 @@ module.exports = plugin =
           # Force an immediate reload of the package.  Just the API `activate`
           # might defer activation for later.
           thisPackage.activateNow()
+        @deactivate()  # necessary to do explicitly in older versions of Atom
         thisPackage.deactivate()
       "examplify:make-example-code": =>
 
