@@ -50,13 +50,7 @@ module.exports = plugin =
     @subscriptions = new CompositeDisposable()
     @subscriptions.add (atom.commands.add "atom-workspace",
       "examplify:reset": =>
-        thisPackage = atom.packages.getActivePackage "codescoop"
-        thisPackage.onDidDeactivate =>
-          # Force an immediate reload of the package.  Just the API `activate`
-          # might defer activation for later.
-          thisPackage.activateNow()
-        @deactivate()  # necessary to do explicitly in older versions of Atom
-        thisPackage.deactivate()
+        @deactivate(=> @activate())
       "examplify:make-example-code": =>
 
         # Don't allow any edits to the source code at this point
@@ -101,7 +95,7 @@ module.exports = plugin =
         @controller.exampleController.undo()
     )
 
-  deactivate: () ->
+  deactivate: (onDidDeactivate) ->
     this.subscriptions.dispose()
 
     # Reset the user interface to where it was before.
@@ -116,7 +110,9 @@ module.exports = plugin =
     # Force the file-open action to be synchronous.
     sourcePath = @codeEditor.getPath()
     @codeEditor.destroy()
-    (atom.workspace.open sourcePath).then()
+    (atom.workspace.open sourcePath).then(=>
+      onDidDeactivate() if onDidDeactivate?
+    )
 
   serialize: () ->
     return {}
