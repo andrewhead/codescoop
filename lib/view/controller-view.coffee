@@ -23,11 +23,13 @@ module.exports.ControllerView = class ControllerView extends $
           "examplify:make-example-code"
       .appendTo element
 
+    """
     @printButton = $ "<button></button>"
       .attr "id", "print-symbol-button"
       .attr "disabled", true
       .append @_makeIcon "quote", "Print"
       .appendTo element
+    """
 
     @undoButton = $ "<button></button>"
       .attr "id", "undo-button"
@@ -79,16 +81,20 @@ module.exports.ControllerView = class ControllerView extends $
 
     # Enable the print button whenever a selection is made in the example
     # editor.
+    """
     exampleEditor.onDidChangeSelectionRange (event) =>
       newRange = event.newBufferRange
       @printButton.attr "disabled", (newRange.start.isEqual newRange.end)
+    """
 
     # When the print button is clicked, add a print statement
+    """
     @printButton.click =>
       log.debug "Printing out a variable",
         { selection: exampleEditor.getSelectedBufferRange() }
       symbolName = exampleEditor.getSelectedText()
       exampleController.addPrintedSymbol symbolName
+    """
 
     # Enable the undo button based on whether there are commands on the stack
     exampleController.getCommandStack().addListener {
