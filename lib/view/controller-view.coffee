@@ -94,9 +94,14 @@ module.exports.ControllerView = class ControllerView extends $
     atom.workspace.onDidChangeActivePane =>
       @_updateRunButton.bind model, exampleEditor
 
-    # When the run button is clicked, run the code!
+    # When the run button is clicked, show a message that running is unsupported.
     @runButton.click =>
-      atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
+      atom.notifications.addInfo \
+        "Compiling and running is disabled for the online demo. " +
+        "Check out the repository for the full prototype at " +
+        "https://github.com/andrewhead/codescoop.",
+        { dismissable: true, icon: "diff-renamed" }
+      # atom.commands.dispatch (atom.views.getView exampleEditor), "script:run"
 
     # Enable the run-button: people should be able to test the program now!
     @runButton.attr "disabled", false
