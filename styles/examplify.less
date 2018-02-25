@@ -143,6 +143,12 @@ atom-text-editor.source-editor {
   }
 }
 
+atom-text-editor.example-editor {
+  .gutter, .gutter .line-number {
+    color: #888888;
+  }
+}
+
 atom-text-editor.stub-editor {
   background-color: darken(#F0F0FF, 90%) !important;
   div.gutter.line-numbers {
@@ -232,18 +238,28 @@ atom-text-editor.locked-editor {
 
 atom-overlay.error-choice-button {
 
-  background-color: #fff;
-  border: 2px solid @text-color-warning;
-  padding: @component-padding;
-  font-family: @font-family;
-  opacity: 0;
-  font-weight: bold;
-  color: black;
+  div {
+    opacity: 0;
+    background-color: #fff;
+    border: 2px solid @text-color-warning;
+    padding: @component-padding;
+    font-family: @font-family;
+    font-weight: bold;
+    color: black;
 
-  &:hover {
-    opacity: 1;
-    cursor: pointer;
-    z-index: 100;
+    &::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -25%;
+      right: -50%;
+      bottom: -25%;
+    }
+    &:hover {
+      opacity: 1;
+      cursor: pointer;
+      z-index: 100;
+    }
   }
 
 }
