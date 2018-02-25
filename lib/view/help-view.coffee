@@ -41,7 +41,7 @@ Watch this 3-minute demo video to learn about CodeScoop's other features.
 </p>
 
 <div class="video-container">
-  <iframe class="video" src="https://www.youtube.com/embed/RYbhnRDbvyY?start=60" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <iframe class="video" src="https://www.youtube.com/embed/RYbhnRDbvyY?start=60&vq=hd1080" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <h2>Questions and Answers</h2>
