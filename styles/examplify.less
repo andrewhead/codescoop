@@ -88,16 +88,16 @@ div.help {
 .highlight {
 
   &.error-choice-highlight .region {
-    background-color: fade(@text-color-error, 20%);
+    background-color: fade(@text-color-error, 40%);
     border: 2px fade(@text-color-error, 100%) solid;
-    opacity: .8;
+    opacity: 1;
   }
 
   &.extension-highlight, &.resolution-highlight {
     .region {
       background-color: fade(@text-color-info, 30%);
       border: 2px fade(@text-color-info, 100%) solid;
-      opacity: .6;
+      opacity: 9;
     }
   }
 
@@ -298,6 +298,7 @@ div.controller {
     display: block;
 
     border-radius: @component-border-radius;
+    border-width: 1px;
     padding: @component-padding;
     margin-top: @component-padding;
     margin-bottom: 0;
