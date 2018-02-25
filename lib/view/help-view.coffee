@@ -6,7 +6,7 @@ HELP_HTML = """
 <p>
 In this demo, you can try out the interactions introduced in the paper
 <span class="paper_name">
-<a href="https://codescoop.berkeley.edu/pdfs/example_extraction.pdf">Interactive
+<a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">Interactive
 Extraction of Examples from Existing Code</a></span>.
 </p>
 
@@ -68,7 +68,7 @@ Get in touch with us by emailing andrewhead@berkeley.edu.
 </p>
 
 <p>
-Get more details about the tool and the project in the <a href="https://codescoop.berkeley.edu/pdfs/example_extraction.pdf">paper</a> and on the <a href="https://codescoop.berkeley.edu">project</a> website.
+Get more details about the tool and the project in the <a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">paper</a> and on the <a href="https://codescoop.berkeley.edu/info">project website</a>.
 </p>
 """
 
