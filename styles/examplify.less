@@ -9,6 +9,79 @@
     height: 5px !important;
 }
 
+div.help {
+  @help-font-size: @font-size * 1.2;
+  @line-height: @component-line-height;
+  width: 19em;
+  background-color: @input-background-color;
+  padding: @component-padding * 2;
+  overflow-y: auto;
+  font-size: @help-font-size;
+  line-height: @line-height;
+
+  h1 {
+    font-size: @help-font-size * 1.8;
+    line-height: @line-height;
+    text-align: center;
+    margin-top: 0.2em;
+    margin-bottom: 0.7em;
+  }
+
+  h2 {
+    font-size: @help-font-size * 1.1;
+    line-height: @line-height;
+    margin-top: 1.2em;
+    font-weight: 500;
+  }
+
+  h3 {
+    font-size: @help-font-size;
+    line-height: @line-height;
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  ol, ul {
+    list-style-position: outside;
+    padding-left: 2em;
+    line-height: @line-height * .9;
+
+    &.long-bullets li {
+      margin-bottom: .5em;
+
+      span.action_name {
+        font-style: italic;
+      }
+    }
+  }
+
+  p {
+    a {
+      text-decoration: underline;
+    }
+  }
+
+  .icon::before {
+    margin-right: 0 !important;
+  }
+
+  div.video-container {
+
+    position:relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    iframe.video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
 
 .highlight {
 
@@ -217,11 +290,26 @@ div.controller {
 
   button {
 
+    font-size: 16px;
+    width: 5em;
+    display: block;
+
+    border-radius: @component-border-radius;
+    padding: @component-padding;
+    margin-top: @component-padding;
+    margin-bottom: 0;
+
+    background-color: @button-background-color;
+    border-color: @button-border-color;
+    color: @text-color-highlight;
+    font-family: @font-family;
+
      // The reason we use .icon::before is because this is the way that
      // styles are defined by default for Octicons for Atom.  We repeat
      // it here so that this rule gets higher precedence.
     .icon::before {
       margin: @component-padding;
+      text-align: center;
       font-size: 32px;
       width: 32px;
       height: 32px;
@@ -232,32 +320,18 @@ div.controller {
       margin-bottom: 0;
     }
 
-    border-radius: @component-border-radius;
-    padding: @component-padding;
-    display: block;
-    width: 100%;
-
-    background-color: @button-background-color;
-    border-color: @button-border-color;
-    color: @text-color-highlight;
-    font-family: @font-family;
-
     &:disabled {
       opacity: .3;
     }
 
     &:enabled {
       &:hover {
-        background-color: lighten(#6182B8, 41%);
+        background-color: darken(@button-background-color, 5%);
       }
       &:active {
         background-color: @button-background-color-selected;
       }
     }
-
-    font-size: 16px;
-    margin-top: @component-padding;
-    margin-bottom: 0;
   }
 
 }

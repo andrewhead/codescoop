@@ -51,6 +51,20 @@ module.exports.ControllerView = class ControllerView extends $
       .append @_makeIcon "sync", "Reset"
       .appendTo element
 
+    @helpButton = $ "<button></button>"
+      .attr "id", "help-button"
+      .append @_makeIcon "info", "Hide Help"
+      .click =>
+        helpPanel = $ "div.help"
+        console.log helpPanel.css "display"
+        if (helpPanel.css "display") != "none"
+          helpPanel.css "display", "none"
+          @helpButton.html @_makeIcon "info", "Show Help"
+        else
+          helpPanel.css "display", "block"
+          @helpButton.html @_makeIcon "info", "Hide Help"
+      .appendTo element
+
     @.extend @, element
 
   onPluginInitDone: (pluginController) ->

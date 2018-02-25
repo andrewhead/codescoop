@@ -3,6 +3,7 @@
 { ExampleView } = require "./view/example-view"
 { StubPreview } = require "./view/stub-preview"
 { ControllerView } = require "./view/controller-view"
+{ HelpView } = require "./view/help-view"
 
 { parse } = require "./analysis/parse-tree"
 { ExampleController } = require "./example-controller"
@@ -45,6 +46,7 @@ module.exports = plugin =
     @pluginController = new MainController()
     atom.views.addViewProvider MainController, (controller) =>
       (new ControllerView controller).getNode()
+    atom.workspace.addRightPanel { item: new HelpView() }
     atom.workspace.addRightPanel { item: @pluginController }
 
     @subscriptions = new CompositeDisposable()
@@ -101,7 +103,9 @@ module.exports = plugin =
     # Reset the user interface to where it was before.
     @exampleEditor.destroy() if @exampleEditor?
     for panel in atom.workspace.getRightPanels()
-      panel.destroy() if panel.item instanceof MainController
+      panel.destroy() if (
+        panel.item instanceof MainController or
+        panel.item instanceof HelpView)
 
     # Reset main data fields
     @pluginController = undefined
