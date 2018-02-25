@@ -290,7 +290,8 @@ div.controller {
 
   button {
 
-    font-size: 16px;
+    @button-font-size: 12px;
+    font-size: @button-font-size;
     width: 5em;
     display: block;
 
@@ -308,11 +309,12 @@ div.controller {
      // styles are defined by default for Octicons for Atom.  We repeat
      // it here so that this rule gets higher precedence.
     .icon::before {
-      margin: @component-padding;
+      // margin: @component-padding;
+      margin: .25em;
       text-align: center;
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
+      font-size: @button-font-size * 2;
+      width: @button-font-size * 2;
+      height: @button-font-size * 2;
       display: block;
     }
 
