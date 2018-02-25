@@ -34,8 +34,8 @@ EXAMPLE_FILE_NAME = "ExtractedExample.java"
 disableKeystrokes = (editorView, shouldDisable) =>
   ($ editorView).on 'keydown', (e) =>
     code = e.keyCode or e.which
-    # Still allow arrow keys
-    if not (code <= 40 and code >= 37)
+    # Still allow arrow keys and shortcuts
+    if not (e.ctrlKey or e.metaKey or e.altKey or (code <= 40 and code >= 37))
       if (not shouldDisable?)
         e.preventDefault()
         e.stopPropagation()
@@ -43,6 +43,7 @@ disableKeystrokes = (editorView, shouldDisable) =>
       if shouldDisable()
         e.preventDefault()
         e.stopPropagation()
+        return
 
 
 module.exports = plugin =
