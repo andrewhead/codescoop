@@ -171,6 +171,47 @@ atom-text-editor div.line.definition span {
   opacity: 1;
 }
 
+
+// This loading indicator reused from this fiddle:
+// http://jsfiddle.net/8k2NV/2/
+atom-text-editor.loading {
+  opacity: .5;
+
+  div.loading_container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    div.loading_indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin-top: -40px;
+      border-width: 30px;
+      border-radius: 30px;
+      border-style: double;
+      border-color: #ccc transparent;
+      animation: spin 1s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+  }
+}
+
 atom-text-editor.locked-editor {
   .selection .selection.region {
     background-color: rgba(0, 0, 0, 0);

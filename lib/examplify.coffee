@@ -19,8 +19,8 @@
 { ThrowsAnalysis } = require "./analysis/throws-analysis"
 { CatchAnalysis } = require "./analysis/catch"
 
-{ ExampleModel, ExampleModelState } = require "./model/example-model"
-{ RangeSet } = require "./model/range-set"
+{ ExampleModel, ExampleModelProperty, ExampleModelState } = require "./model/example-model"
+{ RangeSet, Range } = require "./model/range-set"
 { File, SymbolSet } = require "./model/symbol-set"
 
 $ = require "jquery"
@@ -92,6 +92,9 @@ module.exports = plugin =
             exampleEditorView = atom.views.getView @exampleEditor
             ($ exampleEditorView).addClass 'example-editor'
             ($ exampleEditorView).addClass 'locked-editor'
+            ($ exampleEditorView).addClass 'loading'
+            ($ exampleEditorView)
+              .append("<div class='loading_container'><div class='loading_indicator'></div></div>")
 
             # This editor should be read-only.
             # Abort any textual changes so user can't type in code.
@@ -149,10 +152,27 @@ module.exports.MainController = class MainController
     @exampleEditor = exampleEditor
 
     selectedRanges = codeEditor.getSelectedBufferRanges()
-    snippetRanges = selectedRanges
+    buffer = codeEditor.getBuffer()
+
+    # Include full lines for every line where more than just
+    # whitespace was selected.
+    snippetRanges = []
+    for range in selectedRanges
+      for rowNumber in [range.start.row..range.end.row]
+
+        lineFullRange = buffer.rangeForRow rowNumber
+        if rowNumber is range.start.row
+          lineRange = new Range range.start, lineFullRange.end
+        else if rowNumber is range.end.row
+          lineRange = new Range lineFullRange.start, range.end
+        else
+          lineRange = lineFullRange
+
+        if not /^\s*$/.test buffer.getTextInRange lineRange
+          snippetRanges.push lineFullRange
 
     # Prepare models (data)
-    @rangeSet = new RangeSet snippetRanges
+    @rangeSet = new RangeSet []
     @symbols = new SymbolSet()
     @parseTree = parse codeEditor.getText()
     @exampleModel = new ExampleModel codeEditor.getBuffer(), @rangeSet,\
@@ -181,6 +201,20 @@ module.exports.MainController = class MainController
     # Prepare controllers
     @exampleController = new ExampleController \
       @exampleModel, { analyses: @analyses }
+
+    @exampleModel.addObserver {
+      exampleEditor: @exampleEditor
+      waitingToAddRanges: true
+      onPropertyChanged: (model, propertyName, oldValue, newValue) ->
+        if @waitingToAddRanges
+          if propertyName is ExampleModelProperty.STATE
+            if newValue is ExampleModelState.IDLE
+              @waitingToAddRanges = false
+              for range in snippetRanges
+                model.getRangeSet().getChosenRanges().push range
+              exampleEditorView = atom.views.getView @exampleEditor
+              ($ exampleEditorView).removeClass "loading"
+    }
 
     for listener in @initListeners
       listener.onPluginInitDone @

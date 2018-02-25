@@ -78,7 +78,6 @@ module.exports.CodeView = class CodeView
   listenForLineClick: ->
     editorView = (atom.views.getView @textEditor)
     (($ editorView).find '.gutter').on 'mousedown mouseover', '.line-number', (event) =>
-      console.log event
       if event.which in [undefined, 1]
         rowNumber = Number(event.target.dataset.screenRow)
         log.debug "Clicked on line number", { lineNumber: rowNumber }
