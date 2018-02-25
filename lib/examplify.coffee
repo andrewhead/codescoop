@@ -31,6 +31,20 @@ log = require "examplify-log"
 EXAMPLE_FILE_NAME = "ExtractedExample.java"
 
 
+disableKeystrokes = (editorView, shouldDisable) =>
+  ($ editorView).on 'keydown', (e) =>
+    code = e.keyCode or e.which
+    # Still allow arrow keys
+    if not (code <= 40 and code >= 37)
+      if (not shouldDisable?)
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      if shouldDisable()
+        e.preventDefault()
+        e.stopPropagation()
+
+
 module.exports = plugin =
 
   subscriptions: null
@@ -41,6 +55,7 @@ module.exports = plugin =
     @codeEditor = atom.workspace.getActiveTextEditor()
     codeEditorView = atom.views.getView @codeEditor
     ($ codeEditorView).addClass 'source-editor'
+    disableKeystrokes codeEditorView
 
     # Prepare user interface panels
     @pluginController = new MainController()
@@ -79,19 +94,21 @@ module.exports = plugin =
 
             # This editor should be read-only.
             # Abort any textual changes so user can't type in code.
-            exampleEditor.onWillInsertText (event) =>
-              if @pluginController.getModel().getState() != ExampleModelState.IDLE
-                event.cancel()
+            disableKeystrokes exampleEditorView, =>
+              @pluginController.getModel().getState() != ExampleModelState.IDLE
+            # exampleEditor.onWillInsertText (event) =>
+            #   if @pluginController.getModel().getState() != ExampleModelState.IDLE
+            #     event.cancel()
             ($ exampleEditorView).click (event) =>
               if @pluginController.getModel().getState() == ExampleModelState.IDLE
                 ($ exampleEditorView).removeClass 'locked-editor'
               else if @pluginController.getModel().getState() == ExampleModelState.IDLE
                 ($ exampleEditorView).addClass 'locked-editor'
 
-      "examplify:add-selection-to-example": =>
-        selectedRange = @codeEditor.getSelectedBufferRange()
-        rangeSet = @controller.getModel().getRangeSet()
-        rangeSet.getChosenRanges().push selectedRange
+      # examplify:add-selection-to-example": =>
+      #   selectedRange = @codeEditor.getSelectedBufferRange()
+      #   rangeSet = @controller.getModel().getRangeSet()
+      #   rangeSet.getChosenRanges().push selectedRange
       "examplify:undo": =>
         log.debug "Key press for undo"
         @controller.exampleController.undo()
