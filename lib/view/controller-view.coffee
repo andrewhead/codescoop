@@ -15,13 +15,21 @@ module.exports.ControllerView = class ControllerView extends $
       .addClass "controller"
 
     @scoopButton = $ "<button></button>"
-      .attr "id", "run-button"
+      .attr "id", "scoop-button"
+      .attr "disabled", true
       .append @_makeIcon "paintcan", "Scoop"
       .click =>
+        @scoopButton.data 'clicked', true
         atom.commands.dispatch \
           (atom.views.getView atom.workspace.getActiveTextEditor()),
           "examplify:make-example-code"
       .appendTo element
+
+    atom.workspace.getActiveTextEditor().onDidChangeSelectionRange (event) =>
+      newRange = event.newBufferRange
+      @scoopButton.attr "disabled", (
+        (@scoopButton.data 'clicked') or
+        newRange.start.isEqual newRange.end)
 
     """
     @printButton = $ "<button></button>"
