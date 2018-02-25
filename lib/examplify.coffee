@@ -102,8 +102,8 @@ module.exports = plugin =
 
     # Reset the user interface to where it was before.
     @exampleEditor.destroy() if @exampleEditor?
-    for panel in atom.workspace.getRightPanels()
-      panel.destroy() if panel?
+    while atom.workspace.getRightPanels().length >= 1
+      atom.workspace.getRightPanels()[0].destroy()
 
     # Reset main data fields
     @pluginController = undefined
