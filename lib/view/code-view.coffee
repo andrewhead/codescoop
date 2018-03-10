@@ -95,10 +95,17 @@ module.exports.CodeView = class CodeView
     # the DOM contents change, and when the active editor changes, and
     # update the highlighting and dimming.
     editorView = atom.views.getView @textEditor
-    scrollObserver = new MutationObserver ((m, o) => @updateHighlights())
-    scrollObserver.observe editorView, { childList: true, subtree: true }
+    @scrollObserver = new MutationObserver ((m, o) => @updateHighlights())
+    @scrollObserver.observe editorView, { childList: true, subtree: true }
 
   resetHighlights: ->
     editorView = atom.views.getView @textEditor
     lines = $ ( editorView.querySelectorAll 'div.line' )
     ((lines.removeClass 'inactive').removeClass 'active').removeClass 'suggested'
+
+  destroy: ->
+    editorView = atom.views.getView @textEditor
+    @resetHighlights()
+    @rangeSet.removeObserver @
+    @scrollObserver.disconnect()
+    (($ editorView).find '.gutter').off 'mousedown mouseover', '.line-number'

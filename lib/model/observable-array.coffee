@@ -12,6 +12,12 @@ module.exports.makeObservableArray = (array = undefined) ->
   array.addObserver = (observer) ->
     @observers.push observer
 
+  array.removeObserver = (observer) ->
+    for o, index in @observers
+      if o is observer
+        @observers.splice index, 1
+        break
+
   array.notifyObservers = (arrayBefore) ->
     for observer in @observers
       observer.onPropertyChanged @, ObservableArrayProperty.ARRAY_CHANGE,

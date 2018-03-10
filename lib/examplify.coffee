@@ -126,16 +126,16 @@ module.exports = plugin =
     while atom.workspace.getRightPanels().length >= 1
       atom.workspace.getRightPanels()[0].destroy()
 
+    # Reset the source program editor
+    codeEditorView = atom.views.getView @codeEditor
+    ($ codeEditorView).removeClass 'locked-editor'
+    @pluginController.codeView.destroy()
+
     # Reset main data fields
     @pluginController = undefined
 
-    # Open a new source program editor, without annotations and highlights.
-    # Force the file-open action to be synchronous.
-    sourcePath = @codeEditor.getPath()
-    @codeEditor.destroy()
-    (atom.workspace.open sourcePath).then(=>
-      onDidDeactivate() if onDidDeactivate?
-    )
+    # Callback for after deactivation
+    onDidDeactivate() if onDidDeactivate?
 
   serialize: () ->
     return {}

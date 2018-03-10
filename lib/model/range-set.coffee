@@ -116,6 +116,12 @@ module.exports.RangeSet = class RangeSet
   addObserver: (observer) ->
     @observers.push observer
 
+  removeObserver: (observer) ->
+    for o, index in @observers
+      if o is observer
+        @observers.splice index, 1
+        break
+
   _updateActiveRanges: ->
     newRanges = @snippetRanges.concat \
       (methodRange.getRange() for methodRange in @methodRanges),
