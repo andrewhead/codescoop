@@ -292,6 +292,24 @@
       "path": "/Users/andrew/QueryDatabase.java",
       "fileName": "QueryDatabase.java"
     },
+    "name": "rowNumber",
+    "range": {
+      "start": {
+        "row": 61,
+        "column": 24
+      },
+      "end": {
+        "row": 61,
+        "column": 33
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
     "name": "id",
     "range": {
       "start": {

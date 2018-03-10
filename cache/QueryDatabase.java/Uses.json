@@ -655,6 +655,24 @@
     "name": "rowNumber",
     "range": {
       "start": {
+        "row": 61,
+        "column": 36
+      },
+      "end": {
+        "row": 61,
+        "column": 45
+      }
+    },
+    "type": "int"
+  },
+  {
+    "file": {
+      "path": "/Users/andrew/QueryDatabase.java",
+      "fileName": "QueryDatabase.java"
+    },
+    "name": "rowNumber",
+    "range": {
+      "start": {
         "row": 63,
         "column": 44
       },
