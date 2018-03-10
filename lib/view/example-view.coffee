@@ -370,8 +370,8 @@ module.exports.ExampleView = class ExampleView
         .data "error", error
         .click (event) =>
           error = ($ (event.target)).data "error"
-          log.debug "Chose issue to resolve",
-            { type: error.constructor.name, error }
+          # log.debug "Chose issue to resolve",
+          #   { type: error.constructor.name, error }
           @model.setErrorChoice error
       params =
         type: "overlay"

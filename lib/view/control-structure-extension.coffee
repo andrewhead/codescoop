@@ -30,13 +30,13 @@ module.exports.ControlStructureExtensionView = \
       suggestedRanges.remove range
 
   onAccept: (extension) ->
-    log.debug "Accepted control structure", {
-      controlType: extension.getControlStructure().constructor.name
-      ranges: extension.getRanges()
-    }
+    # log.debug "Accepted control structure", {
+    #   controlType: extension.getControlStructure().constructor.name
+    #   ranges: extension.getRanges()
+    # }
 
   onReject: (extension) ->
-    log.debug "Rejected control structure", {
-      controlType: extension.getControlStructure().constructor.name
-      ranges: extension.getRanges()
-    }
+    # log.debug "Rejected control structure", {
+    #   controlType: extension.getControlStructure().constructor.name
+    #   ranges: extension.getRanges()
+    # }

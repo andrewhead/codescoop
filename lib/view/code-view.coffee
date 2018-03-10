@@ -80,7 +80,7 @@ module.exports.CodeView = class CodeView
     (($ editorView).find '.gutter').on 'mousedown mouseover', '.line-number', (event) =>
       if event.which in [undefined, 1]
         rowNumber = Number(event.target.dataset.screenRow)
-        log.debug "Clicked on line number", { lineNumber: rowNumber }
+        # log.debug "Clicked on line number", { lineNumber: rowNumber }
         lineLength = (@textEditor.lineTextForScreenRow rowNumber).length
         newRange = new Range [rowNumber, 0], [rowNumber, lineLength]
         if newRange not in @rangeSet.getChosenRanges()

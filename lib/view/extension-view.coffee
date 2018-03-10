@@ -30,16 +30,16 @@ module.exports.ExtensionView = class ExtensionView extends $
       .text "Accept"
       .click (event) =>
         @revert()
-        log.debug "Accepted extension", { type: @extension.constructor.name }
+        # log.debug "Accepted extension", { type: @extension.constructor.name }
         (@onAccept @extension) if @onAccept?
         @model.setExtensionDecision true
       .mouseover (event) =>
-        log.debug "Previewing an extension",
-          { type: @extension.constructor.name }
+        # log.debug "Previewing an extension",
+        #   { type: @extension.constructor.name }
         @preview()
       .mouseout (event) =>
-        log.debug "Un-previewing an extension",
-          { type: @extension.constructor.name }
+        # log.debug "Un-previewing an extension",
+        #   { type: @extension.constructor.name }
         @revert()
       .appendTo element
 
@@ -48,12 +48,12 @@ module.exports.ExtensionView = class ExtensionView extends $
       .text "Reject"
       .click (event) =>
         @revert()
-        log.debug "Rejected extension", { type: @extension.constructor.name }
+        # log.debug "Rejected extension", { type: @extension.constructor.name }
         (@onReject @extension) if @onAccept?
         @model.setExtensionDecision false
       .appendTo element
 
-    log.debug "Proposing extension", { type: @extension.constructor.name }
+    # log.debug "Proposing extension", { type: @extension.constructor.name }
 
     # Make this object one and the same with the div we just created
     @.extend @, element

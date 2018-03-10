@@ -198,8 +198,8 @@ module.exports.ExampleController = class ExampleController
           suggestion = suggestions[0]
           commandGroup = @commandCreator.createCommandGroupForSuggestion suggestion, @model
           commandGroup.quickAdd = true
-          log.debug "Found an automatic correction",
-            { type: suggestion.constructor.name, suggestion }
+          # log.debug "Found an automatic correction",
+          #   { type: suggestion.constructor.name, suggestion }
           @commandStack.push commandGroup
           for command in commandGroup
             command.apply @model
@@ -346,7 +346,7 @@ module.exports.ExampleController = class ExampleController
       while quickAdd and @commandStack.peek()?
         lastCommandGroup = @commandStack.pop()
         for command in lastCommandGroup
-          log.debug "Reverting command", { type: command.constructor.name }
+          # log.debug "Reverting command", { type: command.constructor.name }
           command.revert @model
         quickAdd = lastCommandGroup.quickAdd
     @reverting = false

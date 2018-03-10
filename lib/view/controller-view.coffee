@@ -131,7 +131,7 @@ module.exports.ControllerView = class ControllerView extends $
 
     # Undo an action when the undo button is clicked
     @undoButton.click =>
-      log.debug "Button press for undo"
+      # log.debug "Button press for undo"
       exampleController.undo()
 
     @resetButton

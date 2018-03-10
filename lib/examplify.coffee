@@ -114,7 +114,7 @@ module.exports = plugin =
       #   rangeSet = @controller.getModel().getRangeSet()
       #   rangeSet.getChosenRanges().push selectedRange
       "examplify:undo": =>
-        log.debug "Key press for undo"
+        # log.debug "Key press for undo"
         @controller.exampleController.undo()
     )
 

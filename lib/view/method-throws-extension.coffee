@@ -18,13 +18,13 @@ module.exports.MethodThrowsExtensionView = \
     @model.getRangeSet().getSuggestedRanges().remove @throwingRange
 
   onAccept: (extension) ->
-    log.debug "Accepted throws", {
-      throwsName: extension.getSuggestedThrows()
-      selectionRange: extension.getThrowingRange()
-    }
+    # log.debug "Accepted throws", {
+    #   throwsName: extension.getSuggestedThrows()
+    #   selectionRange: extension.getThrowingRange()
+    # }
 
   onReject: (extension) ->
-    log.debug "Rejected throws", {
-      throwsName: extension.getSuggestedThrows()
-      selectionRange: extension.getThrowingRange()
-    }
+    # log.debug "Rejected throws", {
+    #   throwsName: extension.getSuggestedThrows()
+    #   selectionRange: extension.getThrowingRange()
+    # }

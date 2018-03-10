@@ -18,10 +18,10 @@ module.exports.MediatingUseExtensionView = \
     # Change the message on the reject button.
     @rejectButton.text "No"
 
-    log.debug "Showing mediating uses", {
-      use: extension.getUse()
-      countOtherUses: extension.getMediatingUses().length
-    }
+    # log.debug "Showing mediating uses", {
+    #   use: extension.getUse()
+    #   countOtherUses: extension.getMediatingUses().length
+    # }
 
     # Suggest all ranges that are mediating uses, and let the user decide
     # which of them to accept, or which to ignore.
