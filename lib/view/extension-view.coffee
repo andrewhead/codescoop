@@ -9,7 +9,7 @@ log = require 'examplify-log'
 # Each event handler takes a jQuery event as input
 module.exports.ExtensionView = class ExtensionView extends $
 
-  constructor: (extension, model, text) ->
+  constructor: (extension, model, text, label) ->
 
     @extension = extension
     @model = model
@@ -19,9 +19,10 @@ module.exports.ExtensionView = class ExtensionView extends $
     element = $ "<div></div>"
       .addClass "extension"
 
-    label = $ "<div></div>"
-      .text text
-      .appendTo element
+    if not label?
+      label = $ "<div></div>"
+        .text text
+    label.appendTo element
 
     # When the accept button is hovered over, we show a preview.
     # When it's clicked, we tell the model the extension was accepted.

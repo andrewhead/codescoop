@@ -81,8 +81,12 @@ module.exports = plugin =
             @exampleEditor = exampleEditor
 
             # Editor syntax should be for Java instead of default
-            if atom.grammars.grammarsByScopeName['source.java']?
-              exampleEditor.setGrammar atom.grammars.grammarsByScopeName['source.java']
+            if atom.grammars.grammarForScopeName?
+              grammar = atom.grammars.grammarForScopeName 'source.java'
+            else if atom.grammars.grammarsByScopeName?
+              grammar = atom.grammars.grammarsByScopeName['source.java']
+            if grammar?
+              exampleEditor.setGrammar grammar
 
             # Initialize the controller now that the scoop is starting
             @pluginController.init @codeEditor, @exampleEditor

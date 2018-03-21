@@ -6,7 +6,7 @@ This way we can configure the classpath for the module only once
 fs = require "fs"
 path = require "path"
 
-PACKAGE_PATH = __dirname + "../.."
+PACKAGE_PATH = __dirname + "/../.."
 if atom? and atom.packages? and atom.packages.loadedPackages? and atom.packages.loadedPackages.codescoop?
   PACKAGE_PATH = atom.packages.loadedPackages.codescoop.path
 

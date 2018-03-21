@@ -271,23 +271,40 @@ atom-overlay.extension-widget {
   background-color: #fff;
   color: @text-color-highlight;
 
-  div div {
-
-    float: left;
-    padding: @component-padding;
-
-    &:not(:last-of-type) {
-      border-right: 1px @tool-panel-border-color solid;
+  div {
+  
+    &.mediating-use-extension {
+      width: 10em;
+      text-align: center;
     }
 
-    &:not(:first-of-type) {
-      font-weight: bold;
-      &:hover {
-        background-color: fade(@syntax-color-renamed, 30%);
-        cursor: pointer;
+    &:not(.mediating-use-extension) div {
+      float: left;
+    }
+
+    div {
+
+      padding: @component-padding;
+
+      &.mediating-use-choice {
+        text-align: center;
+        border-top: 1px @tool-panel-border-color solid;
+      }
+
+      &:not(:last-of-type) {
+        border-right: 1px @tool-panel-border-color solid;
+      }
+
+      &:not(:first-of-type) {
+        &:not(.mediating-use-choice), &:last-of-type {
+          font-weight: bold;
+        }
+        &:hover {
+          background-color: fade(@syntax-color-renamed, 30%);
+          cursor: pointer;
+        }
       }
     }
-
   }
 
 }
