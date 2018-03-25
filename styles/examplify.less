@@ -84,6 +84,11 @@ div.help {
   }
 }
 
+// Disable cold folding
+atom-text-editor::shadow .gutter .line-number:not(.bookmarked) .icon-right {
+  height: 0;
+  overflow: hidden;
+}
 
 .highlight {
 
