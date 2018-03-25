@@ -286,8 +286,52 @@ module.exports.ExampleView = class ExampleView
     width = range.end.column - range.start.column
     height = range.end.row - range.start.row
 
-    # Step 2.  If there are no replacements in this range, we're almost done!
-    # If there are replacements in this range, we want to adjust the position
+    # Default behavior: If there are no replacements before this range or inside
+    # of it, return the offset of the range relative to its active range's
+    # position in the example editor
+    startColumn = undefined
+    if range.start.row is activeRange.start.row
+      columnOffset = range.start.column - activeRange.start.column
+      startColumn = markerRange.start.column + columnOffset
+    else
+      startColumn = range.start.column
+
+    rowOffset = range.start.row - activeRange.start.row
+    adjustedRange = new Range [
+        markerRange.start.row + rowOffset
+        startColumn
+      ], [
+        markerRange.start.row + rowOffset + height
+        startColumn + width
+      ]
+
+    # Step 2a. Check if there are any replacements with the range.  If so,
+    # move the right side of the range.
+    replacementsInRange = []
+    @model.getEdits().forEach (edit) =>
+      if (edit instanceof Replacement)
+        replacement = edit
+        otherRange = edit.getSymbol().getRange()
+        if (activeRange isnt otherRange) and
+            (activeRange.containsRange otherRange) and
+            # XXX: This should technically be inclusive (in case we want to get
+            # the adjusted range for something that has been replaced).
+            # But we don't right now, because this is also used to get the
+            # position of where to replace text in the buffer, before
+            # replacements have been applied.  I should fix this later.
+            (range.containsRange otherRange, { exclusive: true }) and
+            (range.start.row is otherRange.start.row)
+          console.log range, otherRange
+          replacementsInRange.push replacement
+
+      for replacement in replacementsInRange
+        insideRange = replacement.getSymbol().getRange()
+        insideRangeOriginalWidth = insideRange.end.column - insideRange.start.column
+        insideRangeNewText = replacement.getText()
+        replacementWidthDelta = insideRangeNewText.length - insideRangeOriginalWidth
+        adjustedRange.end.column += replacementWidthDelta
+
+    # Step 2b. If there are replacements in this range, adjust the position
     # of the range relative to the end of the last replacement before the
     # range.  Find this range before this one, and adjust offset.
     # XXX: Replacement adjustments only work when all replacements are on
@@ -322,35 +366,15 @@ module.exports.ExampleView = class ExampleView
       # Create a new range relative to the prior replacement
       adjustedStartColumn = adjustedPriorRange.end.column +
         columnsAfterReplacement + replacementWidthDelta
-      nextRange = new Range [
+      adjustedRange = new Range [
         adjustedPriorRange.end.row,
         adjustedStartColumn,
       ], [
         adjustedPriorRange.end.row + height,
         adjustedStartColumn + width
       ]
-      return nextRange
 
-    # If there were no replacements before this, just return the offset of
-    # this range relative to its active range's position in the example editor.
-    else
-
-      startColumn = undefined
-      if range.start.row is activeRange.start.row
-        columnOffset = range.start.column - activeRange.start.column
-        startColumn = markerRange.start.column + columnOffset
-      else
-        startColumn = range.start.column
-
-      rowOffset = range.start.row - activeRange.start.row
-      adjustedRange = new Range [
-          markerRange.start.row + rowOffset
-          startColumn
-        ], [
-          markerRange.start.row + rowOffset + height
-          startColumn + width
-        ]
-      return adjustedRange
+    return adjustedRange
 
   # It's assumed that this is called before any boilerplate text and edits
   # (besides the active lines) have been added to the buffer
