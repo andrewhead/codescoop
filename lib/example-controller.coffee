@@ -303,13 +303,14 @@ module.exports.ExampleController = class ExampleController
 
     else if @model.getState() is ExampleModelState.RESOLUTION
 
-      if (propertyName is ExampleModelProperty.RESOLUTION_CHOICE) and newValue?
+      if (propertyName is ExampleModelProperty.RESOLUTION_CHOICE)
 
-        # Look up commands for this suggestion, execute and save them
-        commandGroup = @commandCreator.createCommandGroupForSuggestion newValue, @model
-        @commandStack.push commandGroup
-        for command in commandGroup
-          command.apply @model
+        if newValue?
+          # Look up commands for this suggestion, execute and save them
+          commandGroup = @commandCreator.createCommandGroupForSuggestion newValue, @model
+          @commandStack.push commandGroup
+          for command in commandGroup
+            command.apply @model
 
         @model.setActiveCorrector null
         @model.setState ExampleModelState.IDLE

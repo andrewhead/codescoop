@@ -34,6 +34,7 @@ module.exports.ExtensionView = class ExtensionView extends $
         # log.debug "Accepted extension", { type: @extension.constructor.name }
         (@onAccept @extension) if @onAccept?
         @model.setExtensionDecision true
+        event.stopPropagation()
       .mouseover (event) =>
         # log.debug "Previewing an extension",
         #   { type: @extension.constructor.name }
@@ -52,6 +53,7 @@ module.exports.ExtensionView = class ExtensionView extends $
         # log.debug "Rejected extension", { type: @extension.constructor.name }
         (@onReject @extension) if @onAccept?
         @model.setExtensionDecision false
+        event.stopPropagation()
       .appendTo element
 
     # log.debug "Proposing extension", { type: @extension.constructor.name }

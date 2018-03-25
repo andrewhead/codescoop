@@ -25,6 +25,7 @@ module.exports.SuggestionView = class SuggestionView extends $
         # log.debug "Picked a correction",
         #   { type: suggestion.constructor.name, suggestion }
         @model.setResolutionChoice suggestion
+        event.stopPropagation()
       .mouseover (event) =>
         # log.debug "Previewing a correction",
         #   { type: suggestion.constructor.name, suggestion }

@@ -59,6 +59,13 @@ module.exports.ExampleView = class ExampleView
     @editMarkerPairs = []
     @update()
 
+    # Allow someone to click outside of the overlays to dismiss the resolution
+    # phase and go back to looking at the errors.
+    view = atom.views.getView @textEditor
+    ($ view).on 'click', (event) =>
+      if (@model.getState() is ExampleModelState.RESOLUTION)
+        @model.setResolutionChoice null
+
   getTextEditor: () ->
     @textEditor
 
@@ -321,7 +328,6 @@ module.exports.ExampleView = class ExampleView
             # replacements have been applied.  I should fix this later.
             (range.containsRange otherRange, { exclusive: true }) and
             (range.start.row is otherRange.start.row)
-          console.log range, otherRange
           replacementsInRange.push replacement
 
       for replacement in replacementsInRange
@@ -420,6 +426,7 @@ module.exports.ExampleView = class ExampleView
           # log.debug "Chose issue to resolve",
           #   { type: error.constructor.name, error }
           @model.setErrorChoice error
+          event.stopPropagation()
       params =
         type: "overlay"
         class: "error-choice-button"
