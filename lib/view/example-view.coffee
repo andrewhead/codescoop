@@ -63,6 +63,25 @@ module.exports.ExampleView = class ExampleView
     @textEditor
 
   onPropertyChanged: (object, propertyName, oldValue, newValue) ->
+
+    # Preserve the scroll as the user is interacting with the editor.
+    # This is implemented as a hack.  Here's how it works:
+    # When the update code resets the text in the buffer, this fires off
+    # an asynchronous event (via `requestAnimationFrame` on the window)
+    # for updating the text editor's scroll based on its contents.
+    # We intercept all of these automatic scrolls, and set the scroll
+    # of the editor back to what it was at the beginning of the update.
+    # At the end of this method, we destroy the scroll-preserving callback.
+    # Importantly, we have to do this by passing the callback destruction
+    # code to `requestAnimationFrame`, so that it will be destroyed only
+    # after all the automatic scrolls have been processed.
+    view = atom.views.getView @textEditor
+    scrollLeft = view.getScrollLeft()
+    scrollTop = view.getScrollTop()
+    preserveScrollCallback = view.emitter.on 'did-change-scroll-left', =>
+      view.setScrollLeft scrollLeft
+      view.setScrollTop scrollTop
+
     @update() if propertyName in [
       ExampleModelProperty.STATE
       ExampleModelProperty.AUXILIARY_DECLARATIONS
@@ -78,6 +97,10 @@ module.exports.ExampleView = class ExampleView
         deletedReplacements = oldValue.filter (replacement) =>
           replacement not in newValue
         (@_revertReplacement replacement) for replacement in deletedReplacements
+
+    # Restore the scroll to what it was before
+    requestAnimationFrame =>
+      preserveScrollCallback.dispose()
 
   update: ->
 
@@ -150,7 +173,7 @@ module.exports.ExampleView = class ExampleView
 
       # Save a reference to a movable buffer range for the active range"s
       # position within the example code.
-      marker = @textEditor.markBufferRange exampleRange
+      marker = @textEditor.markBufferRange exampleRange, { invalidate: "never" }
       @activeRangeMarkerPairs.push [range, marker]
 
   _addAuxiliaryDeclarations: ->
@@ -203,7 +226,7 @@ module.exports.ExampleView = class ExampleView
         declaration = declaration.replace /(\w+\s+\w+\s*\()/, "static $1"
       declarationRange = @_addTextAtEndOfBuffer declaration
 
-      marker = @textEditor.markBufferRange declarationRange
+      marker = @textEditor.markBufferRange declarationRange, { invalidate: "never" }
       @activeRangeMarkerPairs.push [rangeInCode, marker]
 
       @_addTextAtEndOfBuffer "\n"
@@ -228,7 +251,7 @@ module.exports.ExampleView = class ExampleView
 
       # Mark the range of this declaration, so we can annotate it with
       # errors and resolutions at some later time.
-      marker = @textEditor.markBufferRange declarationRange
+      marker = @textEditor.markBufferRange declarationRange, { invalidate: "never" }
       @activeRangeMarkerPairs.push [rangeInCode, marker]
 
       # White space between class declarations
@@ -279,7 +302,7 @@ module.exports.ExampleView = class ExampleView
             (replacementRange.start.row is range.start.row)
           if not replacementBeforeRange?
             replacementBeforeRange = replacement
-          else if (replacementRange.compare replacementRange) is -1
+          else if (replacementBeforeRange.getSymbol().getRange().compare replacementRange) is -1
             replacementBeforeRange = replacement
 
     if replacementBeforeRange?
@@ -334,7 +357,7 @@ module.exports.ExampleView = class ExampleView
   _markRange: (range) ->
     adjustedRange = @_getAdjustedRange range
     return if not adjustedRange?
-    marker = @textEditor.markBufferRange adjustedRange, { invalidate: "overlap" }
+    marker = @textEditor.markBufferRange adjustedRange, { invalidate: "never" }
     @extraRangeMarkerPairs.push [range, marker]
     marker
 
@@ -528,6 +551,19 @@ module.exports.ExampleView = class ExampleView
       if not foundSymbol
         marker = @_markRange symbol.getRange()
 
+      # XXX: add space to the end of the line for every character taken
+      # out of the line.  This keeps the width of the line at the original
+      # width, to avoid editor resizing when previewing replacements.
+      initialRange = marker.getBufferRange()
+      initialLength = initialRange.end.column - initialRange.start.column
+      newLength = edit.getText().length
+      if newLength < initialLength
+        lineNumber = initialRange.start.row
+        lineLength = (@textEditor.lineTextForScreenRow lineNumber).length
+        @textEditor.setTextInBufferRange \
+          (new Range [lineNumber, lineLength], [lineNumber, lineLength]),
+          " ".repeat(initialLength - newLength)
+      
       # Replace the text in the range with the replacement text
       if marker?
         @textEditor.setTextInBufferRange marker.getBufferRange(), edit.getText()
