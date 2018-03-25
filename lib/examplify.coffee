@@ -131,6 +131,7 @@ module.exports = plugin =
       atom.workspace.getRightPanels()[0].destroy()
 
     # Reset the source program editor
+    @codeEditor.clearSelections()
     codeEditorView = atom.views.getView @codeEditor
     ($ codeEditorView).removeClass 'locked-editor'
     @pluginController.codeView.destroy()
