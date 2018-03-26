@@ -64,7 +64,6 @@ module.exports.ControllerView = class ControllerView extends $
       .append @_makeIcon "info", "Hide Help"
       .click =>
         helpPanel = $ "div.help"
-        console.log helpPanel.css "display"
         if (helpPanel.css "display") != "none"
           helpPanel.css "display", "none"
           @helpButton.html @_makeIcon "info", "Show Help"

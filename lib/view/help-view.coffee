@@ -10,12 +10,22 @@ In this demo, you can try out the interactions introduced in the paper
 Extraction of Examples from Existing Code</a></span>.
 </p>
 
-<h2>Step I. Start extracting an example.</h2>
+<h2>Step 1. What's all this about?</h2>
+
+<p>
+CodeScoop is a prototype tool designed to help coders pull executable code examples from their existing code.
+</p>
+
+<p>
+In this demo, you'll use CodeScoop to pull out a succinct, executable example of how to query a database from an existing piece of code.
+</p>
+
+<h2>Step 1. Start extracting an example.</h2>
 
 <p>
 Start extracting an example from the source program by:
 <ol>
-  <li>Selecting some text</li>
+  <li>Selecting some text.  For example, Line 49.</li>
   <li>Clicking the "Scoop" <span class="icon icon-paintcan"></span>button</li>
 </ol>
 </p>
@@ -24,25 +34,29 @@ Start extracting an example from the source program by:
 Your selections will be wrapped in a work-in-progress example file that opens on the right.
 </p>
 
-<h2>Step II. Fix up the example.</h2>
+<h2>Step 2. Fix up the example.</h2>
 
 <p>
 Add code to the example by:
 <ol class="long-bullets">
   <li><span class="action_name">Resolving issues with CodeScoop's help</span>: Fix <span class="broken_symbols">broken symbols</span> by clicking those symbols, and following prompts to add code or insert literals.</li>
-  <li><span class="action_name">Adding code manually</span>: Add any other line by clicking its line number in the gutter of the source program.</li>
+  <li><span class="action_name">Adding more lines</span>: Add any other line by clicking its line number in the gutter of the source program.</li>
 </ol>
 </p>
 
-<h2>Step III. Other features.</h2>
+<h2>Step 3. Explore other features.</h2>
 
 <p>
-Watch this 3-minute demo video to learn about CodeScoop's other features.
+Watch this 1-minute demo video to learn about CodeScoop's other features.
 </p>
 
 <div class="video-container">
   <iframe class="video" src="https://www.youtube.com/embed/RYbhnRDbvyY?start=60&vq=hd1080" frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
 </div>
+
+<p>
+For even more features, check out the paper's <a href="https://www.youtube.com?v=RYbhnRDbvyY&start=60&vq=hd1080">video figure</a>.
+</p>
 
 <h2>Questions and Answers</h2>
 

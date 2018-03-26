@@ -66,6 +66,14 @@ module.exports.ExampleView = class ExampleView
       if (@model.getState() is ExampleModelState.RESOLUTION)
         @model.setResolutionChoice null
 
+    # Add a message to help someone figure out how to add more lines.
+    message = $ "<p></p>"
+      .text "Forget a line?  You can add more lines anytime by clicking line numbers in the source program editor."
+    lineHelp = $ "<div></div>"
+      .append message
+      .addClass "line-help"
+    ($ view).append lineHelp
+
   getTextEditor: () ->
     @textEditor
 
