@@ -4,50 +4,46 @@ HELP_HTML = """
 <h1>CodeScoop Demo</h1>
 
 <p>
-In this demo, you can try out the interactions introduced in the paper
+In this demo, you can try the tool described in the paper
 <span class="paper_name">
 <a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">Interactive
 Extraction of Examples from Existing Code</a></span>.
 </p>
 
-<h2>Step 1. What's all this about?</h2>
+<h2>Step 1. What am I looking at?</h2>
+
+<p>The code to the left is a program that fetches data from a database.</p>
+
+<p>By following these instructions, you can use CodeScoop, our prototype tool, to pull a shorter, executable example from this source program.</p>
+
+<h2>Step 2. Extract a line.</h2>
 
 <p>
-CodeScoop is a prototype tool designed to help coders pull executable code examples from their existing code.
-</p>
-
-<p>
-In this demo, you'll use CodeScoop to pull out a succinct, executable example of how to query a database from an existing piece of code.
-</p>
-
-<h2>Step 1. Start extracting an example.</h2>
-
-<p>
-Start extracting an example from the source program by:
+Start extracting an example from the source program:
 <ol>
-  <li>Selecting some text.  For example, Line 49.</li>
-  <li>Clicking the "Scoop" <span class="icon icon-paintcan"></span>button</li>
+  <li>Select some text (for example, line 49).</li>
+  <li>Click the "Scoop" <span class="icon icon-paintcan"></span>button</li>
 </ol>
 </p>
 
 <p>
-Your selections will be wrapped in a work-in-progress example file that opens on the right.
+Your selections will be wrapped in a new code file, which will be used for building the example.
 </p>
 
-<h2>Step 2. Fix up the example.</h2>
+<h2>Step 3. Flesh out the example.</h2>
 
 <p>
 Add code to the example by:
 <ol class="long-bullets">
-  <li><span class="action_name">Resolving issues with CodeScoop's help</span>: Fix <span class="broken_symbols">broken symbols</span> by clicking those symbols, and following prompts to add code or insert literals.</li>
-  <li><span class="action_name">Adding more lines</span>: Add any other line by clicking its line number in the gutter of the source program.</li>
+  <li><span class="action_name">Resolving issues</span>: Fix <span class="broken_symbols">broken symbols</span> by clicking those symbols, and following prompts to add code or insert literals.</li>
+  <li><span class="action_name">Adding other lines</span>: Add any other line by clicking line numbers in the source program editor.</li>
 </ol>
 </p>
 
-<h2>Step 3. Explore other features.</h2>
+<h2>Step 4. What else can I do?</h2>
 
 <p>
-Watch this 1-minute demo video to learn about CodeScoop's other features.
+Get an overview of CodeScoop's functionality in this 1-minute video:
 </p>
 
 <div class="video-container">
@@ -55,7 +51,7 @@ Watch this 1-minute demo video to learn about CodeScoop's other features.
 </div>
 
 <p>
-For even more features, check out the paper's <a href="https://www.youtube.com?v=RYbhnRDbvyY&start=60&vq=hd1080">video figure</a>.
+Still curious?  Check out the paper's <a href="https://www.youtube.com?v=RYbhnRDbvyY&start=60&vq=hd1080">video figure</a>, or read <a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">the paper</a>.
 </p>
 
 <h2>Questions and Answers</h2>
@@ -72,7 +68,7 @@ For even more features, check out the paper's <a href="https://www.youtube.com?v
 <h3>Where can I try the full prototype?</h3>
 
 <p>
-You can clone and work the full prototype, a standalone desktop app, by following instructions at this project's <a href="https://github.com/andrewhead/codescoop">source code repository</a>.
+You can run the full prototype—a standalone desktop app—by following instructions in the project's <a href="https://github.com/andrewhead/codescoop">source code repository</a>.
 </p>
 
 <h3>I have another question!</h3>

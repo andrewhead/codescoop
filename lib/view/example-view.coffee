@@ -68,7 +68,7 @@ module.exports.ExampleView = class ExampleView
 
     # Add a message to help someone figure out how to add more lines.
     message = $ "<p></p>"
-      .text "Forget a line?  You can add more lines anytime by clicking line numbers in the source program editor."
+      .text "Want to add another line from the source program?  Just click the line numbers in the source program editor."
     lineHelp = $ "<div></div>"
       .append message
       .addClass "line-help"

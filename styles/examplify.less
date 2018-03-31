@@ -55,6 +55,13 @@ div.help {
         font-style: italic;
       }
     }
+
+    span.broken_symbols {
+      background-color: fade(@text-color-error, 40%);
+      border: 2px fade(@text-color-error, 100%) solid;
+      opacity: 1;
+    }
+
   }
 
   p {
@@ -158,7 +165,7 @@ atom-text-editor.example-editor {
   div.line-help {
     position: absolute;
     width: 100%;
-    top: 85%;
+    top: 88%;
     background-color: black;
 
     p {

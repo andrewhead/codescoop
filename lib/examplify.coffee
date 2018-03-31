@@ -103,7 +103,8 @@ module.exports = plugin =
             # This editor should be read-only.
             # Abort any textual changes so user can't type in code.
             disableKeystrokes exampleEditorView, =>
-              @pluginController.getModel().getState() != ExampleModelState.IDLE
+              true
+              # @pluginController.getModel().getState() != ExampleModelState.IDLE
             # exampleEditor.onWillInsertText (event) =>
             #   if @pluginController.getModel().getState() != ExampleModelState.IDLE
             #     event.cancel()
