@@ -47,7 +47,7 @@ Get an overview of CodeScoop's functionality in this 1-minute video:
 </p>
 
 <div class="video-container">
-  <iframe class="video" src="https://www.youtube.com/embed/RYbhnRDbvyY?start=60&vq=hd1080" frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
+  <iframe class="video" src="https://www.youtube.com/embed/RNdWX4yHjhs?vq=hd1080" frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
 </div>
 
 <p>
