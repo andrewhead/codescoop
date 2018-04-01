@@ -22,7 +22,7 @@ module.exports.MediatingUseExtensionView = \
     for mediatingUse in @mediatingUses
       lineButton = $ "<div></div>"
         .attr "class", "mediating-use-choice"
-        .text ("Line " + mediatingUse.getRange().start.row + 1)
+        .text ("Line " + (mediatingUse.getRange().start.row + 1))
         .data "range", mediatingUse.getRange()
         .mouseover ->
           range = ($ @).data 'range'
