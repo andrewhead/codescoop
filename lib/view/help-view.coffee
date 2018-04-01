@@ -51,7 +51,7 @@ Get an overview of CodeScoop's functionality in this 1-minute video:
 </div>
 
 <p>
-Still curious?  Check out the paper's <a href="https://www.youtube.com?v=RYbhnRDbvyY&start=60&vq=hd1080">video figure</a>, or read <a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">the paper</a>.
+Still curious?  Check out the paper's <a href="https://www.youtube.com/watch?v=RYbhnRDbvyY&feature=youtu.be&vq=1080">video figure</a>, or read <a href="https://codescoop.berkeley.edu/files/ExampleExtraction.pdf">the paper</a>.
 </p>
 
 <h2>Questions and Answers</h2>
