@@ -1,6 +1,8 @@
 # CodeScoop
 
-This is the code for the prototype system "CodeScoop", from the CHI paper on "Interactive Extraction of Examples from Existing Code"
+This is the code for the prototype system "CodeScoop", from the CHI paper, ["Interactive Extraction of Examples from Existing Code"](https://people.eecs.berkeley.edu/~andrewhead/pdf/example_extraction.pdf).
+
+Want to try out the tool but don't want to set up the project dependencies? Try out the [online demo](https://codescoop.berkeley.edu/)!.
 
 ## Getting Started
 
